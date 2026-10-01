@@ -42,7 +42,8 @@ let infoId = null;
 function applyFlags() {
   $('#btn-flags').setAttribute('aria-pressed', settings.showFlags);
   $('#hint').hidden = settings.showFlags;
-  world.setMarkers(settings.showFlags);
+  // flags hidden = self-test: capital positions stay, without flags or names
+  world.setMarkers(true, null, { dots: !settings.showFlags });
 }
 async function openInfo(id) {
   const c = data.byId.get(id);
@@ -236,6 +237,29 @@ async function runSync() {
 }
 store.onChange(() => { clearTimeout(syncTimer); syncTimer = setTimeout(runSync, 5000); });
 
+// ---- offline ------------------------------------------------------------------------------
+// The service worker saves every file on install; this asks it how many are saved and can
+// re-download them all (e.g. before a flight).
+async function askWorker(type) {
+  const reg = await navigator.serviceWorker?.ready;
+  if (!reg?.active) throw new Error('offline support not available');
+  return new Promise((resolve, reject) => {
+    const ch = new MessageChannel();
+    ch.port1.onmessage = (e) => (e.data.error ? reject(new Error(e.data.error)) : resolve(e.data));
+    reg.active.postMessage({ type }, [ch.port2]);
+    setTimeout(() => reject(new Error('no answer')), 60000);
+  });
+}
+async function showOffline(type = 'offline-status') {
+  const out = $('#offline-status');
+  out.textContent = type === 'download' ? 'Downloading…' : 'Checking…';
+  try {
+    const { done, total } = await askWorker(type);
+    out.textContent = done === total ? `✓ Everything is on this phone (${total} files). Works offline.`
+      : `${done} of ${total} files saved. Tap Download while online.`;
+  } catch (e) { out.textContent = `Couldn't check (${e.message}).`; }
+}
+
 // ---- events -------------------------------------------------------------------------------
 function onMapClick(id, viaMarker, point) {
   if (tab === 'map') { id ? openInfo(id) : closeInfo(); return; }
@@ -294,7 +318,8 @@ function wire() {
     }
   };
 
-  $('#open-settings').onclick = () => { $('#setup').hidden = true; $('#settings').hidden = false; showSyncStatus(); $('#screen-info').textContent = screenInfo; };
+  $('#open-settings').onclick = () => { $('#setup').hidden = true; $('#settings').hidden = false; showSyncStatus(); showOffline(); $('#screen-info').textContent = screenInfo; };
+  $('#offline-download').onclick = () => showOffline('download');
   $('#settings .close').onclick = showSetup;
   $('#sync-save').onclick = () => {
     const token = $('#sync-token').value.trim();
@@ -340,6 +365,12 @@ function fitScreen() {
 let screenInfo = '';
 addEventListener('resize', fitScreen);
 addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+// iOS can change the window size when the app comes back from the background without a
+// resize event: measure again then
+const refit = () => { fitScreen(); setTimeout(fitScreen, 300); setTimeout(fitScreen, 1000); };
+document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && refit());
+addEventListener('pageshow', refit);
+window.visualViewport?.addEventListener('resize', fitScreen);
 fitScreen();
 setTimeout(fitScreen, 500);
 setTimeout(fitScreen, 2000);

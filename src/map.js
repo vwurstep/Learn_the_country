@@ -135,7 +135,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     for (const el of [f, cap]) el.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
     markers.set(c.id, { country: c, flag: mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
   }
-  let showAll = false, only = null, selected = null;
+  let showAll = false, only = null, selected = null, dotsOnly = false;
   const order = countries.slice().sort((a, b) => (b.sovereign - a.sovereign) || (b.size - a.size));
 
   // Greedy declutter: big countries first; a flag or a name is only shown where it has room.
@@ -161,6 +161,12 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       const m = markers.get(c.id);
       const want = showAll || (only && only.has(c.id));
       const force = !showAll || c.id === selected;  // quiz feedback / selection: always show
+      if (dotsOnly) {  // self-test on the map: capital positions only, no flags, no names
+        setOn(m.flag, false);
+        if (want) shown.push([c, m, false]);
+        else setOn(m.cap, false);
+        continue;
+      }
       const fp = [c.fx ?? c.lon, c.fy ?? c.lat];
       if (want && !(globe && angularDistance(center, fp) > 75)) {
         const p = map.project(fp);
@@ -177,13 +183,13 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       const capOk = !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
       const p = capOk && map.project([c.lon, c.lat]);
       const dot = p && [p.x - 5, p.y - 5, p.x + 5, p.y + 5];
-      const showDot = capOk && (force || free(dot));
+      const showDot = capOk && (force || dotsOnly || free(dot));
       setOn(m.cap, showDot);
       if (!showDot) continue;
       taken.push(dot);
       const lw = c.capital.length * 6.4 + 8;
       const label = [p.x + 5, p.y - 7, p.x + 5 + lw, p.y + 7];
-      const showLabel = (z >= LABEL_FROM_ZOOM || force) && free(label);
+      const showLabel = !dotsOnly && (z >= LABEL_FROM_ZOOM || force) && free(label);
       if (showLabel) taken.push(label);
       m.cap.el.classList.toggle('nolabel', !showLabel);
       m.cap.el.classList.toggle('sel', c.id === selected);
@@ -231,8 +237,8 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     map,
     hitTest,
     nearestCapital,
-    /** show all capital markers (explore) or only some ids (quiz feedback) */
-    setMarkers(all, onlyIds = null) { showAll = all; only = onlyIds ? new Set(onlyIds) : null; relayout(); },
+    /** show all markers (explore) or only some ids (quiz feedback); dots: capital dots only */
+    setMarkers(all, onlyIds = null, { dots = false } = {}) { showAll = all; only = onlyIds ? new Set(onlyIds) : null; dotsOnly = dots; relayout(); },
     select(id) {
       for (const x of marked) setMark(x, null);
       marked = [];
