@@ -137,3 +137,4 @@ body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
 #settings input { width: 100%; font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.15); background: #fff; margin-top: 8px; }
 #settings .row { justify-content: flex-end; }
 #settings code { font-size: 13px; }
+.tiny { font-size: 11px; opacity: 0.7; }

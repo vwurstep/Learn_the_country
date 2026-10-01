@@ -294,7 +294,7 @@ function wire() {
     }
   };
 
-  $('#open-settings').onclick = () => { $('#setup').hidden = true; $('#settings').hidden = false; showSyncStatus(); };
+  $('#open-settings').onclick = () => { $('#setup').hidden = true; $('#settings').hidden = false; showSyncStatus(); $('#screen-info').textContent = screenInfo; };
   $('#settings .close').onclick = showSetup;
   $('#sync-save').onclick = () => {
     const token = $('#sync-token').value.trim();
@@ -316,7 +316,7 @@ async function start() {
   });
   window.__app = { data, world, store };  // for debugging / screenshots
   wire();
-  world.map.on('load', () => showTab('map'));
+  world.map.on('load', () => { fitScreen(); showTab('map'); });
   runSync();
 }
 
@@ -330,14 +330,19 @@ function fitScreen() {
   const safeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0;
   probe.remove();
   const portrait = innerHeight > innerWidth;
-  const gap = navigator.standalone && portrait && safeTop > 0 ? Math.max(0, screen.height - innerHeight) : 0;
-  const extra = gap > 0 && gap <= safeTop + 2 ? gap : 0;  // the gap is at most the status bar height
+  // In the home-screen app the map simply reaches the physical bottom of the screen; if iOS
+  // already gave the window the full height this is 0. (Values can arrive late: re-run on load.)
+  const extra = navigator.standalone && portrait ? Math.max(0, Math.min(150, screen.height - innerHeight)) : 0;
   document.documentElement.style.setProperty('--app-extra', `${extra}px`);
+  screenInfo = `screen ${screen.height}, window ${innerHeight}, top inset ${safeTop}, standalone ${!!navigator.standalone}, extra ${extra}`;
   world?.map.resize();
 }
+let screenInfo = '';
 addEventListener('resize', fitScreen);
 addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
 fitScreen();
+setTimeout(fitScreen, 500);
+setTimeout(fitScreen, 2000);
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 start();

@@ -171,6 +171,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       } else setOn(m.flag, false);
       m.flag.el.classList.toggle('sel', c.id === selected);
       if (want) shown.push([c, m, force]);
+      else setOn(m.cap, false);
     }
     for (const [c, m, force] of shown) {
       const capOk = !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
