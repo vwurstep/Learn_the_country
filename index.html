@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Learn the Country</title>
+  <meta name="theme-color" content="#0e1726">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Countries">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="lib/maplibre-gl.css">
+  <link rel="stylesheet" href="src/style.css">
+  <script src="lib/maplibre-gl.js"></script>
+</head>
+<body class="tab-map">
+  <div id="map"></div>
+
+  <header id="top">
+    <nav class="tabs glass" role="tablist">
+      <button id="tab-map" role="tab" aria-selected="true">Map</button>
+      <button id="tab-quiz" role="tab" aria-selected="false">Quiz</button>
+    </nav>
+  </header>
+
+  <!-- map tab: tools on the right -->
+  <div id="side" class="only-map">
+    <button id="btn-flags" class="round glass" aria-pressed="true" title="Show or hide flags and capitals">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg>
+    </button>
+    <button id="btn-globe" class="round glass" title="Globe or flat map">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
+    </button>
+  </div>
+  <div id="hint" class="only-map glass" hidden>Flags hidden: tap a country to test yourself</div>
+
+  <!-- map tab: info about the tapped country -->
+  <section id="info" class="card glass only-map" hidden>
+    <button class="close" aria-label="Close">×</button>
+    <div class="info-body">
+      <img class="info-flag" alt="">
+      <div>
+        <h2 class="info-name"></h2>
+        <p class="info-cap"></p>
+        <p class="info-meta"></p>
+      </div>
+    </div>
+    <button class="reveal primary" hidden>Reveal</button>
+  </section>
+
+  <!-- quiz tab: setup -->
+  <section id="setup" class="card glass only-quiz" hidden>
+    <h2>Quiz</h2>
+    <p class="label">Mode</p>
+    <div id="modes" class="chips"></div>
+    <p class="label">Region</p>
+    <div id="regions" class="chips"></div>
+    <label class="check"><input type="checkbox" id="territories"> Include territories (Greenland, Hong Kong, …)</label>
+    <p id="progress" class="muted"></p>
+    <div class="row">
+      <button id="reset" class="ghost">Reset progress</button>
+      <button id="start" class="primary">Start</button>
+    </div>
+  </section>
+
+  <!-- quiz tab: question -->
+  <section id="question" class="card glass only-quiz" hidden>
+    <div class="q-head">
+      <button id="q-back" class="ghost small">‹ Setup</button>
+      <span id="q-mode" class="muted"></span>
+      <span id="q-score"></span>
+    </div>
+    <div id="q-prompt"></div>
+    <div id="q-options"></div>
+    <div id="q-result" hidden></div>
+    <div class="row">
+      <button id="q-skip" class="ghost">Skip</button>
+      <button id="q-next" class="primary" hidden>Next</button>
+    </div>
+  </section>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

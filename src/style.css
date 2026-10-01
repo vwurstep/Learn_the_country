@@ -1,0 +1,109 @@
+:root {
+  --ink: #1b2430;
+  --muted: #5d6b7a;
+  --glass: rgba(255, 255, 255, 0.86);
+  --accent: #2f6fd6;
+  --ok: #2e9a55;
+  --bad: #d4473f;
+  --radius: 16px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0e1726; color: var(--ink);
+  font: 16px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+#map { position: fixed; inset: 0; }
+.glass { background: var(--glass); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18); }
+[hidden] { display: none !important; }
+body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
+
+/* ---- top tabs ---- */
+#top { position: fixed; top: calc(var(--safe-top) + 10px); left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 5; }
+.tabs { pointer-events: auto; display: flex; padding: 4px; border-radius: 999px; }
+.tabs button { padding: 7px 22px; border-radius: 999px; font-weight: 600; color: var(--muted); }
+.tabs button[aria-selected="true"] { background: var(--ink); color: #fff; }
+
+#side { position: fixed; right: 12px; top: calc(var(--safe-top) + 64px); display: flex; flex-direction: column; gap: 10px; z-index: 4; }
+.round { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; }
+#btn-flags[aria-pressed="false"] { color: var(--muted); }
+#btn-flags[aria-pressed="false"] svg { opacity: 0.45; }
+#btn-flags[aria-pressed="true"] { color: var(--accent); }
+#hint { position: fixed; left: 50%; transform: translateX(-50%); top: calc(var(--safe-top) + 64px); padding: 6px 14px; border-radius: 999px;
+  font-size: 13px; color: var(--muted); z-index: 3; white-space: nowrap; }
+
+/* ---- cards ---- */
+.card { position: fixed; left: 10px; right: 10px; bottom: calc(var(--safe-bottom) + 10px); max-width: 520px; margin: 0 auto;
+  border-radius: var(--radius); padding: 14px 16px; z-index: 6; max-height: 72vh; overflow-y: auto; }
+.card h2 { margin: 0 0 6px; font-size: 20px; }
+.close { position: absolute; top: 6px; right: 10px; font-size: 26px; color: var(--muted); line-height: 1; padding: 4px; }
+.row { display: flex; gap: 10px; justify-content: space-between; margin-top: 12px; }
+.primary { background: var(--accent); color: #fff; padding: 10px 22px; border-radius: 12px; font-weight: 600; }
+.ghost { color: var(--accent); padding: 10px 6px; }
+.small { padding: 2px 0; font-size: 14px; }
+.muted { color: var(--muted); font-size: 14px; }
+.center { text-align: center; margin: 6px 0 0; }
+.label { margin: 10px 0 6px; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { padding: 6px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.06); font-size: 14px; }
+.chips button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; }
+
+/* info card (map tab) */
+.info-body { display: flex; gap: 14px; align-items: center; padding-right: 24px; }
+.info-flag { width: 96px; border-radius: 4px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); flex: none; }
+.info-name { margin: 0; }
+.info-cap { margin: 2px 0; }
+.info-meta { margin: 0; color: var(--muted); font-size: 14px; }
+#info.hidden-answer .info-flag { filter: blur(14px); }
+#info.hidden-answer .info-name, #info.hidden-answer .info-cap { color: transparent; background: rgba(0, 0, 0, 0.1); border-radius: 6px; }
+#info .reveal { width: 100%; margin-top: 12px; }
+
+/* question card */
+.q-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+#q-score { font-weight: 600; font-variant-numeric: tabular-nums; }
+#q-prompt { display: flex; flex-direction: column; align-items: center; }
+.q-flag { width: min(200px, 55vw); border-radius: 6px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.q-text { font-size: 26px; font-weight: 700; text-align: center; }
+.q-text small { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.grid:empty { display: none; }
+.grid button { background: rgba(0, 0, 0, 0.06); border-radius: 12px; padding: 12px 8px; font-weight: 600; min-height: 52px; }
+.grid.flags button { padding: 8px; }
+.grid.flags img { width: 100%; max-width: 130px; display: block; margin: 0 auto; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.grid button.right { background: var(--ok); color: #fff; }
+.grid button.wrong { background: var(--bad); color: #fff; }
+.grid button:disabled { cursor: default; }
+#q-result { margin-top: 10px; }
+.verdict { margin: 0 0 6px; font-weight: 700; font-size: 18px; }
+.verdict.ok { color: var(--ok); }
+.verdict.bad { color: var(--bad); }
+.answer { display: flex; gap: 12px; align-items: center; }
+.answer img { width: 64px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); }
+#q-result .muted { margin: 6px 0 0; }
+/* map questions: keep the card small so the map stays usable */
+#question.map-q .q-flag { width: 110px; }
+#question.map-q .q-text { font-size: 22px; }
+
+/* ---- capital markers (0×0 box at the capital; children positioned around it) ---- */
+.cap { width: 0; height: 0; position: relative; cursor: pointer; }
+.cap .dot { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%;
+  background: #c0392b; box-shadow: 0 0 0 1.5px #fff; }
+.cap .flag { position: absolute; left: calc(var(--flag-w, 22px) / -2); bottom: 5px; width: var(--flag-w, 22px); height: auto;
+  border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3); }
+.cap .lbl { position: absolute; left: 7px; top: -4px; white-space: nowrap; font-size: 11.5px; font-weight: 600; color: #1b2430;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff; pointer-events: none; }
+.cap.noflag .flag, .cap.nolabel .lbl { display: none; }
+.cap.sel .dot { background: #f2a541; }
+.cap.sel { z-index: 2; }
+
+.maplibregl-ctrl-attrib { display: none; }
+
+#q-next { margin-left: auto; }
+/* after answering a multiple-choice question: shrink the card so the map shows the answer */
+#question.answered .q-flag { width: 90px; }
+#question.answered .q-text { font-size: 18px; }
+#question.answered .grid button { min-height: 40px; padding: 6px; }
+#question.answered .grid.flags img { max-width: 64px; }
+#question.answered .answer img { display: none; }

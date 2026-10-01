@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Node / Python
+node_modules/
+__pycache__/
+
+# Claude Code local settings
+.claude/
+
+# temporary downloads from tools/build_data.*
+tools/cache/
