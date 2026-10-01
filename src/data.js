@@ -1,16 +1,17 @@
 /* Data access: loads the country list, shapes and summaries. No DOM or map code here.
    Learning progress lives in store.js. Schema of data/countries.json:
    {id: 'fr', name, capital, lat, lon (of the capital), fx, fy (flag spot, mid-country), continent,
-   sovereign}. data/info.json: {id: {about, dates: [[year, event]], known: [..]}} (loaded lazily). */
+   sovereign}. data/colors.json: {id: {c: national colour hex, alt?, why}}. data/info.json: {id: {about, dates: [[year, event]], known: [..]}} (loaded lazily). */
 
 export const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
 
 export const flagUrl = (id) => `flags/${id}.svg`;
 
 export async function loadData() {
-  const [countries, world] = await Promise.all([
+  const [countries, world, colors] = await Promise.all([
     fetch('data/countries.json').then((r) => r.json()),
     fetch('data/world.geojson').then((r) => r.json()),
+    fetch('data/colors.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
   ]);
   const byId = new Map(countries.map((c) => [c.id, c]));
   // rough on-screen size of each country (bbox area in degrees²), used to give big countries
@@ -26,7 +27,7 @@ export async function loadData() {
     size.set(id, Math.max(size.get(id) || 0, (x1 - x0) * (y1 - y0)));
   }
   for (const c of countries) c.size = size.get(c.id) || 0;
-  return { countries, byId, world };
+  return { countries, byId, world, colors };
 }
 
 // ---- settings (per device) ------------------------------------------------------------

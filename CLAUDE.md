@@ -39,11 +39,22 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   is turned off.
 - **Decluttering:** `layout()` in map.js runs on every move and handles markers greedily.
   Sovereign states come first, then bigger countries (bbox area). A flag or name is shown
-  only where it doesn't overlap one already placed. Names appear from zoom 2.6. On the
+  only where it doesn't overlap one already placed. Flags are placed first; capital dots
+  then give way to flags until zoomed in. Names appear from zoom 2.6. On the
   globe, markers on the far side are removed.
-- **Country colours** come from a hash of the id, so neighbours can share a colour. Quiz
-  feedback recolours a country with feature-state `mark`: `sel`, `right`, `wrong` or
-  `target`.
+- **Country colours = national colours** (2026-10-01, Phil's request; still being iterated).
+  - `data/colors.json` gives `{id: {c, alt?, why}}`, chosen by a subagent. It is the colour
+    the country identifies with (flag or sports colour).
+  - Where an identity colour was weak, the agent picked one that differs from the
+    neighbours. Debatable picks: Hungary green, Czechia blue, Brazil green, Germany black
+    (shows as grey).
+  - Drawn as a tint, mixed 50% with white (`TINT` in map.js). The two-colour stripes idea
+    (`alt`) is on hold; it may look messy.
+  - Quiz feedback recolours a country with feature-state `mark` (`sel`, `right`, `wrong`,
+    `target`) and adds a bold outline (`mark-line`), so it stays visible on a similar
+    national colour.
+- **iOS bottom gap** with the translucent status bar: `fitScreen()` in app.js, the same
+  fix as in the SA app. The map extends by `--app-extra`.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.

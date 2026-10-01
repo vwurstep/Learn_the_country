@@ -312,13 +312,32 @@ function wire() {
 async function start() {
   data = await loadData();
   world = createMap($('#map'), {
-    countries: data.countries, world: data.world, projection: settings.projection, onClick: onMapClick,
+    countries: data.countries, world: data.world, colors: data.colors, projection: settings.projection, onClick: onMapClick,
   });
   window.__app = { data, world, store };  // for debugging / screenshots
   wire();
   world.map.on('load', () => showTab('map'));
   runSync();
 }
+
+// iOS home-screen app with a translucent status bar: iOS moves the window up under the status
+// bar but doesn't make it taller, leaving an empty strip at the bottom. Measure the gap and let
+// the map extend into it (same fix as in the LP_South_Africa app). Only when the quirk is present.
+function fitScreen() {
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;height:0;padding-top:env(safe-area-inset-top);visibility:hidden';
+  document.body.appendChild(probe);
+  const safeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0;
+  probe.remove();
+  const portrait = innerHeight > innerWidth;
+  const gap = navigator.standalone && portrait && safeTop > 0 ? Math.max(0, screen.height - innerHeight) : 0;
+  const extra = gap > 0 && gap <= safeTop + 2 ? gap : 0;  // the gap is at most the status bar height
+  document.documentElement.style.setProperty('--app-extra', `${extra}px`);
+  world?.map.resize();
+}
+addEventListener('resize', fitScreen);
+addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+fitScreen();
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 start();

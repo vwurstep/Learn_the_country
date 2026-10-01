@@ -1,8 +1,8 @@
 /* Service worker: caches the app (code, data and every flag) so it works offline.
    CACHE is stamped by tools/release.py; old caches are deleted on activate. */
-var CACHE = 'ltc-2026-10-01.114755';
+var CACHE = 'ltc-2026-10-01.133919';
 var FILES = ['./', './index.html', './src/style.css', './src/app.js', './src/data.js', './src/map.js',
-             './src/quiz.js', './src/store.js', './src/sync-github.js', './data/info.json', './lib/maplibre-gl.js', './lib/maplibre-gl.css', './data/countries.json',
+             './src/quiz.js', './src/store.js', './src/sync-github.js', './data/info.json', './data/colors.json', './lib/maplibre-gl.js', './lib/maplibre-gl.css', './data/countries.json',
              './data/world.geojson', './manifest.webmanifest', './icons/icon-180.png', './icons/icon-192.png',
              './icons/icon-512.png'];
 

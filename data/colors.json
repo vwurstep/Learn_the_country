@@ -1,0 +1,1123 @@
+{
+ "af": {
+  "c": "#d32011",
+  "alt": "#009a44",
+  "why": "Tricolour red band; black-red-green"
+ },
+ "ax": {
+  "c": "#d21034",
+  "alt": "#0053a5",
+  "why": "Red-fimbriated cross; Finland already blue"
+ },
+ "al": {
+  "c": "#e41e20",
+  "why": "Red field, double-headed eagle"
+ },
+ "dz": {
+  "c": "#006233",
+  "why": "Les Verts; green half of flag"
+ },
+ "as": {
+  "c": "#bf0a30",
+  "alt": "#002868",
+  "why": "Red of flag; Samoa takes blue"
+ },
+ "ad": {
+  "c": "#fedf00",
+  "alt": "#10069f",
+  "why": "Yellow centre band; neighbours red/blue"
+ },
+ "ao": {
+  "c": "#ce1126",
+  "alt": "#111111",
+  "why": "Red half of flag; Palancas Negras"
+ },
+ "ai": {
+  "c": "#ff8c00",
+  "alt": "#012169",
+  "why": "Three orange dolphins on flag"
+ },
+ "ag": {
+  "c": "#ce1126",
+  "alt": "#fcd116",
+  "why": "Red triangles; sun yellow secondary"
+ },
+ "ar": {
+  "c": "#74acdf",
+  "why": "Albiceleste light blue"
+ },
+ "am": {
+  "c": "#f2a800",
+  "alt": "#d90012",
+  "why": "Apricot (orange) band of tricolour"
+ },
+ "aw": {
+  "c": "#418fde",
+  "alt": "#f9e814",
+  "why": "Larkspur blue flag"
+ },
+ "au": {
+  "c": "#ffcd00",
+  "alt": "#00843d",
+  "why": "Green and gold; gold kits"
+ },
+ "at": {
+  "c": "#ed2939",
+  "why": "Red-white-red; football kit red"
+ },
+ "az": {
+  "c": "#00b5e2",
+  "alt": "#3f9c35",
+  "why": "Blue band of flag"
+ },
+ "bs": {
+  "c": "#00abc9",
+  "alt": "#ffc72c",
+  "why": "Aquamarine of flag"
+ },
+ "bh": {
+  "c": "#ce1126",
+  "why": "Red field with white serration"
+ },
+ "bd": {
+  "c": "#006a4e",
+  "alt": "#f42a41",
+  "why": "Green field; Tigers play green"
+ },
+ "bb": {
+  "c": "#00267f",
+  "alt": "#ffc726",
+  "why": "Ultramarine bands; trident gold"
+ },
+ "by": {
+  "c": "#009a44",
+  "alt": "#c8313e",
+  "why": "Green band; Russia/Poland take red"
+ },
+ "be": {
+  "c": "#ed2939",
+  "alt": "#fae042",
+  "why": "Red Devils; flag red band"
+ },
+ "bz": {
+  "c": "#ce1126",
+  "alt": "#003f87",
+  "why": "Red border stripes; Guatemala is blue"
+ },
+ "bj": {
+  "c": "#e8112d",
+  "alt": "#008751",
+  "why": "Red band; green neighbours already taken"
+ },
+ "bm": {
+  "c": "#c8102e",
+  "why": "Red ensign"
+ },
+ "bt": {
+  "c": "#ffd520",
+  "alt": "#ff4e12",
+  "why": "Yellow half of dragon flag"
+ },
+ "bo": {
+  "c": "#fcd116",
+  "alt": "#007934",
+  "why": "Yellow centre band; team La Verde"
+ },
+ "ba": {
+  "c": "#002395",
+  "alt": "#fecb00",
+  "why": "Blue field with yellow triangle"
+ },
+ "bw": {
+  "c": "#75aadb",
+  "why": "Light blue flag (water)"
+ },
+ "br": {
+  "c": "#009c3b",
+  "alt": "#ffdf00",
+  "why": "Verde e amarela; green field"
+ },
+ "vg": {
+  "c": "#012169",
+  "alt": "#009e49",
+  "why": "Blue ensign"
+ },
+ "bn": {
+  "c": "#f7e017",
+  "why": "Yellow (royal) flag"
+ },
+ "bg": {
+  "c": "#00966e",
+  "alt": "#d62612",
+  "why": "Green band; kits white and green"
+ },
+ "bf": {
+  "c": "#009e49",
+  "alt": "#ef2b2d",
+  "why": "Les Etalons green; flag green half"
+ },
+ "bi": {
+  "c": "#ce1126",
+  "alt": "#1eb53a",
+  "why": "Red fields with saltire"
+ },
+ "kh": {
+  "c": "#032ea1",
+  "alt": "#e00025",
+  "why": "Blue bands; Thailand and Vietnam red"
+ },
+ "cm": {
+  "c": "#ce1126",
+  "alt": "#007a5e",
+  "why": "Red centre band with star; Lions"
+ },
+ "ca": {
+  "c": "#ff0000",
+  "why": "Red maple leaf"
+ },
+ "cv": {
+  "c": "#003893",
+  "alt": "#f7d116",
+  "why": "Blue Sharks; blue field"
+ },
+ "bq": {
+  "c": "#ff7f00",
+  "why": "Dutch Oranje (Caribbean Netherlands)"
+ },
+ "ky": {
+  "c": "#012169",
+  "alt": "#c8102e",
+  "why": "Blue ensign"
+ },
+ "cf": {
+  "c": "#ffce00",
+  "alt": "#003082",
+  "why": "Yellow band; neighbours blue/green/red"
+ },
+ "td": {
+  "c": "#002664",
+  "alt": "#fecb00",
+  "why": "Blue band; Les Sao play blue"
+ },
+ "cl": {
+  "c": "#d52b1e",
+  "alt": "#0039a6",
+  "why": "La Roja; red band"
+ },
+ "cn": {
+  "c": "#de2910",
+  "alt": "#ffde00",
+  "why": "Red flag with gold stars"
+ },
+ "cx": {
+  "c": "#1c8a42",
+  "alt": "#0021a5",
+  "why": "Green half of flag"
+ },
+ "cc": {
+  "c": "#ffe000",
+  "alt": "#008000",
+  "why": "Yellow crescent; Christmas Island green"
+ },
+ "co": {
+  "c": "#fcd116",
+  "alt": "#003893",
+  "why": "Yellow half; Los Cafeteros yellow"
+ },
+ "km": {
+  "c": "#3d8e33",
+  "alt": "#ffc61e",
+  "why": "Green triangle with crescent"
+ },
+ "ck": {
+  "c": "#012169",
+  "why": "Blue ensign with star ring"
+ },
+ "cr": {
+  "c": "#ce1126",
+  "alt": "#002b7f",
+  "why": "La Sele red; red centre band"
+ },
+ "hr": {
+  "c": "#ff0000",
+  "alt": "#171796",
+  "why": "Red-white chequerboard; Vatreni"
+ },
+ "cu": {
+  "c": "#002a8f",
+  "alt": "#cb1515",
+  "why": "Blue stripes of flag"
+ },
+ "cw": {
+  "c": "#002b7f",
+  "alt": "#f9e814",
+  "why": "Blue field with yellow stripe"
+ },
+ "cy": {
+  "c": "#d57800",
+  "why": "Copper-coloured island on flag"
+ },
+ "cz": {
+  "c": "#11457e",
+  "alt": "#d7141a",
+  "why": "Blue triangle; red neighbours taken"
+ },
+ "dk": {
+  "c": "#c8102e",
+  "why": "Dannebrog red"
+ },
+ "dj": {
+  "c": "#6ab2e7",
+  "alt": "#12ad2b",
+  "why": "Light blue band of flag"
+ },
+ "dm": {
+  "c": "#006b3f",
+  "alt": "#9c4a97",
+  "why": "Green field (forests), sisserou parrot"
+ },
+ "do": {
+  "c": "#ce1126",
+  "alt": "#002d62",
+  "why": "Red quarters; Haiti takes blue"
+ },
+ "cd": {
+  "c": "#007fff",
+  "alt": "#ce1126",
+  "why": "Sky blue field, yellow star"
+ },
+ "ec": {
+  "c": "#034ea2",
+  "alt": "#ffdd00",
+  "why": "Blue band; Colombia already yellow"
+ },
+ "eg": {
+  "c": "#ce1126",
+  "why": "Pharaohs red; red band"
+ },
+ "sv": {
+  "c": "#0f47af",
+  "why": "Cobalt blue bands; La Selecta"
+ },
+ "gq": {
+  "c": "#3e9a00",
+  "alt": "#e32118",
+  "why": "Green band; Cameroon takes red"
+ },
+ "er": {
+  "c": "#ea0437",
+  "alt": "#4189dd",
+  "why": "Red triangle of flag"
+ },
+ "ee": {
+  "c": "#0072ce",
+  "alt": "#111111",
+  "why": "Blue band (sky, sea)"
+ },
+ "sz": {
+  "c": "#b10c0c",
+  "alt": "#3e5eb9",
+  "why": "Crimson centre band with shield"
+ },
+ "et": {
+  "c": "#078930",
+  "alt": "#fcdd09",
+  "why": "Green band; Pan-African tricolour"
+ },
+ "fk": {
+  "c": "#012169",
+  "why": "Blue ensign"
+ },
+ "fo": {
+  "c": "#0065bd",
+  "alt": "#ef303e",
+  "why": "Blue-fimbriated cross; Denmark is red"
+ },
+ "fj": {
+  "c": "#68bfe5",
+  "why": "Light blue field"
+ },
+ "fi": {
+  "c": "#003580",
+  "why": "Blue cross; Leijonat blue"
+ },
+ "fr": {
+  "c": "#0055a4",
+  "alt": "#ef4135",
+  "why": "Les Bleus; tricolore blue"
+ },
+ "pf": {
+  "c": "#ce1126",
+  "why": "Red bands of flag"
+ },
+ "ga": {
+  "c": "#fcd116",
+  "alt": "#3a75c4",
+  "why": "Yellow band; Panthers yellow kits"
+ },
+ "gm": {
+  "c": "#0c1c8c",
+  "alt": "#ce1126",
+  "why": "Blue band (river Gambia)"
+ },
+ "ge": {
+  "c": "#ff0000",
+  "why": "Five red crosses; Lelos red"
+ },
+ "de": {
+  "c": "#111111",
+  "alt": "#ffcc00",
+  "why": "Schwarz; black band of flag"
+ },
+ "gh": {
+  "c": "#ce1126",
+  "alt": "#fcd116",
+  "why": "Red band; Black Stars kits"
+ },
+ "gi": {
+  "c": "#da000c",
+  "why": "Red band and castle"
+ },
+ "gr": {
+  "c": "#0d5eaf",
+  "why": "Greek blue stripes and cross"
+ },
+ "gl": {
+  "c": "#d00c33",
+  "why": "Red half and disc"
+ },
+ "gd": {
+  "c": "#ce1126",
+  "alt": "#fcd116",
+  "why": "Red border; nutmeg flag"
+ },
+ "gu": {
+  "c": "#c62139",
+  "alt": "#00297b",
+  "why": "Red border; Marianas take blue"
+ },
+ "gt": {
+  "c": "#4997d0",
+  "why": "Sky blue bands"
+ },
+ "gg": {
+  "c": "#f9dd16",
+  "alt": "#e8112d",
+  "why": "Gold cross; Jersey takes red"
+ },
+ "gn": {
+  "c": "#ce1126",
+  "alt": "#fcd116",
+  "why": "Syli National red; red band"
+ },
+ "gw": {
+  "c": "#fcd116",
+  "alt": "#ce1126",
+  "why": "Yellow band; Guinea red, Senegal green"
+ },
+ "gy": {
+  "c": "#fcd116",
+  "alt": "#009e49",
+  "why": "Golden Arrowhead; Brazil is green"
+ },
+ "ht": {
+  "c": "#00209f",
+  "alt": "#d21034",
+  "why": "Blue band; Grenadiers blue"
+ },
+ "hn": {
+  "c": "#00bce4",
+  "why": "Turquoise bands"
+ },
+ "hk": {
+  "c": "#de2910",
+  "why": "Red flag with bauhinia"
+ },
+ "hu": {
+  "c": "#477050",
+  "alt": "#ce2939",
+  "why": "Green band; Austria/Croatia already red"
+ },
+ "is": {
+  "c": "#02529c",
+  "alt": "#dc1e35",
+  "why": "Blue field, red-white cross"
+ },
+ "in": {
+  "c": "#ff9933",
+  "alt": "#000080",
+  "why": "Saffron band; Men in Blue alt"
+ },
+ "id": {
+  "c": "#ce1126",
+  "why": "Merah Putih; red half"
+ },
+ "ir": {
+  "c": "#239f40",
+  "alt": "#da0000",
+  "why": "Green band; Team Melli"
+ },
+ "iq": {
+  "c": "#ce1126",
+  "alt": "#007a3d",
+  "why": "Red band; Lions of Mesopotamia"
+ },
+ "ie": {
+  "c": "#169b62",
+  "alt": "#ff883e",
+  "why": "Boys in Green; emerald isle"
+ },
+ "im": {
+  "c": "#cf142b",
+  "why": "Red field with triskelion"
+ },
+ "il": {
+  "c": "#0038b8",
+  "why": "Blue stripes and Star of David"
+ },
+ "it": {
+  "c": "#0066cc",
+  "alt": "#009246",
+  "why": "Azzurri (Savoy blue)"
+ },
+ "ci": {
+  "c": "#f77f00",
+  "why": "Les Elephants orange; orange band"
+ },
+ "jm": {
+  "c": "#009b3a",
+  "alt": "#fed100",
+  "why": "Green triangles; Reggae Boyz"
+ },
+ "jp": {
+  "c": "#bc002d",
+  "why": "Hinomaru red disc"
+ },
+ "je": {
+  "c": "#df112d",
+  "why": "Red saltire"
+ },
+ "jo": {
+  "c": "#111111",
+  "alt": "#ce1126",
+  "why": "Black band; Iraq takes red"
+ },
+ "kz": {
+  "c": "#00afca",
+  "alt": "#fec50c",
+  "why": "Sky blue flag with sun"
+ },
+ "ke": {
+  "c": "#bb0000",
+  "alt": "#006600",
+  "why": "Red band with shield; Harambee"
+ },
+ "ki": {
+  "c": "#ce1126",
+  "alt": "#003f87",
+  "why": "Red upper half with frigatebird"
+ },
+ "xk": {
+  "c": "#244aa5",
+  "alt": "#d0a650",
+  "why": "Blue field with gold map"
+ },
+ "kw": {
+  "c": "#0066cc",
+  "alt": "#007a3d",
+  "why": "Al-Azraq (The Blue) national team"
+ },
+ "kg": {
+  "c": "#e8112d",
+  "alt": "#ffef00",
+  "why": "Red field with yellow sun"
+ },
+ "la": {
+  "c": "#002868",
+  "alt": "#ce1126",
+  "why": "Blue centre band (Mekong)"
+ },
+ "lv": {
+  "c": "#9e3039",
+  "why": "Latvian carmine"
+ },
+ "lb": {
+  "c": "#ed1c24",
+  "alt": "#00a651",
+  "why": "Red bands; cedar green alt"
+ },
+ "ls": {
+  "c": "#00209f",
+  "alt": "#009543",
+  "why": "Blue band of flag"
+ },
+ "lr": {
+  "c": "#002868",
+  "alt": "#bf0a30",
+  "why": "Blue canton; Guinea takes red"
+ },
+ "ly": {
+  "c": "#111111",
+  "alt": "#239e46",
+  "why": "Black centre band; neighbours red/green"
+ },
+ "li": {
+  "c": "#002b7f",
+  "alt": "#ce1126",
+  "why": "Blue band with crown"
+ },
+ "lt": {
+  "c": "#fdb913",
+  "alt": "#006a44",
+  "why": "Yellow band; green also used"
+ },
+ "lu": {
+  "c": "#00a3e0",
+  "alt": "#ed2939",
+  "why": "Light blue band (vs Netherlands)"
+ },
+ "mo": {
+  "c": "#00785e",
+  "why": "Green flag with lotus"
+ },
+ "mg": {
+  "c": "#fc3d32",
+  "alt": "#007e3a",
+  "why": "Red band of flag"
+ },
+ "mw": {
+  "c": "#ce1126",
+  "alt": "#21873b",
+  "why": "Red band; Flames"
+ },
+ "my": {
+  "c": "#010066",
+  "alt": "#ffcc00",
+  "why": "Blue canton; Brunei takes yellow"
+ },
+ "mv": {
+  "c": "#007e3a",
+  "alt": "#d21034",
+  "why": "Green centre panel"
+ },
+ "ml": {
+  "c": "#fcd116",
+  "alt": "#14b53a",
+  "why": "Yellow band; Les Aigles yellow"
+ },
+ "mt": {
+  "c": "#cf142b",
+  "why": "Red half of flag"
+ },
+ "mh": {
+  "c": "#dd7500",
+  "alt": "#003893",
+  "why": "Orange ray of flag"
+ },
+ "mr": {
+  "c": "#d01c1f",
+  "alt": "#00a95c",
+  "why": "Red bands; Senegal/Algeria already green"
+ },
+ "mu": {
+  "c": "#1a206d",
+  "alt": "#ea2839",
+  "why": "Blue band of four-band flag"
+ },
+ "mx": {
+  "c": "#006847",
+  "alt": "#ce1126",
+  "why": "El Tri green"
+ },
+ "fm": {
+  "c": "#75b2dd",
+  "why": "Light blue with four stars"
+ },
+ "md": {
+  "c": "#cc092f",
+  "alt": "#0046ae",
+  "why": "Red band; Romania yellow, Ukraine blue"
+ },
+ "mc": {
+  "c": "#ce1126",
+  "why": "Red-white Grimaldi colours"
+ },
+ "mn": {
+  "c": "#0066b3",
+  "alt": "#c4272f",
+  "why": "Eternal blue sky; centre band"
+ },
+ "me": {
+  "c": "#d4af37",
+  "alt": "#c40308",
+  "why": "Gold border and eagle"
+ },
+ "ms": {
+  "c": "#009e49",
+  "alt": "#012169",
+  "why": "Emerald Isle of the Caribbean"
+ },
+ "ma": {
+  "c": "#c1272d",
+  "alt": "#006233",
+  "why": "Red field with green star"
+ },
+ "mz": {
+  "c": "#fce100",
+  "alt": "#007168",
+  "why": "Yellow band; neighbours green/red"
+ },
+ "mm": {
+  "c": "#fecb00",
+  "alt": "#34b233",
+  "why": "Yellow band; neighbours green/red"
+ },
+ "na": {
+  "c": "#003580",
+  "alt": "#d21034",
+  "why": "Blue triangle with sun"
+ },
+ "nr": {
+  "c": "#002b7f",
+  "alt": "#ffc61e",
+  "why": "Blue field with gold stripe"
+ },
+ "np": {
+  "c": "#dc143c",
+  "alt": "#003893",
+  "why": "Crimson double pennant"
+ },
+ "nl": {
+  "c": "#ff7f00",
+  "alt": "#21468b",
+  "why": "Oranje (House of Orange), national teams"
+ },
+ "nc": {
+  "c": "#0035ad",
+  "alt": "#ce1126",
+  "why": "Kanak flag blue band"
+ },
+ "nz": {
+  "c": "#111111",
+  "why": "All Blacks; silver fern on black"
+ },
+ "ni": {
+  "c": "#0067c6",
+  "why": "Blue bands"
+ },
+ "ne": {
+  "c": "#e05206",
+  "why": "Orange band and disc"
+ },
+ "ng": {
+  "c": "#008751",
+  "why": "Super Eagles green"
+ },
+ "nu": {
+  "c": "#fedd00",
+  "why": "Yellow ensign"
+ },
+ "nf": {
+  "c": "#008000",
+  "why": "Green Norfolk pine"
+ },
+ "kp": {
+  "c": "#024fa2",
+  "alt": "#ed1c27",
+  "why": "Blue stripes; China/Korea red"
+ },
+ "mk": {
+  "c": "#f8e92e",
+  "alt": "#d20000",
+  "why": "Yellow sun rays"
+ },
+ "mp": {
+  "c": "#0071bc",
+  "why": "Blue field with star"
+ },
+ "no": {
+  "c": "#ba0c2f",
+  "alt": "#00205b",
+  "why": "Red field of cross flag"
+ },
+ "om": {
+  "c": "#db161b",
+  "alt": "#008000",
+  "why": "Red hoist and band"
+ },
+ "pk": {
+  "c": "#01411c",
+  "why": "Pakistan green"
+ },
+ "pw": {
+  "c": "#ffde00",
+  "alt": "#4aadd6",
+  "why": "Yellow moon; Micronesia blue"
+ },
+ "ps": {
+  "c": "#007a3d",
+  "alt": "#ce1126",
+  "why": "Green band; Jordan black, Israel blue"
+ },
+ "pa": {
+  "c": "#005293",
+  "alt": "#da121a",
+  "why": "Blue quarters; Marea Roja alt"
+ },
+ "pg": {
+  "c": "#111111",
+  "alt": "#ce1126",
+  "why": "Black half; Indonesia red"
+ },
+ "py": {
+  "c": "#d52b1e",
+  "alt": "#0038a8",
+  "why": "Albirroja red band"
+ },
+ "pe": {
+  "c": "#d91023",
+  "why": "Blanquirroja red bands"
+ },
+ "ph": {
+  "c": "#0038a8",
+  "alt": "#ce1126",
+  "why": "Blue band; Gilas blue"
+ },
+ "pn": {
+  "c": "#012169",
+  "why": "Blue ensign"
+ },
+ "pl": {
+  "c": "#dc143c",
+  "why": "Bialo-czerwoni red"
+ },
+ "pt": {
+  "c": "#046a38",
+  "alt": "#da291c",
+  "why": "Green band; Spain takes red"
+ },
+ "pr": {
+  "c": "#ed0000",
+  "alt": "#0050f0",
+  "why": "Red stripes"
+ },
+ "qa": {
+  "c": "#8d1b3d",
+  "why": "Qatar maroon"
+ },
+ "cg": {
+  "c": "#009543",
+  "alt": "#dc241f",
+  "why": "Green triangle; Diables Rouges alt"
+ },
+ "ro": {
+  "c": "#fcd116",
+  "alt": "#002b7f",
+  "why": "Tricolorii yellow kits"
+ },
+ "ru": {
+  "c": "#d52b1e",
+  "alt": "#0039a6",
+  "why": "Sbornaya red; red band"
+ },
+ "rw": {
+  "c": "#00a1de",
+  "alt": "#fad201",
+  "why": "Sky blue band with sun"
+ },
+ "bl": {
+  "c": "#fcd116",
+  "alt": "#0055a4",
+  "why": "Gold of coat of arms"
+ },
+ "sh": {
+  "c": "#012169",
+  "why": "Blue ensign"
+ },
+ "kn": {
+  "c": "#009e49",
+  "alt": "#ce1126",
+  "why": "Green triangle of flag"
+ },
+ "lc": {
+  "c": "#65cfff",
+  "alt": "#fcd116",
+  "why": "Cerulean blue field"
+ },
+ "mf": {
+  "c": "#0055a4",
+  "why": "French tricolore blue"
+ },
+ "pm": {
+  "c": "#0055a4",
+  "alt": "#fcd116",
+  "why": "Blue field with ship"
+ },
+ "vc": {
+  "c": "#fcd116",
+  "alt": "#009e60",
+  "why": "Yellow centre band"
+ },
+ "ws": {
+  "c": "#002b7f",
+  "alt": "#ce1126",
+  "why": "Manu Samoa blue; canton blue"
+ },
+ "sm": {
+  "c": "#5eb6e4",
+  "why": "Light blue band"
+ },
+ "st": {
+  "c": "#12ad2b",
+  "alt": "#ffce00",
+  "why": "Green bands of flag"
+ },
+ "sa": {
+  "c": "#006c35",
+  "why": "Saudi green"
+ },
+ "sn": {
+  "c": "#00853f",
+  "alt": "#fcd116",
+  "why": "Green band; Lions of Teranga"
+ },
+ "rs": {
+  "c": "#c6363c",
+  "alt": "#0c4076",
+  "why": "Red band; Orlovi red kits"
+ },
+ "sc": {
+  "c": "#003f87",
+  "alt": "#fcd856",
+  "why": "Blue ray of flag"
+ },
+ "sl": {
+  "c": "#1eb53a",
+  "alt": "#0000cd",
+  "why": "Green band; Liberia blue"
+ },
+ "sg": {
+  "c": "#ef3340",
+  "why": "Red half of flag"
+ },
+ "sx": {
+  "c": "#d21034",
+  "alt": "#002b7f",
+  "why": "Red upper band"
+ },
+ "sk": {
+  "c": "#0b4ea2",
+  "alt": "#ee1c25",
+  "why": "Blue band; football/hockey blue"
+ },
+ "si": {
+  "c": "#005da4",
+  "alt": "#00843d",
+  "why": "Blue band with Triglav"
+ },
+ "sb": {
+  "c": "#0051ba",
+  "alt": "#215b33",
+  "why": "Blue triangle (ocean)"
+ },
+ "so": {
+  "c": "#4189dd",
+  "why": "Light blue flag"
+ },
+ "za": {
+  "c": "#007749",
+  "alt": "#ffb612",
+  "why": "Springbok green and gold"
+ },
+ "kr": {
+  "c": "#cd2e3a",
+  "alt": "#0047a0",
+  "why": "Red Devils; taegeuk red"
+ },
+ "ss": {
+  "c": "#0f47af",
+  "alt": "#111111",
+  "why": "Blue triangle with star"
+ },
+ "es": {
+  "c": "#c60b1e",
+  "alt": "#ffc400",
+  "why": "La Roja; red bands"
+ },
+ "lk": {
+  "c": "#8d153a",
+  "alt": "#ffbe29",
+  "why": "Maroon field with lion"
+ },
+ "sd": {
+  "c": "#007229",
+  "alt": "#d21034",
+  "why": "Green triangle; Egypt takes red"
+ },
+ "sr": {
+  "c": "#c8102e",
+  "alt": "#377e3f",
+  "why": "Red centre band with star"
+ },
+ "se": {
+  "c": "#fecc02",
+  "alt": "#006aa7",
+  "why": "Blagult; yellow kits"
+ },
+ "ch": {
+  "c": "#da291c",
+  "why": "Red field with white cross"
+ },
+ "sy": {
+  "c": "#007a3d",
+  "alt": "#111111",
+  "why": "2025 flag green band"
+ },
+ "tw": {
+  "c": "#000095",
+  "alt": "#fe0000",
+  "why": "Blue canton; China takes red"
+ },
+ "tj": {
+  "c": "#006600",
+  "alt": "#cc0000",
+  "why": "Green band; neighbours red"
+ },
+ "tz": {
+  "c": "#1eb53a",
+  "alt": "#00a3dd",
+  "why": "Green triangle; Taifa Stars"
+ },
+ "th": {
+  "c": "#a51931",
+  "alt": "#2d2a4a",
+  "why": "Red bands; Laos/Cambodia blue"
+ },
+ "tl": {
+  "c": "#ffc726",
+  "alt": "#dc241f",
+  "why": "Yellow triangle; Indonesia red"
+ },
+ "tg": {
+  "c": "#ffce00",
+  "alt": "#006a4e",
+  "why": "Yellow stripes; Ghana red, Benin red"
+ },
+ "tk": {
+  "c": "#00247d",
+  "alt": "#fed100",
+  "why": "Blue field with canoe"
+ },
+ "to": {
+  "c": "#c10000",
+  "why": "Red field with cross"
+ },
+ "tt": {
+  "c": "#ce1126",
+  "alt": "#111111",
+  "why": "Red field; Soca Warriors"
+ },
+ "tn": {
+  "c": "#e70013",
+  "why": "Red field with crescent"
+ },
+ "tr": {
+  "c": "#e30a17",
+  "why": "Red flag with crescent-star"
+ },
+ "tm": {
+  "c": "#00843d",
+  "why": "Green field with carpet gul"
+ },
+ "tc": {
+  "c": "#012169",
+  "why": "Blue ensign"
+ },
+ "tv": {
+  "c": "#5b97b1",
+  "why": "Light blue ensign"
+ },
+ "ug": {
+  "c": "#fcdc04",
+  "alt": "#111111",
+  "why": "Yellow bands; Cranes yellow"
+ },
+ "ua": {
+  "c": "#0057b7",
+  "alt": "#ffd700",
+  "why": "Blue band; Romania takes yellow"
+ },
+ "ae": {
+  "c": "#ff0000",
+  "alt": "#00732f",
+  "why": "Red hoist band"
+ },
+ "gb": {
+  "c": "#012169",
+  "alt": "#c8102e",
+  "why": "Union Jack blue"
+ },
+ "us": {
+  "c": "#3c3b6e",
+  "alt": "#b22234",
+  "why": "Old Glory blue canton"
+ },
+ "vi": {
+  "c": "#f4c300",
+  "alt": "#0d4aa2",
+  "why": "Yellow eagle on white"
+ },
+ "uy": {
+  "c": "#0038a8",
+  "alt": "#fcd116",
+  "why": "La Celeste; blue stripes"
+ },
+ "uz": {
+  "c": "#0099b5",
+  "alt": "#1eb53a",
+  "why": "Blue band (Timurid blue)"
+ },
+ "vu": {
+  "c": "#fdce12",
+  "alt": "#111111",
+  "why": "Yellow Y and boar tusk"
+ },
+ "va": {
+  "c": "#ffe000",
+  "why": "Papal gold"
+ },
+ "ve": {
+  "c": "#7a1a2e",
+  "alt": "#fcd116",
+  "why": "Vinotinto (wine red) national team"
+ },
+ "vn": {
+  "c": "#da251d",
+  "alt": "#ffff00",
+  "why": "Red flag, gold star"
+ },
+ "wf": {
+  "c": "#ed2939",
+  "why": "Red field with white cross"
+ },
+ "eh": {
+  "c": "#111111",
+  "alt": "#007a3d",
+  "why": "Black band; neighbours green/red"
+ },
+ "ye": {
+  "c": "#111111",
+  "alt": "#ce1126",
+  "why": "Black band; Oman takes red"
+ },
+ "zm": {
+  "c": "#ef7d00",
+  "alt": "#198a00",
+  "why": "Chipolopolo copper/orange; eagle"
+ },
+ "zw": {
+  "c": "#de2010",
+  "alt": "#319208",
+  "why": "Red band; cricket Chevrons red"
+ }
+}

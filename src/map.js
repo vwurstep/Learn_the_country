@@ -4,7 +4,7 @@
 import { flagUrl } from './data.js';
 
 const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
-// soft land colours; neighbours may share one (it's a hash, not a map colouring)
+// fallback land colours (by hash of the id) for shapes without a national colour
 const LAND = ['#e8dcb5', '#d5e3b5', '#f0c9a8', '#cfd9c0', '#e9d1d9', '#d8cfe8'];
 const MARK = { sel: '#f2a541', right: '#4caf6a', wrong: '#e0574f', target: '#4caf6a' };
 
@@ -22,6 +22,13 @@ export const REGION_VIEWS = {
 const FLAG_W = { 1: 18, 2: 22, 3: 28, 4: 34 };
 const LABEL_FROM_ZOOM = 2.6;
 
+// national colours are drawn as tints (mixed with white) so borders, flags and labels stay readable
+const TINT = 0.5;
+function tint(hex, t = TINT) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (v) => Math.round(v + (255 - v) * t).toString(16).padStart(2, '0');
+  return '#' + ch(n >> 16) + ch((n >> 8) & 255) + ch(n & 255);
+}
 const hash = (s) => [...s].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
 const toRad = (d) => (d * Math.PI) / 180;
 function angularDistance([lon1, lat1], [lon2, lat2]) {
@@ -58,8 +65,11 @@ function borderLines(world) {
   return { type: 'Feature', properties: {}, geometry: { type: 'MultiLineString', coordinates: lines } };
 }
 
-export function createMap(el, { countries, world, projection = 'globe', onClick }) {
-  for (const f of world.features) f.properties.c = hash(f.properties.id) % LAND.length;
+export function createMap(el, { countries, world, colors = {}, projection = 'globe', onClick }) {
+  for (const f of world.features) {
+    const nat = colors[f.properties.id]?.c;
+    f.properties.col = nat ? tint(nat) : LAND[hash(f.properties.id) % LAND.length];
+  }
   const bboxes = new Map(world.features.map((f) => [f.properties.id, bboxOf(f.geometry)]));
 
   const markState = ['coalesce', ['feature-state', 'mark'], ''];
@@ -85,12 +95,21 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
           paint: {
             'fill-color': ['match', markState,
               'sel', MARK.sel, 'right', MARK.right, 'wrong', MARK.wrong, 'target', MARK.target,
-              ['match', ['get', 'c'], ...LAND.flatMap((col, i) => [i, col]), LAND[0]]],
+              ['get', 'col']],
           },
         },
         {
           id: 'border', type: 'line', source: 'borders',
           paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 4, 1.2, 8, 2] },
+        },
+        {
+          // bold outline for selected / quiz-marked countries (their fill alone can blend in
+          // with a similar national colour)
+          id: 'mark-line', type: 'line', source: 'world',
+          paint: {
+            'line-color': ['match', markState, 'sel', '#c77700', 'right', '#1e7a3c', 'target', '#1e7a3c', 'wrong', '#b3261e', 'rgba(0,0,0,0)'],
+            'line-width': ['match', markState, '', 0, 2.5],
+          },
         },
       ],
     },
@@ -120,7 +139,7 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
   const order = countries.slice().sort((a, b) => (b.sovereign - a.sovereign) || (b.size - a.size));
 
   // Greedy declutter: big countries first; a flag or a name is only shown where it has room.
-  // Capital dots always show (they are small and needed to see where the capital is).
+  // Capital dots give way to flags when zoomed out; they reappear as the map is zoomed in.
   let raf = 0;
   function layout() {
     raf = 0;
@@ -134,6 +153,8 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
     const free = (b) => !taken.some((t) => b[0] < t[2] && b[2] > t[0] && b[1] < t[3] && b[3] > t[1]);
     const list = selected ? [markers.get(selected)?.country, ...order].filter(Boolean) : order;
     const seen = new Set();
+    // pass 1: flags; pass 2: capital dots (hidden while they'd sit on a flag) and names
+    const shown = [];
     for (const c of list) {
       if (seen.has(c.id)) continue;
       seen.add(c.id);
@@ -141,26 +162,30 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
       const want = showAll || (only && only.has(c.id));
       const force = !showAll || c.id === selected;  // quiz feedback / selection: always show
       const fp = [c.fx ?? c.lon, c.fy ?? c.lat];
-      const flagOk = want && !(globe && angularDistance(center, fp) > 75);
-      const capOk = want && !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
-      if (flagOk) {
+      if (want && !(globe && angularDistance(center, fp) > 75)) {
         const p = map.project(fp);
         const box = [p.x - fw / 2 - 1, p.y - fh / 2 - 1, p.x + fw / 2 + 1, p.y + fh / 2 + 1];
         const show = force || free(box);
         if (show) taken.push(box);
         setOn(m.flag, show);
       } else setOn(m.flag, false);
-      setOn(m.cap, capOk);
-      if (capOk) {
-        const p = map.project([c.lon, c.lat]);
-        const lw = c.capital.length * 6.4 + 8;
-        const label = [p.x + 5, p.y - 7, p.x + 5 + lw, p.y + 7];
-        const showLabel = (z >= LABEL_FROM_ZOOM || force) && free(label);
-        if (showLabel) taken.push(label);
-        m.cap.el.classList.toggle('nolabel', !showLabel);
-        m.cap.el.classList.toggle('sel', c.id === selected);
-      }
       m.flag.el.classList.toggle('sel', c.id === selected);
+      if (want) shown.push([c, m, force]);
+    }
+    for (const [c, m, force] of shown) {
+      const capOk = !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
+      const p = capOk && map.project([c.lon, c.lat]);
+      const dot = p && [p.x - 5, p.y - 5, p.x + 5, p.y + 5];
+      const showDot = capOk && (force || free(dot));
+      setOn(m.cap, showDot);
+      if (!showDot) continue;
+      taken.push(dot);
+      const lw = c.capital.length * 6.4 + 8;
+      const label = [p.x + 5, p.y - 7, p.x + 5 + lw, p.y + 7];
+      const showLabel = (z >= LABEL_FROM_ZOOM || force) && free(label);
+      if (showLabel) taken.push(label);
+      m.cap.el.classList.toggle('nolabel', !showLabel);
+      m.cap.el.classList.toggle('sel', c.id === selected);
     }
   }
   function setOn(m, on) {
