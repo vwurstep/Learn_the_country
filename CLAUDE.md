@@ -12,8 +12,16 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
      the map as a dot with its flag and name. The toggle can hide them so Phil can test
      himself: with flags hidden, tapping a country shows a blurred card with a Reveal
      button.
-   - **Quiz:** flashcard-style questions in several modes (see below), filtered by region,
-     with territories optional. Weak and unseen countries come up more often.
+   - **Quiz:** questions in several modes (see below), filtered by region, with territories
+     optional. Weak and unseen countries come up more often. A **hard pile** holds the
+     cards Phil finds hard.
+   - Round 2 (2026-10-01), Phil's feedback on the first version:
+     - flags sit mid-country and capitals are dark blue dots;
+     - name/capital answers are flashcards (reveal, then "knew it" / "didn't know");
+     - after every answer Phil is offered "add to / remove from hard pile";
+     - progress syncs to GitHub (token), like in the SA app;
+     - each country has a summary on the map tab;
+     - fixed the date-line seams on the globe.
 2. **Later (ideas, not decided):** shaded-relief background (Natural Earth raster), more
    quiz modes (type the answer, borders/neighbours, time attack), per-mode statistics,
    spaced repetition, more panels.
@@ -39,16 +47,39 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.
-- **Data kept separate from how it's shown** (as in the SA app): `src/data.js` handles
-  loading and progress (localStorage `ltc.*`), `src/quiz.js` is pure question logic
-  (testable, injectable RNG), `src/map.js` is the map, `src/app.js` the wiring and panels.
+- **Data kept separate from how it's shown** (as in the SA app):
+  - `src/data.js` loads static data and per-device settings (`ltc.<setting>`);
+  - `src/store.js` holds **user data**: one JSON doc in localStorage `ltc.user`,
+    `{v, stats, hard, removed}`, merged per entry (the newest wins, with tombstones for removals);
+  - `src/quiz.js` is pure question logic (testable, injectable RNG);
+  - `src/map.js` is the map, and `src/app.js` the wiring and panels.
+- **Sync is pluggable, ready for user accounts later:**
+  - A backend is `{pull(), push(doc)}`. Today it is `src/sync-github.js`: the file `user.json` on
+    branch `userdata` of this repo, written with a fine-grained token that Phil pastes into
+    Quiz → Sync…. The token is stored in localStorage `ltc.sync`.
+  - The repo is public, so the progress file is publicly readable. That's fine for quiz stats.
+  - Accounts later: add a backend with the same two methods and pick it in `backend()` in app.js.
+  - Sync runs on start, 5 s after a change, and when the app is hidden or shown.
+  - On a conflict (409) it pulls, merges and retries.
+  - To read Phil's data: `gh api 'repos/vwurstep/Learn_the_country/contents/user.json?ref=userdata' --jq .content | base64 -d`.
+  - Never test against the real `userdata` branch. Use a throwaway branch and delete it.
 
 ## Quiz modes (`MODES` in src/quiz.js)
 
-Flag → country, Country → flag, Capital → country, Country → capital (4 options each;
-the wrong options are preferably from the same continent), Find the country / flag /
-capital on the map, and Mixed. Progress is `ltc.stats = {id: {right, wrong, last}}`. The
-picking weight is `0.3 + 4·missRate + min(daysSinceSeen, 1)`, and unseen countries get 3.
+Each mode has a `type`:
+- **recall** (flashcard): Flag → country, Capital → country, Country → capital. Show
+  answer, then Phil rates himself.
+- **choice**: Country → flag, with 4 flags. The wrong options are preferably from the same
+  continent.
+- **map**: Find the country / flag / capital on the map.
+- **Mixed** picks a random mode for each question.
+
+Picking weight: `0.3 + 4·missRate + min(daysSinceSeen, 1)`; unseen countries get 3.
+
+**Hard pile:** cards are keyed `mode:id` and use Leitner boxes. `BOX_DAYS = [0,1,3,7,21]`
+days. Right moves a card up a box, wrong sends it back to box 0. Practice takes due
+cards first (lower box = likelier). When nothing is due it practises early. Cards leave
+the pile only by hand.
 
 ## Data (`data/`, `flags/`)
 
@@ -57,6 +88,11 @@ picking weight is `0.3 + 4·missRate + min(daysSinceSeen, 1)`, and unseen countr
   Central America as North America.
 - `data/world.geojson`: Natural Earth 1:50m, `properties.id` = iso2.
 - `flags/<id>.svg`: lipis/flag-icons 4x3 (MIT).
+- `data/info.json`: country summaries `{id: {about, dates: [[year, event]], known: []}}`.
+  Written by subagents (brief `tools/briefs/info.md`, batches `data/info/todo-N.json` →
+  `part-N.json`) and merged by `node tools/merge_info.mjs`. They come from model
+  knowledge without a QA pass yet. Agents flagged unsure details (e.g. exact years for
+  small territories). If Phil reports an error, fix it in the part file and re-merge.
 - Built by `tools/build_data.*`. Sources and licences are in `LICENSES.md`.
 
 ## Working style for Claude
@@ -75,7 +111,9 @@ index.html              page: map, tabs, info card, quiz setup + question cards
 src/app.js              wiring, tabs, panels
 src/map.js              MapLibre map, capital markers, declutter, hit testing
 src/quiz.js             pure quiz logic (modes, pools, weighting, distractors)
-src/data.js             data loading + progress/settings in localStorage
+src/data.js             static data loading + per-device settings
+src/store.js            user data (stats, hard pile), merge, sync driver
+src/sync-github.js      GitHub sync backend
 src/style.css
 lib/maplibre-gl.*       vendored MapLibre GL JS (BSD-3)
 data/, flags/           country data, shapes, flags

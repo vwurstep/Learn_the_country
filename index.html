@@ -49,11 +49,16 @@
       </div>
     </div>
     <button class="reveal primary" hidden>Reveal</button>
+    <div class="info-more"></div>
   </section>
 
   <!-- quiz tab: setup -->
   <section id="setup" class="card glass only-quiz" hidden>
     <h2>Quiz</h2>
+    <div class="row tight pile-row">
+      <span id="pile-info" class="muted"></span>
+      <button id="start-pile" class="primary">Practise</button>
+    </div>
     <p class="label">Mode</p>
     <div id="modes" class="chips"></div>
     <p class="label">Region</p>
@@ -61,9 +66,30 @@
     <label class="check"><input type="checkbox" id="territories"> Include territories (Greenland, Hong Kong, …)</label>
     <p id="progress" class="muted"></p>
     <div class="row">
-      <button id="reset" class="ghost">Reset progress</button>
+      <button id="reset" class="ghost">Reset statistics</button>
       <button id="start" class="primary">Start</button>
     </div>
+    <div class="row tight sync-row">
+      <span id="sync-line" class="muted"></span>
+      <button id="open-settings" class="ghost small">Sync…</button>
+    </div>
+  </section>
+
+  <!-- quiz tab: sync settings -->
+  <section id="settings" class="card glass only-quiz" hidden>
+    <button class="close" aria-label="Close">×</button>
+    <h2>Sync progress</h2>
+    <p class="muted">Your statistics and hard pile are saved on this phone. To keep them safe across
+      reinstalls and devices, they can be synced to the <code>userdata</code> branch of the app's GitHub repo
+      (<b>readable by anyone</b>, since the repo is public). Paste a fine-grained GitHub token with
+      <i>Contents: read and write</i> on <code>vwurstep/Learn_the_country</code> only.</p>
+    <input id="sync-token" type="password" placeholder="github_pat_…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="row">
+      <button id="sync-off" class="ghost">Turn off</button>
+      <button id="sync-now" class="ghost">Sync now</button>
+      <button id="sync-save" class="primary">Save token</button>
+    </div>
+    <p id="sync-status" class="muted"></p>
   </section>
 
   <!-- quiz tab: question -->
@@ -76,10 +102,7 @@
     <div id="q-prompt"></div>
     <div id="q-options"></div>
     <div id="q-result" hidden></div>
-    <div class="row">
-      <button id="q-skip" class="ghost">Skip</button>
-      <button id="q-next" class="primary" hidden>Next</button>
-    </div>
+    <div id="q-buttons" class="row"></div>
   </section>
 
   <script type="module" src="src/app.js"></script>

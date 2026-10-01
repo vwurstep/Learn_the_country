@@ -2,6 +2,7 @@
   --ink: #1b2430;
   --muted: #5d6b7a;
   --glass: rgba(255, 255, 255, 0.86);
+  --card: #f8fafc;
   --accent: #2f6fd6;
   --ok: #2e9a55;
   --bad: #d4473f;
@@ -34,7 +35,7 @@ body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
   font-size: 13px; color: var(--muted); z-index: 3; white-space: nowrap; }
 
 /* ---- cards ---- */
-.card { position: fixed; left: 10px; right: 10px; bottom: calc(var(--safe-bottom) + 10px); max-width: 520px; margin: 0 auto;
+.card { background: var(--card) !important; position: fixed; left: 10px; right: 10px; bottom: calc(var(--safe-bottom) + 10px); max-width: 520px; margin: 0 auto;
   border-radius: var(--radius); padding: 14px 16px; z-index: 6; max-height: 72vh; overflow-y: auto; }
 .card h2 { margin: 0 0 6px; font-size: 20px; }
 .close { position: absolute; top: 6px; right: 10px; font-size: 26px; color: var(--muted); line-height: 1; padding: 4px; }
@@ -86,24 +87,52 @@ body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
 #question.map-q .q-flag { width: 110px; }
 #question.map-q .q-text { font-size: 22px; }
 
-/* ---- capital markers (0×0 box at the capital; children positioned around it) ---- */
+/* ---- markers: flag mid-country; capital = 0×0 box at the capital with dot + name ---- */
+.flagpin { width: var(--flag-w, 22px); height: auto; display: block; border-radius: 2px; cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3); }
+.flagpin.sel { outline: 2px solid #f2a541; outline-offset: 1px; }
 .cap { width: 0; height: 0; position: relative; cursor: pointer; }
 .cap .dot { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%;
-  background: #c0392b; box-shadow: 0 0 0 1.5px #fff; }
-.cap .flag { position: absolute; left: calc(var(--flag-w, 22px) / -2); bottom: 5px; width: var(--flag-w, 22px); height: auto;
-  border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3); }
-.cap .lbl { position: absolute; left: 7px; top: -4px; white-space: nowrap; font-size: 11.5px; font-weight: 600; color: #1b2430;
+  background: #1d3c78; box-shadow: 0 0 0 1.5px #fff; }
+.cap .lbl { position: absolute; left: 7px; top: -8px; white-space: nowrap; font-size: 11.5px; font-weight: 600; color: #1b2430;
   text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff; pointer-events: none; }
-.cap.noflag .flag, .cap.nolabel .lbl { display: none; }
+.cap.nolabel .lbl { display: none; }
 .cap.sel .dot { background: #f2a541; }
 .cap.sel { z-index: 2; }
 
 .maplibregl-ctrl-attrib { display: none; }
 
-#q-next { margin-left: auto; }
 /* after answering a multiple-choice question: shrink the card so the map shows the answer */
 #question.answered .q-flag { width: 90px; }
 #question.answered .q-text { font-size: 18px; }
 #question.answered .grid button { min-height: 40px; padding: 6px; }
 #question.answered .grid.flags img { max-width: 64px; }
-#question.answered .answer img { display: none; }
+
+/* info card: summary */
+#info { max-height: 60vh; }
+.info-more:empty { display: none; }
+.info-more .about { margin: 12px 0 6px; font-size: 15px; }
+.dates { list-style: none; padding: 0; margin: 8px 0; font-size: 14px; }
+.dates li { padding: 3px 0; border-top: 1px solid rgba(0, 0, 0, 0.06); }
+.dates b { display: inline-block; min-width: 4.2em; color: var(--accent); }
+.known { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.known span { background: rgba(0, 0, 0, 0.06); border-radius: 999px; padding: 4px 10px; }
+#info.hidden-answer .info-more { display: none; }
+
+/* quiz buttons */
+#q-buttons { align-items: center; }
+#q-buttons .wide { flex: 1; }
+#q-buttons button:last-child:not(.wide) { margin-left: auto; }
+.btn-ok { background: var(--ok); color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 600; }
+.btn-bad { background: var(--bad); color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 600; }
+.pile { padding: 9px 12px; border-radius: 12px; font-weight: 600; font-size: 14px; color: var(--accent); background: rgba(47, 111, 214, 0.1); }
+.pile.suggest { background: #f2a541; color: #fff; }
+.row.tight { margin-top: 4px; align-items: center; }
+.pile-row { margin: 0 0 4px; padding: 8px 10px; border-radius: 12px; background: rgba(242, 165, 65, 0.14); }
+.pile-row .muted { color: var(--ink); }
+.sync-row { margin-top: 14px; }
+#start-pile:disabled { opacity: 0.4; }
+#setup { max-height: calc(100vh - var(--safe-top) - 90px); }
+#settings input { width: 100%; font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.15); background: #fff; margin-top: 8px; }
+#settings .row { justify-content: flex-end; }
+#settings code { font-size: 13px; }

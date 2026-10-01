@@ -1,0 +1,202 @@
+{
+  "cf": {
+    "about": "The Central African Republic is a landlocked country in the heart of Africa, bordered by Chad, Sudan, the two Congos and Cameroon. It has about 5.5 million people, speaks French and Sango, and is nominally a presidential republic. Once the French colony of Ubangi-Shari, it became independent in 1960 and soon fell under Jean-Bédel Bokassa, who crowned himself emperor in 1976. Decades of coups followed, and a 2013 rebellion plunged the country into a civil war that has left it one of the poorest and least stable nations on earth despite rich diamond, gold and timber resources.",
+    "dates": [["1960", "Independence from France"], ["1966", "Bokassa seizes power in coup"], ["1976", "Bokassa crowns himself emperor"], ["1979", "Bokassa overthrown"], ["2013", "Séléka rebels take Bangui; civil war"]],
+    "known": ["Diamonds and gold", "Bokassa's imperial coronation", "Dzanga-Sangha forest elephants and gorillas", "Chronic instability and UN peacekeeping"]
+  },
+  "td": {
+    "about": "Chad is a vast landlocked country in north-central Africa, stretching from the Sahara in the north through the Sahel to Lake Chad in the southwest. About 18 million people live there, speaking French and Arabic alongside many local languages, under a strongly presidential system. Independent from France in 1960, Chad endured decades of civil war and conflict with Libya before Idriss Déby took power in 1990. Oil exports began in 2003. Déby was killed fighting rebels in 2021 and was succeeded by his son, Mahamat Déby.",
+    "dates": [["1960", "Independence from France"], ["1982", "Hissène Habré takes power"], ["1990", "Idriss Déby seizes power"], ["2003", "Oil exports begin"], ["2021", "Déby killed; his son takes over"]],
+    "known": ["Lake Chad, shrinking inland sea", "Ennedi Plateau rock arches", "Zakouma National Park elephants", "Oil and cotton", "Tibesti Mountains in the Sahara"]
+  },
+  "cl": {
+    "about": "Chile is a ribbon of land running 4,300 km down South America's Pacific coast, squeezed between the Andes and the ocean, from the Atacama Desert to the fjords of Patagonia. Around 20 million people, nearly all Spanish-speaking, live in this presidential republic, a third of them in Santiago. Chile won independence from Spain in 1818 and gained its mineral-rich north in the War of the Pacific. The 1973 coup against Salvador Allende brought Augusto Pinochet's dictatorship, which ended in 1990. Today Chile is one of Latin America's wealthiest and most stable economies, built on copper, wine and fruit.",
+    "dates": [["1818", "Independence from Spain"], ["1879–1884", "War of the Pacific; gains the north"], ["1970", "Salvador Allende elected president"], ["1973", "Pinochet's military coup"], ["1990", "Return to democracy"]],
+    "known": ["Copper, world's largest producer", "Atacama Desert and its observatories", "Wine", "Easter Island (Rapa Nui)", "Patagonia and Torres del Paine"]
+  },
+  "cn": {
+    "about": "China fills much of East Asia and, with about 1.4 billion people, is the world's second most populous country and its second-largest economy. Mandarin is the official language; the country is a one-party state ruled by the Communist Party. Chinese civilisation stretches back over three thousand years, and the empire founded by the Qin in 221 BC lasted, through many dynasties, until 1912. After civil war and Japanese invasion, Mao Zedong proclaimed the People's Republic in 1949. Reforms from 1978 turned China into the workshop of the world and lifted hundreds of millions out of poverty.",
+    "dates": [["221 BC", "Qin unifies China"], ["1912", "Last emperor abdicates; republic founded"], ["1949", "People's Republic proclaimed"], ["1978", "Reform and opening begins"], ["1997", "Hong Kong returned by Britain"]],
+    "known": ["Great Wall and Forbidden City", "Terracotta Army", "Giant pandas", "World's largest manufacturer", "Regional cuisines and tea"]
+  },
+  "cx": {
+    "about": "Christmas Island is an Australian external territory in the Indian Ocean, about 350 km south of Java. The rugged, forested island was named when sighted on Christmas Day 1643, annexed by Britain in 1888 for its phosphate deposits, and transferred from Singapore to Australia in 1958. Fewer than 2,000 people live there, most of Chinese or Malay heritage. Much of the island is national park, and it is famous for the annual migration of millions of red crabs to the sea. It also housed Australia's offshore immigration detention centre.",
+    "dates": [["1643", "Named on Christmas Day"], ["1888", "Annexed by Britain; phosphate mining"], ["1958", "Transferred to Australia"]],
+    "known": ["Red crab migration", "Phosphate mining", "Seabirds and rainforest national park", "Immigration detention centre"]
+  },
+  "cc": {
+    "about": "The Cocos (Keeling) Islands are two coral atolls in the Indian Ocean, roughly halfway between Australia and Sri Lanka, forming an Australian external territory. About 600 people live on two of the 27 islands, most of them Cocos Malay Muslims descended from plantation workers. Settled in 1827, the islands were ruled for 150 years as a private fief by the Scottish Clunies-Ross family, who were bought out by Australia in 1978. In 1984 the islanders voted to integrate fully with Australia.",
+    "dates": [["1609", "Sighted by William Keeling"], ["1827", "Clunies-Ross settlement founded"], ["1955", "Transferred from Britain to Australia"], ["1984", "Islanders vote to join Australia"]],
+    "known": ["Coral atolls and turquoise lagoon", "Cocos Malay culture", "Clunies-Ross family 'kings'", "Coconut plantations"]
+  },
+  "co": {
+    "about": "Colombia sits at the northwest corner of South America with coasts on both the Caribbean and the Pacific, spanning Andean mountains, Amazon rainforest and tropical plains. Its roughly 52 million Spanish-speaking people make it the continent's second most populous country, governed as a presidential republic. Liberated from Spain by Simón Bolívar in 1819, it later lost Panama and suffered long bouts of political violence. A guerrilla war with the FARC lasted from 1964 until a 2016 peace accord, and drug cartels shaped its late twentieth century. Today it is known for coffee, music and extraordinary biodiversity.",
+    "dates": [["1819", "Independence won at Boyacá"], ["1830", "Gran Colombia breaks up"], ["1903", "Panama secedes"], ["1964", "FARC insurgency begins"], ["2016", "Peace accord with FARC"]],
+    "known": ["Coffee", "Gabriel García Márquez", "Cartagena's walled old city", "Shakira and cumbia", "Emeralds", "Second-highest biodiversity on earth"]
+  },
+  "km": {
+    "about": "The Comoros are a volcanic archipelago in the Mozambique Channel between Madagascar and mainland Africa. Three islands form the Union of the Comoros, home to about 900,000 people who speak Comorian, Arabic and French; the fourth island, Mayotte, voted to remain French. Independent since 1975, the country has suffered more than twenty coups and attempted coups, including several by the mercenary Bob Denard. A 2001 constitution gave each island autonomy to end a secession crisis. Most people are Sunni Muslim and farm ylang-ylang, vanilla and cloves.",
+    "dates": [["1975", "Independence from France; Mayotte stays French"], ["1978", "Bob Denard's mercenary coup"], ["1997", "Anjouan and Mohéli attempt secession"], ["2001", "New federal constitution"]],
+    "known": ["Ylang-ylang perfume oil and vanilla", "Mount Karthala, active volcano", "Repeated coups", "Coelacanth, the living fossil fish"]
+  },
+  "ck": {
+    "about": "The Cook Islands are fifteen islands scattered across the South Pacific between French Polynesia and Samoa. Named after Captain James Cook, they became a British protectorate in 1888 and were annexed to New Zealand in 1901. Since 1965 they have been self-governing in free association with New Zealand, which handles defence; Cook Islanders are New Zealand citizens. About 15,000 people live there, mostly on Rarotonga, speaking Cook Islands Māori and English, and many more live in New Zealand. Tourism and black pearls drive the economy.",
+    "dates": [["1888", "British protectorate"], ["1901", "Annexed to New Zealand"], ["1965", "Self-government in free association with New Zealand"]],
+    "known": ["Aitutaki lagoon", "Rarotonga's mountains and reefs", "Black pearl farming", "Polynesian drumming and dance"]
+  },
+  "cr": {
+    "about": "Costa Rica is a small Central American republic between Nicaragua and Panama, with coasts on both the Caribbean and the Pacific. About 5 million Spanish-speaking people live in one of Latin America's most stable democracies. Independent from Spain in 1821, it escaped most of the region's upheavals; after a brief civil war in 1948 it abolished its army and invested in education and health instead. A quarter of its territory is protected, and its rainforests, volcanoes and beaches have made it a pioneer of eco-tourism.",
+    "dates": [["1821", "Independence from Spain"], ["1838", "Leaves Central American Federation"], ["1948", "Civil war; army abolished"], ["1987", "President Arias wins Nobel Peace Prize"]],
+    "known": ["Eco-tourism and biodiversity", "No army since 1948", "Coffee", "Arenal and other volcanoes", "'Pura vida'"]
+  },
+  "hr": {
+    "about": "Croatia curves around the Adriatic Sea in southeastern Europe, from the plains around Zagreb to a coast of over a thousand islands. Its roughly 3.9 million people speak Croatian and live in a parliamentary republic. A medieval kingdom from 925, Croatia spent centuries under Hungarian, Venetian and Habsburg rule before joining Yugoslavia in 1918. It declared independence in 1991, fought a four-year war against Serb forces, and joined the EU in 2013, adopting the euro and entering Schengen in 2023. Tourism along the Dalmatian coast dominates the economy.",
+    "dates": [["925", "Tomislav crowned first king"], ["1102", "Union with Hungary"], ["1918", "Joins Yugoslavia"], ["1991", "Declares independence; war of independence"], ["2013", "Joins the European Union"], ["2023", "Adopts the euro and joins Schengen"]],
+    "known": ["Dubrovnik's walls", "Plitvice Lakes", "Adriatic islands and sailing", "Football, 2018 World Cup finalists", "Birthplace of the necktie"]
+  },
+  "cu": {
+    "about": "Cuba is the largest island in the Caribbean, lying just 150 km south of Florida. Its roughly 11 million people speak Spanish and live under a one-party communist state. A Spanish colony from 1492 and a major sugar producer, Cuba became independent in 1902 under heavy American influence. Fidel Castro's 1959 revolution turned it into a Soviet ally, provoking the Bay of Pigs invasion and the 1962 Missile Crisis. A US embargo and the Soviet collapse brought lasting hardship, but Cuba is famed for its music, cigars and free health care.",
+    "dates": [["1492", "Columbus lands"], ["1898", "Spanish-American War ends Spanish rule"], ["1902", "Independence"], ["1959", "Castro's revolution"], ["1962", "Cuban Missile Crisis"]],
+    "known": ["Havana's vintage cars and colonial streets", "Cigars and rum", "Salsa and son music", "Baseball", "Fidel Castro and Che Guevara"]
+  },
+  "cw": {
+    "about": "Curaçao is a constituent country of the Kingdom of the Netherlands, an island in the southern Caribbean about 65 km off Venezuela. About 150,000 people live there, speaking Papiamentu, Dutch and English. Captured by the Dutch in 1634, it became a major hub of the Atlantic slave trade and later of oil refining for Venezuelan crude. When the Netherlands Antilles was dissolved in 2010, Curaçao gained autonomy in internal affairs while the Netherlands keeps defence and foreign policy. Tourism, finance and the port drive the economy.",
+    "dates": [["1634", "Captured by the Dutch"], ["1863", "Slavery abolished"], ["1918", "Oil refinery opens"], ["2010", "Becomes autonomous country within the Kingdom"]],
+    "known": ["Willemstad's pastel waterfront", "Blue Curaçao liqueur", "Diving and beaches", "Papiamentu language"]
+  },
+  "cy": {
+    "about": "Cyprus is an island in the eastern Mediterranean, south of Turkey, with about 1.2 million people speaking Greek and Turkish. It is a presidential republic and EU member. Ruled over the centuries by Greeks, Romans, Byzantines, Crusaders, Venetians and Ottomans, it passed to Britain in 1878 and became independent in 1960. In 1974 a Greek-backed coup triggered a Turkish invasion, and the island has been divided ever since: the Turkish Cypriot north declared a republic in 1983 recognised only by Turkey, while a UN buffer zone runs through Nicosia, the last divided capital in Europe.",
+    "dates": [["1571", "Ottoman conquest"], ["1878", "British administration begins"], ["1960", "Independence from Britain"], ["1974", "Coup and Turkish invasion; island divided"], ["2004", "Joins the European Union"]],
+    "known": ["Divided capital Nicosia", "Mythical birthplace of Aphrodite", "Halloumi cheese", "Beaches of Ayia Napa and Paphos", "Troodos mountain monasteries"]
+  },
+  "cz": {
+    "about": "Czechia, or the Czech Republic, is a landlocked country in central Europe made up of Bohemia, Moravia and part of Silesia. Its roughly 10.9 million people speak Czech and live in a parliamentary republic. Prague was the seat of the Holy Roman Empire under Charles IV in the fourteenth century, and the Czech lands later spent four hundred years under the Habsburgs. Czechoslovakia emerged in 1918, fell to Nazi Germany and then to communism, and was freed by the 1989 Velvet Revolution. The peaceful split from Slovakia came in 1993 and EU membership in 2004.",
+    "dates": [["1346", "Charles IV begins Prague's golden age"], ["1526", "Habsburg rule begins"], ["1918", "Czechoslovakia founded"], ["1968", "Prague Spring crushed by Soviet tanks"], ["1989", "Velvet Revolution"], ["1993", "Peaceful split from Slovakia"]],
+    "known": ["Prague's castle and Charles Bridge", "Beer, home of Pilsner", "Bohemian crystal", "Kafka, Dvořák and Havel", "Hundreds of castles"]
+  },
+  "dk": {
+    "about": "Denmark is the southernmost Nordic country, occupying the Jutland peninsula and over 400 islands between the North and Baltic Seas; Greenland and the Faroe Islands are self-governing parts of the realm. About 6 million people speak Danish in a constitutional monarchy and EU member. Home of the Vikings, Denmark once ruled a union with Norway and Sweden, lost Norway in 1814 and Schleswig in 1864, and became a constitutional monarchy in 1849. Today it is a prosperous welfare state renowned for design, wind energy and consistently high rankings for happiness.",
+    "dates": [["c. 965", "Harald Bluetooth unites Denmark and adopts Christianity"], ["1397", "Kalmar Union with Norway and Sweden"], ["1814", "Loses Norway"], ["1849", "First democratic constitution"], ["1940–1945", "German occupation"], ["1973", "Joins the European Community"]],
+    "known": ["Lego", "Hans Christian Andersen", "Copenhagen and the Little Mermaid", "Design and hygge", "Wind power", "Vikings"]
+  },
+  "dj": {
+    "about": "Djibouti is a small, arid country on the Horn of Africa, guarding the Bab-el-Mandeb strait where the Red Sea meets the Gulf of Aden. About 1 million people, mainly Somali and Afar, speak French, Arabic, Somali and Afar under a long-serving president. Formerly French Somaliland, it gained independence in 1977. Its strategic location has drawn military bases from France, the United States, China, Japan and others, and its port handles most of landlocked Ethiopia's trade, linked by a modern railway to Addis Ababa.",
+    "dates": [["1888", "French colony established"], ["1977", "Independence from France"], ["1991–1994", "Civil war"], ["2017", "China opens its first overseas base"]],
+    "known": ["Foreign military bases", "Lake Assal, Africa's lowest point", "Port serving Ethiopia", "Whale sharks in the Gulf of Tadjoura"]
+  },
+  "dm": {
+    "about": "Dominica is a mountainous volcanic island in the eastern Caribbean, between Guadeloupe and Martinique, known as the Nature Isle. About 70,000 people speak English and a French-based creole in this parliamentary republic. The last Caribbean island to be colonised, it passed from France to Britain in 1763 and became independent in 1978. It still has a Kalinago (Carib) reserve, the largest indigenous community in the region. Hurricane Maria devastated the island in 2017. Dominica is not to be confused with the Dominican Republic.",
+    "dates": [["1763", "Ceded by France to Britain"], ["1978", "Independence from Britain"], ["2017", "Hurricane Maria devastates the island"]],
+    "known": ["Boiling Lake and Morne Trois Pitons", "Rainforests and waterfalls", "Kalinago indigenous community", "Resident sperm whales", "Citizenship-by-investment programme"]
+  },
+  "do": {
+    "about": "The Dominican Republic occupies the eastern two-thirds of Hispaniola, the Caribbean island it shares with Haiti. About 11 million Spanish-speaking people live in this presidential republic, whose capital Santo Domingo is the oldest European city in the Americas. The country declared independence from Haitian rule in 1844, endured the brutal Trujillo dictatorship from 1930 to 1961 and a US intervention in 1965, and has since grown into the Caribbean's largest economy. Beach resorts, baseball and merengue define its image abroad.",
+    "dates": [["1496", "Santo Domingo founded"], ["1844", "Independence from Haiti"], ["1930", "Trujillo dictatorship begins"], ["1961", "Trujillo assassinated"], ["1965", "US military intervention"]],
+    "known": ["Punta Cana beaches", "Baseball stars", "Merengue and bachata", "Santo Domingo's colonial zone", "Cigars and rum"]
+  },
+  "cd": {
+    "about": "The Democratic Republic of the Congo is Africa's second-largest country, spanning the Congo River basin and the world's second-largest rainforest in the centre of the continent. Around 100 million people speak French plus Lingala, Swahili and hundreds of other languages. Seized by Belgium's King Leopold II as a brutal private domain in 1885, it became the Belgian Congo and gained independence in 1960. Mobutu Sese Seko ruled as dictator for 32 years, renaming the country Zaire. His fall in 1997 led to devastating wars, and conflict continues in the mineral-rich east.",
+    "dates": [["1885", "Congo Free State under Leopold II"], ["1908", "Becomes Belgian Congo"], ["1960", "Independence; Lumumba prime minister"], ["1965", "Mobutu seizes power"], ["1997", "Mobutu overthrown; Congo wars"]],
+    "known": ["Congo River and rainforest", "Cobalt, copper and coltan", "Mountain gorillas of Virunga", "Congolese rumba", "Ongoing conflict in the east"]
+  },
+  "ec": {
+    "about": "Ecuador straddles the equator on South America's Pacific coast, with the Andes running down its spine and Amazon lowlands to the east. About 18 million people, speaking Spanish and Quechua, live in this presidential republic. Once part of the Inca Empire and then the Spanish Empire, it won independence in 1822 and left Gran Colombia in 1830. It adopted the US dollar in 2000 after a banking collapse. Ecuador is the world's largest banana exporter and governs the Galápagos Islands, whose wildlife inspired Darwin.",
+    "dates": [["1534", "Spanish conquest of Quito"], ["1822", "Independence won at Pichincha"], ["1830", "Leaves Gran Colombia"], ["2000", "Adopts the US dollar"]],
+    "known": ["Galápagos Islands", "Equator monument near Quito", "Quito's colonial centre", "Bananas", "Panama hats, actually Ecuadorian", "Chimborazo volcano"]
+  },
+  "eg": {
+    "about": "Egypt lies in the northeast corner of Africa, with the Sinai Peninsula reaching into Asia, and almost all of its roughly 110 million Arabic-speaking people live along the Nile. It is a presidential republic dominated by the military. One of the world's oldest civilisations, pharaonic Egypt was unified around 3100 BC and built the pyramids. It was later ruled by Greeks, Romans, Arabs, Ottomans and Britain. The 1952 revolution brought Nasser and republican rule, Sadat made peace with Israel in 1979, and the 2011 uprising toppled Mubarak.",
+    "dates": [["c. 3100 BC", "Unification of Upper and Lower Egypt"], ["332 BC", "Alexander the Great conquers Egypt"], ["641", "Arab conquest"], ["1869", "Suez Canal opens"], ["1952", "Revolution ends the monarchy"], ["2011", "Arab Spring uprising"]],
+    "known": ["Pyramids of Giza and the Sphinx", "Nile River", "Tutankhamun and the Valley of the Kings", "Suez Canal", "Red Sea diving"]
+  },
+  "sv": {
+    "about": "El Salvador is the smallest and most densely populated country in Central America, lying on the Pacific coast between Guatemala and Honduras. About 6.3 million Spanish-speaking people live in this presidential republic. Independent from Spain in 1821, it was long dominated by coffee oligarchs and the military, and a civil war from 1980 to 1992 killed some 75,000 people. Gang violence followed, until President Nayib Bukele's sweeping crackdown from 2022. In 2021 it became the first country to adopt Bitcoin as legal tender.",
+    "dates": [["1821", "Independence from Spain"], ["1932", "La Matanza peasant massacre"], ["1980–1992", "Civil war"], ["2021", "Adopts Bitcoin as legal tender"], ["2022", "Bukele's state of emergency against gangs"]],
+    "known": ["Pupusas", "Surfing beaches", "Volcanoes", "Bitcoin experiment", "Archbishop Óscar Romero"]
+  },
+  "gq": {
+    "about": "Equatorial Guinea is a small country on the Gulf of Guinea made up of the mainland region of Río Muni and several islands, including Bioko, where Malabo stands. It is Africa's only Spanish-speaking country, with about 1.7 million people and a presidential system that is in practice authoritarian. Independent from Spain in 1968, it suffered the murderous rule of Francisco Macías Nguema until his nephew Teodoro Obiang seized power in 1979; Obiang remains the world's longest-serving president. Oil discovered in the 1990s made it rich on paper, though most citizens stay poor.",
+    "dates": [["1778", "Spain acquires Bioko from Portugal"], ["1968", "Independence from Spain"], ["1979", "Obiang overthrows Macías Nguema"], ["1990s", "Offshore oil boom"]],
+    "known": ["Oil wealth and inequality", "Africa's only Spanish-speaking country", "Obiang's decades-long rule", "Bioko island's rainforest and turtles"]
+  },
+  "er": {
+    "about": "Eritrea stretches along the Red Sea coast of the Horn of Africa, north of Ethiopia. Its few million people speak Tigrinya, Arabic and other languages, and live under one of the world's most closed one-party regimes, led by Isaias Afwerki since independence. An Italian colony from 1890, it was federated with and then annexed by Ethiopia, triggering a thirty-year war of independence that ended in 1993. A border war with Ethiopia from 1998 to 2000 was followed by a formal peace in 2018. Indefinite national service drives many young Eritreans to emigrate.",
+    "dates": [["1890", "Italian colony of Eritrea"], ["1952", "Federated with Ethiopia"], ["1962", "Annexed by Ethiopia; war begins"], ["1993", "Independence after referendum"], ["1998–2000", "Border war with Ethiopia"], ["2018", "Peace agreement with Ethiopia"]],
+    "known": ["Asmara's Italian modernist architecture", "Dahlak Islands in the Red Sea", "Indefinite national service", "Cycling", "Isolation and emigration"]
+  },
+  "ee": {
+    "about": "Estonia is the northernmost of the three Baltic states, facing Finland across the Gulf of Finland. Its 1.3 million people speak Estonian, a Finnic language unrelated to its Latvian and Russian neighbours, and live in a parliamentary republic in the EU and NATO. Ruled in turn by Danes, Germans, Swedes and Russians, Estonia first became independent in 1918, was occupied by the Soviet Union in 1940, and regained freedom in 1991 after the Singing Revolution. It has since become a pioneer of digital government and tech startups.",
+    "dates": [["1710", "Conquered by Russia from Sweden"], ["1918", "Declares independence"], ["1940", "Occupied by the Soviet Union"], ["1991", "Independence restored"], ["2004", "Joins EU and NATO"]],
+    "known": ["Tallinn's medieval old town", "Digital government and e-residency", "Birthplace of Skype", "Song Festival tradition", "Forests, bogs and saunas"]
+  },
+  "sz": {
+    "about": "Eswatini, known as Swaziland until 2018, is a small landlocked kingdom in southern Africa wedged between South Africa and Mozambique. About 1.2 million people speak Swazi and English under King Mswati III, Africa's last absolute monarch, who has reigned since 1986. The Swazi kingdom was founded in the eighteenth century, became a British protectorate after the Boer War and gained independence in 1968. The king suspended the constitution and banned political parties in 1973. Sugar, forestry and tourism support an economy heavily tied to South Africa.",
+    "dates": [["1903", "British protectorate"], ["1968", "Independence from Britain"], ["1973", "King suspends constitution; parties banned"], ["1986", "Mswati III becomes king"], ["2018", "Renamed from Swaziland to Eswatini"]],
+    "known": ["Africa's last absolute monarchy", "Umhlanga Reed Dance", "Hlane Royal National Park", "Sibebe Rock, giant granite dome"]
+  },
+  "et": {
+    "about": "Ethiopia is a landlocked country in the Horn of Africa and, with about 120 million people, the continent's second most populous. It is a federal republic organised along ethnic lines, with Amharic as the working language alongside Oromo and dozens of others. Home to the ancient kingdom of Aksum and one of the world's oldest Christian traditions, Ethiopia famously defeated Italy at Adwa in 1896 and was never colonised. Emperor Haile Selassie was overthrown by the Marxist Derg in 1974; a rebel coalition took power in 1991. A civil war in Tigray raged from 2020 to 2022.",
+    "dates": [["4th century", "Aksum adopts Christianity"], ["1896", "Defeats Italy at Adwa"], ["1936–1941", "Italian occupation"], ["1974", "Haile Selassie overthrown by the Derg"], ["1991", "EPRDF rebels take Addis Ababa"], ["2020–2022", "Tigray war"]],
+    "known": ["Birthplace of coffee", "Rock-hewn churches of Lalibela", "Lucy, the hominid fossil", "Long-distance runners", "Never colonised", "Its own calendar and clock"]
+  },
+  "fk": {
+    "about": "The Falkland Islands are a British Overseas Territory in the South Atlantic, about 500 km east of Argentina, which claims them as the Malvinas. Around 3,500 people live on the two main islands and hundreds of smaller ones, most in Stanley. Britain established permanent rule in 1833. Argentina invaded in 1982, prompting a ten-week war that Britain won. In a 2013 referendum, islanders voted almost unanimously to remain British. Sheep farming, squid fishing licences and tourism sustain a small but prosperous economy.",
+    "dates": [["1833", "British rule established"], ["1982", "Argentine invasion and Falklands War"], ["2013", "Referendum votes to remain British"]],
+    "known": ["1982 Falklands War", "Penguin colonies", "Sheep farming", "Squid fishing", "Sovereignty dispute with Argentina"]
+  },
+  "fo": {
+    "about": "The Faroe Islands are eighteen rugged islands in the North Atlantic between Iceland and Norway, a self-governing territory within the Kingdom of Denmark. About 54,000 people speak Faroese, a descendant of Old Norse. Settled by Vikings in the ninth century, the islands passed with Norway to the Danish crown and have had home rule since 1948; they are not part of the EU. Fishing and fish farming dominate the economy, and the islands' sea cliffs, grass-roofed houses and dramatic weather draw growing numbers of visitors.",
+    "dates": [["9th century", "Settled by Norse Vikings"], ["1814", "Pass from Norway to Denmark"], ["1948", "Home rule granted"]],
+    "known": ["Sea cliffs and grass-roofed houses", "Fishing and salmon farming", "Sheep outnumber people", "Grindadráp pilot whale hunt", "Puffins"]
+  },
+  "fj": {
+    "about": "Fiji is an archipelago of over 300 islands in the South Pacific, about 2,000 km north of New Zealand. Its roughly 900,000 people are mostly indigenous Fijians and Indo-Fijians, descendants of indentured labourers brought by the British, and speak Fijian, Hindi and English. A British colony from 1874, Fiji became independent in 1970 but has since seen four coups, driven largely by ethnic tensions. It is a parliamentary republic. Tourism, sugar and remittances support the economy, and rugby is a national passion.",
+    "dates": [["1874", "Ceded to Britain"], ["1970", "Independence"], ["1987", "First military coups"], ["2006", "Bainimarama coup"], ["2014", "Return to elected government"]],
+    "known": ["Rugby sevens, Olympic champions", "Coral reefs and island resorts", "Kava ceremonies", "Fiji Water", "Sugar cane"]
+  },
+  "fi": {
+    "about": "Finland is a Nordic country of forests and some 188,000 lakes, lying between Sweden and Russia and stretching north into Lapland. Its 5.6 million people speak Finnish and Swedish and live in a parliamentary republic that joined the EU in 1995 and NATO in 2023. Part of Sweden for six centuries and a Russian grand duchy from 1809, Finland declared independence in 1917 and held off a Soviet invasion in the Winter War. It became a prosperous welfare state and regularly tops global happiness rankings.",
+    "dates": [["1809", "Becomes a Russian grand duchy"], ["1917", "Declares independence"], ["1939–1940", "Winter War against the Soviet Union"], ["1995", "Joins the European Union"], ["2023", "Joins NATO"]],
+    "known": ["Saunas", "Lakes and forests", "Happiest country rankings", "Nokia", "Santa Claus and Lapland", "Moomins"]
+  },
+  "fr": {
+    "about": "France is the largest country in Western Europe, stretching from the Channel and the Atlantic to the Mediterranean and the Alps, with overseas territories around the globe. About 68 million people speak French in a semi-presidential republic that is a founding member of the EU and a nuclear power. Rome's Gaul became the kingdom of the Franks, and medieval and absolutist France grew into a great power. The 1789 Revolution overthrew the monarchy, Napoleon conquered much of Europe, and after empires and republics the present Fifth Republic was founded in 1958.",
+    "dates": [["843", "Treaty of Verdun creates West Francia"], ["1789", "French Revolution begins"], ["1804", "Napoleon crowned emperor"], ["1870", "Third Republic proclaimed"], ["1940–1944", "German occupation"], ["1958", "Fifth Republic founded"]],
+    "known": ["Eiffel Tower and the Louvre", "Wine, cheese and haute cuisine", "Fashion and luxury brands", "Tour de France", "The Riviera and the Alps"]
+  },
+  "pf": {
+    "about": "French Polynesia is an overseas collectivity of France made up of 118 islands spread across the South Pacific, including Tahiti, Moorea and Bora Bora. About 280,000 people speak French and Tahitian; the territory has broad internal autonomy, while France handles defence and currency. Tahiti became a French protectorate in 1842 and a colony in 1880. From 1966 to 1996 France carried out nuclear tests at Mururoa and Fangataufa atolls. Tourism, black pearls and French subsidies support the economy.",
+    "dates": [["1842", "Tahiti becomes a French protectorate"], ["1880", "Annexed by France"], ["1966–1996", "French nuclear tests at Mururoa"], ["2004", "Granted expanded autonomy"]],
+    "known": ["Bora Bora's lagoon and overwater bungalows", "Tahitian black pearls", "Paul Gauguin", "Teahupo'o surf break", "Nuclear testing legacy"]
+  },
+  "ga": {
+    "about": "Gabon lies on the equator on Africa's Atlantic coast, with nearly 90 percent of its land covered by rainforest. About 2.4 million people speak French and Bantu languages in one of Africa's wealthier countries, thanks to oil, manganese and timber. Independent from France in 1960, it was ruled for over half a century by the Bongo family: Omar Bongo from 1967 and his son Ali from 2009, until a military coup in 2023. Gabon is a leader in forest conservation, with thirteen national parks.",
+    "dates": [["1960", "Independence from France"], ["1967", "Omar Bongo becomes president"], ["2009", "Ali Bongo succeeds his father"], ["2023", "Military coup ends Bongo rule"]],
+    "known": ["Rainforests and Loango's surfing hippos", "Oil and manganese", "Bongo family dynasty", "Albert Schweitzer's hospital at Lambaréné"]
+  },
+  "gm": {
+    "about": "The Gambia is the smallest country on mainland Africa, a narrow strip along the Gambia River entirely surrounded by Senegal except for its Atlantic coast. About 2.7 million people speak English, Mandinka, Wolof and other languages in a presidential republic. A British colony built around the river trade, it became independent in 1965. Yahya Jammeh ruled harshly from a 1994 coup until he was forced out in 2017 after losing an election. Peanuts, tourism and remittances support the economy.",
+    "dates": [["1816", "British found Bathurst (Banjul)"], ["1965", "Independence from Britain"], ["1994", "Yahya Jammeh seizes power"], ["2017", "Jammeh forced out after election defeat"]],
+    "known": ["Gambia River", "Birdwatching", "Beach tourism, the 'Smiling Coast'", "Kunta Kinte and the novel Roots"]
+  },
+  "ge": {
+    "about": "Georgia lies in the Caucasus at the crossroads of Europe and Asia, between the Black Sea and the mountains bordering Russia. Its roughly 3.7 million people speak Georgian, with its own unique alphabet, and live in a parliamentary republic. One of the first countries to adopt Christianity, Georgia had a medieval golden age before falling under Persian, Ottoman and then Russian rule in 1801. Independent briefly in 1918, it was absorbed by the Soviet Union and regained independence in 1991. Russia backs the breakaway regions of Abkhazia and South Ossetia, over which the two fought a short war in 2008.",
+    "dates": [["337", "Adopts Christianity"], ["1184", "Queen Tamar begins golden age"], ["1801", "Annexed by Russia"], ["1921", "Soviet takeover"], ["1991", "Independence from the USSR"], ["2008", "War with Russia"]],
+    "known": ["Wine, made for 8,000 years", "Caucasus mountains", "Tbilisi's old town and baths", "Khachapuri cheese bread", "Stalin's birthplace, Gori", "Polyphonic singing"]
+  },
+  "de": {
+    "about": "Germany lies at the heart of Europe, from the North Sea and Baltic coasts to the Alps, and is the EU's most populous country and largest economy, with about 84 million German-speaking people in a federal parliamentary republic. Fragmented for centuries within the Holy Roman Empire, Germany was unified under Prussia in 1871. Defeat in the First World War, the Weimar Republic and the Nazi dictatorship led to the Second World War and the Holocaust. Divided between West and East during the Cold War, Germany reunified in 1990 and is a pillar of the EU.",
+    "dates": [["962", "Otto I crowned Holy Roman Emperor"], ["1517", "Luther launches the Reformation"], ["1871", "German Empire unified"], ["1933", "Hitler comes to power"], ["1949", "Divided into West and East Germany"], ["1990", "Reunification"]],
+    "known": ["Cars: BMW, Mercedes, Volkswagen", "Beer and Oktoberfest", "Bach, Beethoven and Goethe", "The Berlin Wall", "Football", "Castles and Christmas markets"]
+  },
+  "gh": {
+    "about": "Ghana sits on West Africa's Gulf of Guinea coast, between Côte d'Ivoire and Togo. About 33 million people speak English alongside Akan, Ewe and other languages in one of Africa's most stable democracies. The region was home to the powerful Ashanti Empire and, as the Gold Coast, became a hub of the Atlantic slave trade. In 1957 under Kwame Nkrumah it became the first sub-Saharan colony to win independence, inspiring the rest of the continent. After decades of coups, multiparty democracy returned in 1992. Gold, cocoa and oil anchor the economy.",
+    "dates": [["c. 1700", "Ashanti Empire rises"], ["1874", "British Gold Coast colony"], ["1957", "First sub-Saharan colony to gain independence"], ["1966", "Nkrumah overthrown"], ["1992", "Return to multiparty democracy"]],
+    "known": ["Gold and cocoa", "Kwame Nkrumah and independence", "Cape Coast and Elmina slave castles", "Kente cloth", "Highlife music", "Lake Volta"]
+  },
+  "gi": {
+    "about": "Gibraltar is a British Overseas Territory at the southern tip of Spain, a 6-square-kilometre promontory dominated by the Rock, guarding the strait between the Mediterranean and the Atlantic. About 34,000 people speak English and Spanish and govern their own affairs, with Britain responsible for defence and foreign policy. Captured by an Anglo-Dutch force in 1704 and ceded to Britain in 1713, it remains claimed by Spain, which closed the land border from 1969 to 1985. Gibraltarians voted overwhelmingly to stay British in 1967 and 2002. Finance, online gaming and shipping drive the economy.",
+    "dates": [["1704", "Captured by Anglo-Dutch forces"], ["1713", "Ceded to Britain by Treaty of Utrecht"], ["1969–1985", "Spain closes the border"], ["2002", "Referendum rejects shared sovereignty with Spain"]],
+    "known": ["The Rock of Gibraltar", "Barbary macaques, Europe's only wild monkeys", "Strait of Gibraltar", "Pillars of Hercules", "Online gaming and finance hub"]
+  }
+}

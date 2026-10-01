@@ -39,6 +39,25 @@ function bboxOf(geom) {
   return [x0, y0, x1, y1];
 }
 
+/** Country outlines as lines, without the artificial edges where shapes are cut at the date
+    line (±180°) or run along the south pole: those would show up as seams on the globe. */
+function borderLines(world) {
+  const cut = (a, b) => (Math.abs(a[0]) >= 179.99 && Math.abs(b[0]) >= 179.99) || (a[1] <= -89.99 && b[1] <= -89.99);
+  const lines = [];
+  for (const f of world.features) {
+    const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+    for (const poly of polys) for (const ring of poly) {
+      let cur = [ring[0]];
+      for (let i = 1; i < ring.length; i++) {
+        if (cut(ring[i - 1], ring[i])) { if (cur.length > 1) lines.push(cur); cur = [ring[i]]; }
+        else cur.push(ring[i]);
+      }
+      if (cur.length > 1) lines.push(cur);
+    }
+  }
+  return { type: 'Feature', properties: {}, geometry: { type: 'MultiLineString', coordinates: lines } };
+}
+
 export function createMap(el, { countries, world, projection = 'globe', onClick }) {
   for (const f of world.features) f.properties.c = hash(f.properties.id) % LAND.length;
   const bboxes = new Map(world.features.map((f) => [f.properties.id, bboxOf(f.geometry)]));
@@ -55,7 +74,10 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
     style: {
       version: 8,
       projection: { type: projection },
-      sources: { world: { type: 'geojson', data: world, promoteId: 'id' } },
+      sources: {
+        world: { type: 'geojson', data: world, promoteId: 'id' },
+        borders: { type: 'geojson', data: borderLines(world) },
+      },
       layers: [
         { id: 'ocean', type: 'background', paint: { 'background-color': OCEAN } },
         {
@@ -67,7 +89,7 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
           },
         },
         {
-          id: 'border', type: 'line', source: 'world',
+          id: 'border', type: 'line', source: 'borders',
           paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 4, 1.2, 8, 2] },
         },
       ],
@@ -77,31 +99,31 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
   map.keyboard.disableRotation();
   el.style.background = SPACE;
 
-  // ---- capital markers ----------------------------------------------------------------
-  const markers = new Map();  // id -> {country, el, marker}
+  // ---- markers: a flag in the middle of each country, a dot + name at its capital ------------
+  const markers = new Map();  // id -> {country, flag, cap} (each {el, marker, on})
+  const mk = (el, lngLat) => ({ el, on: false,
+    marker: new maplibregl.Marker({ element: el, anchor: 'center', opacity: '1', opacityWhenCovered: '0' }).setLngLat(lngLat) });
   for (const c of countries) {
-    const m = document.createElement('div');
-    m.className = 'cap';
-    m.innerHTML = `<img class="flag" alt="" loading="lazy" src="${flagUrl(c.id)}"><i class="dot"></i><span class="lbl"></span>`;
-    m.querySelector('.lbl').textContent = c.capital;
-    m.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
-    const marker = new maplibregl.Marker({ element: m, anchor: 'center', opacity: '1', opacityWhenCovered: '0' })
-      .setLngLat([c.lon, c.lat]);
-    markers.set(c.id, { country: c, el: m, marker, on: false });
+    const f = document.createElement('img');
+    f.className = 'flagpin';
+    f.alt = '';
+    f.loading = 'lazy';
+    f.src = flagUrl(c.id);
+    const cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.innerHTML = '<i class="dot"></i><span class="lbl"></span>';
+    cap.querySelector('.lbl').textContent = c.capital;
+    for (const el of [f, cap]) el.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
+    markers.set(c.id, { country: c, flag: mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
   }
   let showAll = false, only = null, selected = null;
   const order = countries.slice().sort((a, b) => (b.sovereign - a.sovereign) || (b.size - a.size));
 
-  function visibleIds() {
-    if (showAll) return null;  // all
-    return only || new Set();
-  }
-
-  // Greedy declutter: big countries first; a flag/name is only shown where it has room.
+  // Greedy declutter: big countries first; a flag or a name is only shown where it has room.
+  // Capital dots always show (they are small and needed to see where the capital is).
   let raf = 0;
   function layout() {
     raf = 0;
-    const ids = visibleIds();
     const z = map.getZoom();
     const fw = FLAG_W[Math.max(1, Math.min(4, Math.floor(z)))];
     const fh = Math.round(fw * 0.75);
@@ -116,22 +138,29 @@ export function createMap(el, { countries, world, projection = 'globe', onClick 
       if (seen.has(c.id)) continue;
       seen.add(c.id);
       const m = markers.get(c.id);
-      const want = ids === null || ids.has(c.id);
-      const backside = globe && angularDistance(center, [c.lon, c.lat]) > 75;
-      if (!want || backside) { setOn(m, false); continue; }
-      setOn(m, true);
-      const p = map.project([c.lon, c.lat]);
-      const flag = [p.x - fw / 2 - 1, p.y - fh - 5, p.x + fw / 2 + 1, p.y - 3];
-      const showFlag = c.id === selected || ids !== null || free(flag);
-      // the name sits right of the dot, just below the flag: test it before reserving the flag
-      const lw = c.capital.length * 6.4 + 8;
-      const label = [p.x + 4, p.y - 2, p.x + 4 + lw, p.y + 8];
-      const showLabel = (z >= LABEL_FROM_ZOOM || ids !== null || c.id === selected) && free(label);
-      if (showFlag) taken.push(flag);
-      if (showLabel) taken.push(label);
-      m.el.classList.toggle('noflag', !showFlag);
-      m.el.classList.toggle('nolabel', !showLabel);
-      m.el.classList.toggle('sel', c.id === selected);
+      const want = showAll || (only && only.has(c.id));
+      const force = !showAll || c.id === selected;  // quiz feedback / selection: always show
+      const fp = [c.fx ?? c.lon, c.fy ?? c.lat];
+      const flagOk = want && !(globe && angularDistance(center, fp) > 75);
+      const capOk = want && !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
+      if (flagOk) {
+        const p = map.project(fp);
+        const box = [p.x - fw / 2 - 1, p.y - fh / 2 - 1, p.x + fw / 2 + 1, p.y + fh / 2 + 1];
+        const show = force || free(box);
+        if (show) taken.push(box);
+        setOn(m.flag, show);
+      } else setOn(m.flag, false);
+      setOn(m.cap, capOk);
+      if (capOk) {
+        const p = map.project([c.lon, c.lat]);
+        const lw = c.capital.length * 6.4 + 8;
+        const label = [p.x + 5, p.y - 7, p.x + 5 + lw, p.y + 7];
+        const showLabel = (z >= LABEL_FROM_ZOOM || force) && free(label);
+        if (showLabel) taken.push(label);
+        m.cap.el.classList.toggle('nolabel', !showLabel);
+        m.cap.el.classList.toggle('sel', c.id === selected);
+      }
+      m.flag.el.classList.toggle('sel', c.id === selected);
     }
   }
   function setOn(m, on) {

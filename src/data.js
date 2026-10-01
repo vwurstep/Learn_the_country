@@ -1,6 +1,7 @@
-/* Data access: loads the country list and shapes, keeps learning progress in localStorage.
-   No DOM or map code here. Schema of data/countries.json:
-   {id: 'fr', name, capital, lat, lon (of the capital), continent, sovereign} */
+/* Data access: loads the country list, shapes and summaries. No DOM or map code here.
+   Learning progress lives in store.js. Schema of data/countries.json:
+   {id: 'fr', name, capital, lat, lon (of the capital), fx, fy (flag spot, mid-country), continent,
+   sovereign}. data/info.json: {id: {about, dates: [[year, event]], known: [..]}} (loaded lazily). */
 
 export const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
 
@@ -25,31 +26,20 @@ export async function loadData() {
     size.set(id, Math.max(size.get(id) || 0, (x1 - x0) * (y1 - y0)));
   }
   for (const c of countries) c.size = size.get(c.id) || 0;
-  const hasShape = new Set(world.features.map((f) => f.properties.id));
-  return { countries, byId, world, hasShape };
+  return { countries, byId, world };
 }
 
-// ---- progress ---------------------------------------------------------------------------
-// stats[id] = {right, wrong, last} across all quiz modes; used to ask weak countries more often.
-const KEY = 'ltc.stats';
-let stats = {};
-try { stats = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
-
-export function getStats() { return stats; }
-export function record(id, correct) {
-  const s = (stats[id] ||= { right: 0, wrong: 0, last: 0 });
-  correct ? s.right++ : s.wrong++;
-  s.last = Date.now();
-  try { localStorage.setItem(KEY, JSON.stringify(stats)); } catch {}
-}
-export function resetStats() {
-  stats = {};
-  try { localStorage.removeItem(KEY); } catch {}
-}
-
+// ---- settings (per device) ------------------------------------------------------------
 export function loadSetting(name, fallback) {
   try { const v = JSON.parse(localStorage.getItem('ltc.' + name)); return v ?? fallback; } catch { return fallback; }
 }
 export function saveSetting(name, value) {
   try { localStorage.setItem('ltc.' + name, JSON.stringify(value)); } catch {}
+}
+
+let info = null;
+/** Country summaries, loaded on first use. */
+export async function loadInfo() {
+  if (!info) info = fetch('data/info.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  return info;
 }

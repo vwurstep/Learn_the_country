@@ -10,3 +10,6 @@ __pycache__/
 
 # temporary downloads from tools/build_data.*
 tools/cache/
+
+# macOS/iCloud conflict copies ("de 2.svg")
+* [0-9].*

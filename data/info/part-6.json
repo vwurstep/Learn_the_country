@@ -1,0 +1,187 @@
+{
+  "lk": {
+    "about": "Sri Lanka is a teardrop-shaped island off the southern tip of India, home to about 22 million people who speak mainly Sinhala and Tamil. It is a presidential republic; the legislative capital is Sri Jayawardenepura Kotte, a suburb of the commercial hub Colombo. Buddhist Sinhalese kingdoms flourished from antiquity at Anuradhapura and Polonnaruwa before Portuguese, Dutch and finally British rule. Independent as Ceylon in 1948, the country endured a 26-year civil war with Tamil Tiger separatists and a severe economic crisis in 2022.",
+    "dates": [["c. 250 BC", "Buddhism arrives on the island"], ["1505", "Portuguese arrive on the coast"], ["1815", "British take Kandy, control whole island"], ["1948", "Independence as Ceylon"], ["1972", "Becomes republic, renamed Sri Lanka"], ["2009", "Civil war ends with Tamil Tigers defeated"]],
+    "known": ["Ceylon tea plantations", "Sigiriya rock fortress", "Cricket", "Buddhist temples and Kandy", "Beaches and wildlife"]
+  },
+  "sd": {
+    "about": "Sudan lies in northeast Africa, where the Blue and White Nile meet at Khartoum. About 48 million people live there, speaking Arabic and many local languages. Ancient Nubia and the Kingdom of Kush rivalled Egypt, leaving more pyramids than Egypt itself. After Anglo-Egyptian rule, Sudan became independent in 1956 but suffered decades of civil war, which led to South Sudan breaking away in 2011. Dictator Omar al-Bashir was ousted in 2019; a 2021 coup and then a devastating war between the army and the RSF militia since 2023 have shattered the country.",
+    "dates": [["c. 750 BC", "Kingdom of Kush rules Egypt"], ["1885", "Mahdist revolt takes Khartoum"], ["1899", "Anglo-Egyptian condominium established"], ["1956", "Independence"], ["2011", "South Sudan secedes"], ["2023", "War between army and RSF begins"]],
+    "known": ["Nubian pyramids of Meroe", "Confluence of the Blue and White Nile", "Darfur conflict", "Gum arabic and gold"]
+  },
+  "sr": {
+    "about": "Suriname, on the northern coast of South America, is the continent's smallest sovereign country and its only Dutch-speaking one, with about 600,000 people. Most live near the coast; over 90 percent of the land is rainforest. The Dutch acquired it in 1667, trading New Amsterdam (New York) to England, and ran sugar plantations with enslaved Africans, later bringing Indian and Javanese contract workers, which explains today's remarkably mixed population. Independent since 1975, it endured a 1980 military coup under Desi Bouterse before returning to democracy. It is a presidential republic.",
+    "dates": [["1667", "Dutch acquire it from England"], ["1863", "Slavery abolished"], ["1975", "Independence from the Netherlands"], ["1980", "Military coup led by Bouterse"], ["1991", "Return to civilian rule"]],
+    "known": ["Vast untouched rainforest", "Dutch wooden architecture of Paramaribo", "Ethnic and religious diversity", "Bauxite and gold"]
+  },
+  "se": {
+    "about": "Sweden is the largest Nordic country, stretching from the Baltic to the Arctic, with about 10.5 million mostly Swedish-speaking people and a parliamentary constitutional monarchy. Forged as a kingdom under Gustav Vasa in the 1500s, it was a Baltic great power in the 1600s before losing Finland to Russia in 1809. It then stayed out of every war for two centuries, building a famous welfare state and export industries. Sweden joined the EU in 1995 and, abandoning its neutrality after Russia invaded Ukraine, NATO in 2024.",
+    "dates": [["1397", "Kalmar Union with Denmark and Norway"], ["1523", "Gustav Vasa founds independent kingdom"], ["1809", "Loses Finland to Russia"], ["1905", "Union with Norway dissolved"], ["1995", "Joins the European Union"], ["2024", "Joins NATO"]],
+    "known": ["Nobel Prizes", "IKEA, Volvo and Spotify", "ABBA", "Midsummer and the welfare state", "Forests, lakes and the archipelago"]
+  },
+  "ch": {
+    "about": "Switzerland is a landlocked Alpine country of about 9 million people with four national languages: German, French, Italian and Romansh. It is a federal republic of 26 cantons where citizens vote directly on laws several times a year. Born from a 1291 alliance of mountain valleys against the Habsburgs, the confederation grew by adding cantons, had its neutrality recognised at the Congress of Vienna in 1815 and became a modern federal state in 1848. Staying out of both world wars, it became one of the richest countries on Earth, known for banking, precision industry and hosting international organisations.",
+    "dates": [["1291", "Founding alliance of three cantons"], ["1648", "Independence from the Holy Roman Empire recognised"], ["1815", "Neutrality guaranteed at Congress of Vienna"], ["1848", "Federal constitution creates modern state"], ["1971", "Women gain the vote nationally"], ["2002", "Joins the United Nations"]],
+    "known": ["Alps and the Matterhorn", "Watches and banking", "Chocolate and cheese", "Neutrality and the Red Cross", "Direct democracy"]
+  },
+  "sy": {
+    "about": "Syria sits at the eastern end of the Mediterranean, bordering Turkey, Iraq, Jordan, Lebanon and Israel. Its roughly 23 million people speak Arabic, with Kurdish and other minorities. Damascus and Aleppo are among the oldest continuously inhabited cities, and Damascus was capital of the Umayyad Caliphate. After four centuries of Ottoman rule and a French mandate, Syria became independent in 1946. The Assad family ruled from 1970 until a brutal civil war that began in 2011 ended with rebels toppling Bashar al-Assad in December 2024, leaving a transitional government to rebuild a shattered country.",
+    "dates": [["661", "Damascus becomes Umayyad capital"], ["1516", "Ottoman conquest"], ["1920", "French Mandate begins"], ["1946", "Independence"], ["1970", "Hafez al-Assad seizes power"], ["2024", "Assad regime falls"]],
+    "known": ["Umayyad Mosque of Damascus", "Ruins of Palmyra", "Aleppo citadel and souks", "Levantine cuisine"]
+  },
+  "tw": {
+    "about": "Taiwan is a mountainous island off China's southeast coast with about 23 million people, mostly Mandarin-speaking, and a vibrant democracy. Ruled by the Dutch, the Qing dynasty and then Japan, it was handed to the Republic of China in 1945; in 1949 the Nationalist government retreated there after losing the Chinese civil war. Decades of martial law gave way to full democracy in the 1990s. Taiwan governs itself under the name Republic of China, but the People's Republic of China claims it, and most countries do not formally recognise it. It is a world leader in semiconductors.",
+    "dates": [["1624", "Dutch establish colony"], ["1683", "Qing dynasty annexes island"], ["1895", "Ceded to Japan"], ["1949", "Nationalist government retreats to Taiwan"], ["1987", "Martial law lifted"], ["1996", "First direct presidential election"]],
+    "known": ["TSMC and semiconductors", "Night markets and bubble tea", "Taipei 101", "Taroko Gorge", "National Palace Museum"]
+  },
+  "tj": {
+    "about": "Tajikistan is a landlocked, overwhelmingly mountainous country in Central Asia, bordering Afghanistan and China, with about 10 million people. Tajik, a form of Persian, sets it apart from its Turkic-speaking neighbours. Heir to the Samanid empire that made Bukhara a centre of Persian culture, the region was absorbed by Russia in the 1800s and became a Soviet republic. Independence in 1991 was followed by a bloody civil war; Emomali Rahmon has ruled as president since 1992. It is the poorest of the former Soviet states, heavily dependent on remittances from workers in Russia.",
+    "dates": [["9th century", "Samanid empire flourishes"], ["1868", "Russian conquest of region begins"], ["1929", "Becomes Soviet republic"], ["1991", "Independence from Soviet Union"], ["1992", "Civil war begins; Rahmon takes power"], ["1997", "Peace agreement ends civil war"]],
+    "known": ["Pamir Mountains and Pamir Highway", "Persian language and heritage", "Remittance economy", "Fann Mountains and Iskanderkul"]
+  },
+  "tz": {
+    "about": "Tanzania lies on the East African coast, with about 65 million people united by Swahili alongside English and over a hundred local languages. It is a presidential republic; Dodoma is the official capital while Dar es Salaam is the largest city. The Swahili coast traded with Arabia and India for centuries, and Zanzibar became a sultanate and slave market. Germany colonised the mainland, Britain took over after World War I, and Tanganyika won independence in 1961 under Julius Nyerere, uniting with Zanzibar in 1964. Nyerere's socialist experiment gave way to market reforms and multiparty politics in the 1990s.",
+    "dates": [["1885", "German East Africa established"], ["1919", "Britain takes over as mandate"], ["1961", "Tanganyika independent under Nyerere"], ["1964", "Union with Zanzibar forms Tanzania"], ["1992", "Multiparty politics restored"]],
+    "known": ["Mount Kilimanjaro", "Serengeti and Ngorongoro Crater", "Zanzibar spice island", "Olduvai Gorge, cradle of humankind"]
+  },
+  "th": {
+    "about": "Thailand occupies the heart of mainland Southeast Asia, with about 70 million Thai-speaking people and a constitutional monarchy in which the army has often intervened. Known as Siam until 1939, it is the only Southeast Asian country never colonised, as its kings played Britain and France against each other. The Sukhothai and Ayutthaya kingdoms shaped Thai culture before Bangkok was founded in 1782 under the Chakri dynasty that still reigns. A 1932 revolution ended absolute monarchy, and the country has since swung between elected governments and military coups while becoming a manufacturing and tourism powerhouse.",
+    "dates": [["1351", "Ayutthaya kingdom founded"], ["1767", "Burmese destroy Ayutthaya"], ["1782", "Chakri dynasty founds Bangkok"], ["1932", "Revolution ends absolute monarchy"], ["1939", "Siam renamed Thailand"], ["2014", "Military coup"]],
+    "known": ["Bangkok temples and Grand Palace", "Thai cuisine", "Beaches of Phuket and Krabi", "Muay Thai", "Street food and tourism"]
+  },
+  "tl": {
+    "about": "Timor-Leste, or East Timor, occupies the eastern half of Timor island at the end of the Indonesian archipelago, with about 1.3 million mostly Catholic people speaking Tetum and Portuguese. A Portuguese colony for over four centuries, it declared independence in 1975 only to be invaded by Indonesia days later; the occupation cost perhaps a quarter of the population. A 1999 UN-backed referendum chose independence despite militia violence, and after UN administration the country became fully sovereign in 2002, making it Asia's youngest nation. It is a semi-presidential republic reliant on offshore oil and gas.",
+    "dates": [["1975", "Portugal leaves; Indonesia invades"], ["1999", "Referendum votes for independence"], ["2002", "Full independence restored"]],
+    "known": ["Asia's youngest nation", "Coffee", "Diving at Atauro Island", "Cristo Rei statue in Dili"]
+  },
+  "tg": {
+    "about": "Togo is a narrow strip of West Africa between Ghana and Benin, stretching from a short Atlantic coast to the savanna. About 9 million people speak French plus Ewe, Kabiye and others. A German colony from 1884, it was split between Britain and France after World War I, and French Togo became independent in 1960. Since a 1967 coup the Gnassingbe family has ruled, first Eyadema and since 2005 his son Faure, who in 2024 pushed through a constitution shifting power to a prime minister post he then took. Phosphates and Lome's port drive the economy.",
+    "dates": [["1884", "German protectorate of Togoland"], ["1916", "Partitioned between Britain and France"], ["1960", "Independence from France"], ["1967", "Eyadema seizes power"], ["2005", "Faure Gnassingbe succeeds his father"]],
+    "known": ["Voodoo culture and Lome's fetish market", "Koutammakou mud tower houses", "Phosphates", "Lome's beaches and port"]
+  },
+  "tk": {
+    "about": "Tokelau is a dependent territory of New Zealand made up of three tiny coral atolls in the South Pacific, north of Samoa, with about 1,500 people speaking Tokelauan and English. There is no airport; the only access is a day-long boat trip from Samoa. A British protectorate from 1889, it was placed under New Zealand administration in 1925. Referendums in 2006 and 2007 on self-government in free association with New Zealand narrowly fell short of the required majority, so it remains a territory, though it runs its own affairs through village councils and a rotating head of government.",
+    "dates": [["1889", "Becomes British protectorate"], ["1925", "New Zealand takes over administration"], ["2007", "Self-government referendum narrowly fails"]],
+    "known": ["No airport, reached only by boat", "Almost entirely solar powered", "One of the smallest populations on Earth", ".tk internet domain"]
+  },
+  "to": {
+    "about": "Tonga is a Polynesian kingdom of about 170 islands in the South Pacific, with roughly 100,000 people speaking Tongan and English. The medieval Tu'i Tonga empire held sway over much of the region. King George Tupou I unified the islands in 1845 and gave them a constitution in 1875, and Tonga was never colonised, only a British protected state from 1900 to 1970. It remains the Pacific's only monarchy, though reforms in 2010 made most parliament seats elected. In 2022 a huge underwater volcanic eruption and tsunami devastated the islands.",
+    "dates": [["1845", "George Tupou I unifies Tonga"], ["1875", "Constitution adopted"], ["1900", "Becomes British protected state"], ["1970", "Full independence restored"], ["2010", "Democratic reforms to parliament"], ["2022", "Hunga Tonga eruption and tsunami"]],
+    "known": ["The Pacific's only monarchy", "Rugby", "Swimming with humpback whales", "Never colonised"]
+  },
+  "tt": {
+    "about": "Trinidad and Tobago is a two-island republic at the southern end of the Caribbean, just off Venezuela, with about 1.4 million English-speaking people of mainly African and Indian descent. Spanish for three centuries, Trinidad passed to Britain in 1797, and Tobago was joined to it in 1889. Independence came in 1962 and republic status in 1976. Unlike most Caribbean neighbours it is industrial, with oil and natural gas making it one of the region's richest countries. Its Carnival, calypso and the steelpan, the only acoustic instrument invented in the 20th century, are famous worldwide.",
+    "dates": [["1797", "Britain captures Trinidad from Spain"], ["1889", "Tobago joined to Trinidad"], ["1962", "Independence from Britain"], ["1976", "Becomes a republic"]],
+    "known": ["Carnival", "Steelpan, calypso and soca", "Oil and natural gas", "Pitch Lake natural asphalt", "Writer V. S. Naipaul"]
+  },
+  "tn": {
+    "about": "Tunisia is North Africa's smallest country, wedged between Algeria and Libya on the Mediterranean, with about 12 million Arabic-speaking people; French is widely used. Ancient Carthage, Rome's great rival, stood near today's capital Tunis. Arab conquest, Ottoman rule and a French protectorate from 1881 followed. Independent in 1956 under Habib Bourguiba, it became one of the Arab world's most secular and educated societies. In 2011 the Jasmine Revolution overthrew Ben Ali and sparked the Arab Spring; Tunisia built a democracy that President Kais Saied has steadily rolled back since 2021.",
+    "dates": [["c. 814 BC", "Carthage founded"], ["146 BC", "Rome destroys Carthage"], ["1881", "French protectorate established"], ["1956", "Independence under Bourguiba"], ["2011", "Jasmine Revolution sparks Arab Spring"], ["2021", "Saied suspends parliament"]],
+    "known": ["Ruins of Carthage", "Birthplace of the Arab Spring", "Sidi Bou Said and beaches", "Sahara and Star Wars film sets", "Olive oil and couscous"]
+  },
+  "tr": {
+    "about": "Turkey bridges Europe and Asia, with Istanbul straddling the Bosphorus and the capital Ankara in the Anatolian heartland. About 85 million people speak Turkish, with a large Kurdish minority. Anatolia hosted Hittites, Greeks, Romans and Byzantines before Turkic Seljuks arrived in 1071; the Ottomans took Constantinople in 1453 and built an empire spanning three continents. After defeat in World War I, Mustafa Kemal Ataturk founded a secular republic in 1923. A NATO member since 1952 and long-time EU candidate, Turkey became a presidential republic under Recep Tayyip Erdogan in 2017.",
+    "dates": [["1071", "Seljuks defeat Byzantines at Manzikert"], ["1453", "Ottomans conquer Constantinople"], ["1923", "Ataturk founds the Republic"], ["1952", "Joins NATO"], ["2017", "Referendum creates presidential system"]],
+    "known": ["Istanbul and Hagia Sophia", "Cappadocia balloon landscapes", "Kebab, baklava and Turkish tea", "Ephesus and Troy", "Turkish carpets and bazaars"]
+  },
+  "tm": {
+    "about": "Turkmenistan lies in Central Asia between the Caspian Sea, Iran and Uzbekistan, mostly covered by the Karakum desert. Its roughly 7 million people speak Turkmen. The Silk Road city of Merv was once among the world's largest. Russia conquered the region in the 1880s, and it became a Soviet republic before independence in 1991. Since then it has been one of the most closed and authoritarian states on Earth, ruled by the eccentric Saparmurat Niyazov and then the Berdimuhamedow family, who have built a white-marble capital on revenues from some of the world's largest natural gas reserves.",
+    "dates": [["1881", "Russian conquest completed at Geok Tepe"], ["1925", "Becomes Soviet republic"], ["1991", "Independence from Soviet Union"], ["1995", "UN recognises permanent neutrality"], ["2006", "Niyazov dies; Berdimuhamedow takes over"]],
+    "known": ["Darvaza gas crater, the Gates of Hell", "White-marble Ashgabat", "Akhal-Teke horses and carpets", "Vast natural gas reserves", "Ruins of Merv"]
+  },
+  "tc": {
+    "about": "The Turks and Caicos Islands are a British Overseas Territory in the Atlantic, southeast of the Bahamas, with about 45,000 people, mostly English-speaking. The capital Cockburn Town is on Grand Turk, while Providenciales holds most of the population and the resorts. Bermudian salt rakers settled the islands in the 1680s; they were later governed from the Bahamas and then Jamaica before becoming a separate colony in 1962. Britain imposed direct rule from 2009 to 2012 after a corruption scandal. Tourism built on some of the world's finest beaches, plus offshore finance, drives the economy.",
+    "dates": [["1680s", "Bermudian salt rakers settle"], ["1873", "Annexed to Jamaica"], ["1962", "Becomes separate British colony"], ["2009", "Britain imposes direct rule"]],
+    "known": ["Grace Bay beach", "Luxury resorts on Providenciales", "Diving and coral walls", "Offshore finance"]
+  },
+  "tv": {
+    "about": "Tuvalu is a Polynesian nation of nine low-lying coral atolls in the central Pacific, with about 11,000 people speaking Tuvaluan and English. It is a parliamentary democracy with the British monarch as head of state. Formerly the Ellice Islands, it was ruled by Britain jointly with the Gilbert Islands before separating in 1975 and gaining independence in 1978. With its highest point only a few metres above sea level, Tuvalu has become a symbol of the threat of rising seas; in 2023 it signed a treaty with Australia offering its citizens a path to migrate.",
+    "dates": [["1892", "Becomes British protectorate"], ["1916", "Part of Gilbert and Ellice Islands colony"], ["1975", "Separates from the Gilbert Islands"], ["1978", "Independence"], ["2023", "Falepili Union treaty with Australia"]],
+    "known": ["Threatened by sea-level rise", ".tv internet domain", "One of the world's smallest countries", "Funafuti lagoon"]
+  },
+  "ug": {
+    "about": "Uganda is a landlocked country on the East African plateau, bordering Lake Victoria, with about 48 million people speaking English, Swahili and many local languages, Luganda chief among them. The powerful Buganda kingdom became a British protectorate in 1894, and Uganda gained independence in 1962. Idi Amin's brutal dictatorship in the 1970s and civil war followed, until Yoweri Museveni took power in 1986; he has ruled ever since. Fertile and green, Uganda was called the Pearl of Africa by Churchill, and holds the source of the Nile and half of the world's mountain gorillas.",
+    "dates": [["1894", "Britain declares protectorate"], ["1962", "Independence"], ["1971", "Idi Amin seizes power"], ["1979", "Amin overthrown"], ["1986", "Museveni takes power"]],
+    "known": ["Source of the Nile at Jinja", "Mountain gorillas of Bwindi", "Lake Victoria", "Rwenzori Mountains", "The Pearl of Africa"]
+  },
+  "ua": {
+    "about": "Ukraine is the largest country entirely in Europe, stretching from the Carpathians to the Black Sea, with about 38 million Ukrainian-speaking people before millions fled the war. Kyiv was the heart of medieval Kyivan Rus. Later divided between Poland, Austria and Russia, it endured Soviet rule and the Holodomor famine before independence in 1991. Pro-Western revolutions in 2004 and 2014 were answered by Russia seizing Crimea and backing separatists in the east, then launching a full-scale invasion in 2022 that Ukraine continues to resist. It is a semi-presidential republic and a candidate for EU membership.",
+    "dates": [["988", "Kyivan Rus adopts Christianity"], ["1648", "Cossack uprising founds the Hetmanate"], ["1932", "Holodomor famine under Stalin"], ["1991", "Independence from Soviet Union"], ["2014", "Euromaidan revolution; Russia annexes Crimea"], ["2022", "Russia launches full-scale invasion"]],
+    "known": ["Kyiv's golden-domed churches", "Breadbasket of Europe", "Chernobyl", "Borscht and Easter eggs", "Resistance to Russian invasion"]
+  },
+  "ae": {
+    "about": "The United Arab Emirates is a federation of seven emirates on the Arabian Peninsula's Gulf coast, led by Abu Dhabi and the glittering commercial hub Dubai. Of about 10 million residents, almost 90 percent are foreign workers; Arabic is official and English ubiquitous. Known as the Trucial States under British protection from the 1800s, the sheikhdoms united in 1971 as Britain withdrew. Oil discovered in the 1950s turned a land of pearl divers into one of the richest per capita on Earth. Hereditary rulers govern each emirate, with the ruler of Abu Dhabi serving as president.",
+    "dates": [["1820", "Treaty brings British protection"], ["1958", "Oil discovered in Abu Dhabi"], ["1971", "Federation founded as Britain withdraws"], ["2010", "Burj Khalifa opens as tallest building"], ["2020", "Abraham Accords normalise ties with Israel"]],
+    "known": ["Burj Khalifa and Dubai skyline", "Oil wealth", "Sheikh Zayed Grand Mosque", "Emirates airline and global trade hub", "Desert dunes and camel racing"]
+  },
+  "gb": {
+    "about": "The United Kingdom unites England, Scotland, Wales and Northern Ireland on islands off northwest Europe, with about 68 million people and a parliamentary constitutional monarchy, one of the world's oldest. English kings and parliament fought out the balance of power over centuries, with Magna Carta and the 1688 revolution setting precedents for liberty. The union with Scotland in 1707 created Great Britain, which launched the Industrial Revolution and ruled the largest empire in history. After leading the fight in two world wars, it dismantled the empire, built the NHS welfare state and in 2020 left the European Union.",
+    "dates": [["1066", "Norman conquest of England"], ["1215", "Magna Carta signed"], ["1707", "England and Scotland unite"], ["1801", "Union with Ireland"], ["1945", "Victory in World War II"], ["2020", "Leaves the European Union"]],
+    "known": ["Monarchy and Buckingham Palace", "Shakespeare and the Beatles", "Football and the Premier League", "Big Ben and the Tower of London", "Tea, pubs and the BBC"]
+  },
+  "us": {
+    "about": "The United States spans North America from Atlantic to Pacific, plus Alaska and Hawaii, with about 335 million people, mostly English-speaking, and the world's largest economy and military. Thirteen British colonies declared independence in 1776 and adopted a federal constitution in 1787 that still governs. The nation expanded westward, abolished slavery after a bloody civil war, absorbed waves of immigrants and became an industrial giant. Victory in World War II and the Cold War made it the dominant superpower. It is a federal presidential republic of 50 states whose politics are sharply divided between Democrats and Republicans.",
+    "dates": [["1776", "Declaration of Independence"], ["1787", "Constitution drafted"], ["1865", "Civil War ends; slavery abolished"], ["1945", "Emerges from World War II as superpower"], ["1969", "Apollo 11 lands on the Moon"], ["2001", "September 11 attacks"]],
+    "known": ["Hollywood and pop culture", "Silicon Valley and Wall Street", "Grand Canyon and national parks", "Statue of Liberty", "NASA and the Moon landing"]
+  },
+  "vi": {
+    "about": "The United States Virgin Islands are an unincorporated territory of the United States in the eastern Caribbean, east of Puerto Rico, with about 87,000 mainly English-speaking people on St Thomas, St John and St Croix. Denmark colonised the islands from the 1670s and ran sugar plantations with enslaved labour until emancipation in 1848. Fearing Germany might seize them, the US bought the islands from Denmark in 1917 for 25 million dollars. Residents are US citizens but cannot vote for president. The capital Charlotte Amalie on St Thomas is one of the Caribbean's busiest cruise ports.",
+    "dates": [["1672", "Denmark colonises St Thomas"], ["1848", "Slavery abolished after uprising"], ["1917", "United States buys islands from Denmark"], ["1927", "Residents granted US citizenship"]],
+    "known": ["Magens Bay beach", "Virgin Islands National Park on St John", "Cruise ships and duty-free shopping", "Cruzan rum"]
+  },
+  "uy": {
+    "about": "Uruguay is a small, flat country of rolling grassland on South America's Atlantic coast, squeezed between Argentina and Brazil, with about 3.4 million Spanish-speaking people, nearly half in Montevideo. Long contested by Spain, Portugal, Argentina and Brazil, it became an independent buffer state in 1828. In the early 1900s it pioneered welfare and secular reforms, earning the nickname Switzerland of South America. A military dictatorship from 1973 to 1985 gave way to one of the region's most stable democracies, notable for legalising cannabis in 2013. It is a presidential republic built on beef, wool and soy.",
+    "dates": [["1811", "Artigas leads revolt against Spain"], ["1828", "Independence recognised"], ["1930", "Hosts and wins first World Cup"], ["1973", "Military dictatorship begins"], ["1985", "Democracy restored"], ["2013", "Legalises cannabis"]],
+    "known": ["Football and the first World Cup", "Beef asado and mate", "Punta del Este resorts", "Colonia del Sacramento old town", "Progressive social laws"]
+  },
+  "uz": {
+    "about": "Uzbekistan is the most populous country in Central Asia, with about 36 million Uzbek-speaking people, and one of only two doubly landlocked countries on Earth. Its oasis cities Samarkand, Bukhara and Khiva were jewels of the Silk Road, and Timur made Samarkand the capital of his vast empire in the 1300s. Russia conquered the region in the 1800s; under Soviet rule cotton monoculture drained the Aral Sea. Independent since 1991, it was ruled harshly by Islam Karimov until 2016, after which Shavkat Mirziyoyev loosened controls. It remains a presidential republic with limited political freedom.",
+    "dates": [["1370", "Timur makes Samarkand his capital"], ["1865", "Russia captures Tashkent"], ["1924", "Uzbek Soviet republic created"], ["1991", "Independence from Soviet Union"], ["2016", "Karimov dies; Mirziyoyev takes over"]],
+    "known": ["Registan square in Samarkand", "Silk Road cities of Bukhara and Khiva", "Shrinking Aral Sea", "Cotton", "Plov and flatbread"]
+  },
+  "vu": {
+    "about": "Vanuatu is a Y-shaped chain of about 80 volcanic islands in the southwest Pacific, with roughly 330,000 Melanesian people who speak over a hundred languages, united by the creole Bislama alongside English and French. Known as the New Hebrides, it was ruled jointly and awkwardly by Britain and France as a condominium from 1906 until independence in 1980. It is a parliamentary republic. Subsistence farming, tourism and the sale of citizenship support the economy, and the islands are among the world's most exposed to cyclones, earthquakes and volcanoes.",
+    "dates": [["1774", "Cook names the islands New Hebrides"], ["1906", "Anglo-French condominium established"], ["1980", "Independence as Vanuatu"], ["2015", "Cyclone Pam devastates the islands"]],
+    "known": ["Pentecost land diving, origin of bungee", "Mount Yasur, an accessible active volcano", "Diving the SS President Coolidge wreck", "World's highest linguistic diversity per capita"]
+  },
+  "va": {
+    "about": "Vatican City is the world's smallest state, a walled enclave of 44 hectares inside Rome with about 800 residents. It is an absolute monarchy ruled by the Pope, elected for life by the cardinals, and serves as the headquarters of the Roman Catholic Church. Popes governed a broad swath of central Italy as the Papal States from the 700s until Italian unification seized Rome in 1870. The 1929 Lateran Treaty with Mussolini's Italy created today's sovereign state. Italian and Latin are the working languages, and the Swiss Guard has protected the Pope since 1506.",
+    "dates": [["756", "Papal States founded"], ["1506", "Swiss Guard established"], ["1870", "Italy captures Rome, ending Papal States"], ["1929", "Lateran Treaty creates Vatican City"], ["1962", "Second Vatican Council opens"], ["2025", "Leo XIV elected first American pope"]],
+    "known": ["St Peter's Basilica", "Sistine Chapel and Michelangelo", "The Pope", "Vatican Museums", "Swiss Guard"]
+  },
+  "ve": {
+    "about": "Venezuela lies on South America's Caribbean coast, with about 29 million Spanish-speaking people and the world's largest proven oil reserves. Simon Bolivar, born in Caracas, led its independence from Spain and founded Gran Colombia, from which Venezuela split in 1830. Oil made it South America's richest country by the mid-1900s, with a stable democracy after 1958. Hugo Chavez's socialist Bolivarian Revolution from 1999 and Nicolas Maduro's rule since 2013 brought economic collapse, hyperinflation and the emigration of over 7 million people. Maduro's claimed victory in the 2024 election was widely disputed.",
+    "dates": [["1811", "Declaration of independence from Spain"], ["1830", "Separates from Gran Colombia"], ["1958", "Democracy established"], ["1999", "Hugo Chavez takes office"], ["2013", "Maduro succeeds Chavez"], ["2024", "Disputed presidential election"]],
+    "known": ["Angel Falls, world's tallest waterfall", "Oil", "Simon Bolivar", "Beauty queens and baseball", "Los Roques islands"]
+  },
+  "vn": {
+    "about": "Vietnam curves along the eastern edge of mainland Southeast Asia, from the Red River delta around Hanoi to the Mekong delta in the south, with about 100 million Vietnamese-speaking people under a one-party communist state. A thousand years of Chinese rule ended in 938, followed by independent dynasties. France colonised it in the 1800s; Ho Chi Minh declared independence in 1945 and defeated the French at Dien Bien Phu in 1954. The country was partitioned, and the Vietnam War ended with the communist north's victory in 1975. Market reforms since 1986 have made it a booming manufacturing economy.",
+    "dates": [["938", "Independence from China at Bach Dang"], ["1887", "French Indochina established"], ["1945", "Ho Chi Minh declares independence"], ["1954", "French defeated at Dien Bien Phu"], ["1975", "Fall of Saigon ends Vietnam War"], ["1986", "Doi Moi market reforms begin"]],
+    "known": ["Pho and banh mi", "Ha Long Bay", "Motorbike-filled streets", "Coffee", "Hoi An old town"]
+  },
+  "wf": {
+    "about": "Wallis and Futuna is a French overseas collectivity in the South Pacific between Fiji and Samoa, made up of Wallis island and the Futuna and Alofi islands, with about 11,000 people. French is official alongside Wallisian and Futunan, Polynesian languages. Unusually, three traditional kingdoms, Uvea, Sigave and Alo, survive within the French system, and their kings sit on the territorial council. French Catholic missionaries arrived in 1837 and converted the islands; France made them a protectorate in the 1880s and an overseas territory after a 1959 vote. Many islanders live in New Caledonia.",
+    "dates": [["1837", "French missionaries arrive"], ["1887", "Becomes French protectorate"], ["1961", "Becomes French overseas territory"], ["2003", "Status changed to overseas collectivity"]],
+    "known": ["Three traditional kingdoms", "Deeply Catholic Polynesian culture", "Remote and rarely visited", "Lake Lalolalo volcanic crater"]
+  },
+  "eh": {
+    "about": "Western Sahara is a sparsely populated desert territory on Africa's Atlantic coast between Morocco and Mauritania, with about 600,000 people, mostly Arabic-speaking. A Spanish colony from 1884, it was abandoned by Spain in 1975 and claimed by Morocco, which marched 350,000 settlers in; the Sahrawi independence movement Polisario proclaimed a republic and fought Morocco until a 1991 UN ceasefire. Morocco now administers about 80 percent, including Laayoune and the phosphate mines, behind a long sand wall, while Polisario holds the interior and runs refugee camps in Algeria. A promised UN referendum has never been held.",
+    "dates": [["1884", "Spain establishes colony"], ["1975", "Spain withdraws; Morocco's Green March"], ["1976", "Polisario proclaims Sahrawi republic"], ["1991", "UN ceasefire; referendum promised"], ["2020", "Ceasefire collapses"]],
+    "known": ["Africa's last colonial question", "Bou Craa phosphate mines", "The Moroccan sand wall", "Sahrawi refugee camps in Tindouf"]
+  },
+  "ye": {
+    "about": "Yemen occupies the southwest corner of the Arabian Peninsula, with about 34 million Arabic-speaking people. Ancient Saba, linked to the Queen of Sheba, grew rich on incense, and Mocha gave coffee to the world. Britain held Aden from 1839 while the Ottomans and then imams ruled the north; a republic emerged in the north in 1962 and a Marxist state in the south in 1967, uniting in 1990. A 2011 uprising ousted Ali Abdullah Saleh, and since Houthi rebels seized Sana'a in 2014 a civil war with Saudi intervention has caused one of the world's worst humanitarian crises.",
+    "dates": [["1839", "Britain occupies Aden"], ["1962", "Republic declared in North Yemen"], ["1967", "South Yemen independent from Britain"], ["1990", "North and South unify"], ["2014", "Houthis seize Sana'a"], ["2015", "Saudi-led intervention begins"]],
+    "known": ["Old Sana'a tower houses", "Socotra's dragon blood trees", "Mocha coffee", "Mudbrick skyscrapers of Shibam", "Qat chewing"]
+  },
+  "zm": {
+    "about": "Zambia is a landlocked country on the high plateau of south-central Africa, with about 20 million people speaking English and some 70 local languages, led by Bemba and Nyanja. Named for the Zambezi river, it was Northern Rhodesia under the British South Africa Company and then Britain, which exploited the Copperbelt. Kenneth Kaunda led it to independence in 1964 and ran a one-party state until multiparty elections in 1991. Copper still dominates the economy. It is a presidential republic that has seen several peaceful transfers of power, including Hakainde Hichilema's 2021 victory.",
+    "dates": [["1855", "Livingstone reaches Victoria Falls"], ["1924", "Britain takes over Northern Rhodesia"], ["1964", "Independence under Kaunda"], ["1991", "Multiparty democracy restored"], ["2021", "Hichilema wins presidency"]],
+    "known": ["Victoria Falls on the Zambezi", "Copper mining", "South Luangwa walking safaris", "Lake Kariba"]
+  },
+  "zw": {
+    "about": "Zimbabwe is a landlocked country in southern Africa between the Zambezi and Limpopo rivers, with about 16 million people speaking Shona, Ndebele and English. The stone city of Great Zimbabwe, which gives the country its name, was a medieval trading capital. Cecil Rhodes's company colonised it as Southern Rhodesia in 1890; in 1965 the white minority declared independence from Britain, leading to a guerrilla war. Majority rule came in 1980 under Robert Mugabe, whose 37-year rule brought violent land seizures and hyperinflation before the army ousted him in 2017. It is a presidential republic.",
+    "dates": [["11th century", "Great Zimbabwe built"], ["1890", "Rhodes's company occupies the territory"], ["1965", "White minority declares independence"], ["1980", "Independence under Mugabe"], ["2008", "Hyperinflation peaks"], ["2017", "Mugabe forced from power"]],
+    "known": ["Victoria Falls", "Great Zimbabwe ruins", "Hwange wildlife", "Hyperinflation of the 2000s", "Balancing rocks of Matobo"]
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "ps": {
+    "about": "Palestine comprises the West Bank and the Gaza Strip in the eastern Mediterranean Levant, home to about 5 million mostly Arabic-speaking people. The State of Palestine is recognised by most UN members and has been a UN observer state since 2012, though it is not a full member. The Palestinian Authority administers parts of the West Bank, which Israel has occupied since 1967, while Gaza has been run by Hamas since 2007. Palestinians claim East Jerusalem as their capital; Ramallah serves as the administrative centre. Its status, borders and statehood remain the core of the unresolved Israeli-Palestinian conflict.",
+    "dates": [["1948", "Arab-Israeli war and Palestinian displacement"], ["1967", "Israel occupies West Bank and Gaza"], ["1988", "Declaration of independence"], ["1993", "Oslo Accords create Palestinian Authority"], ["2012", "UN non-member observer state"], ["2023", "Gaza war begins"]],
+    "known": ["Bethlehem and Hebron's old city", "Olive groves and olive oil", "Dome of the Rock in East Jerusalem", "Embroidery (tatreez) and dabke dance"]
+  },
+  "pa": {
+    "about": "Panama is the narrow isthmus joining Central and South America, with coasts on both the Caribbean and the Pacific. About 4.4 million people live in this Spanish-speaking presidential republic, whose economy is built on the canal, banking, shipping registries and the US dollar. A Spanish colony, it became part of Colombia after independence in 1821, then separated in 1903 with US backing so the canal could be built. The United States ran the Canal Zone until handing it over in 1999, a decade after invading to remove the dictator Manuel Noriega.",
+    "dates": [["1821", "Independence from Spain, joins Gran Colombia"], ["1903", "Separates from Colombia"], ["1914", "Panama Canal opens"], ["1989", "US invasion removes Noriega"], ["1999", "Canal handed over to Panama"]],
+    "known": ["Panama Canal", "Banking hub and ship registry", "Darién Gap jungle", "Panama Papers leak", "Biodiverse rainforests and beaches"]
+  },
+  "pg": {
+    "about": "Papua New Guinea occupies the eastern half of New Guinea, the world's second-largest island, plus hundreds of smaller islands north of Australia. Its roughly 10 million people, most living in rural villages, speak over 800 languages, the most of any country; English, Tok Pisin and Hiri Motu are official. It is a parliamentary democracy and Commonwealth realm. Divided between Germany and Britain in the 1880s, then administered by Australia, it saw fierce fighting in the Second World War and became independent in 1975. A long separatist war on Bougainville ended in the late 1990s.",
+    "dates": [["1884", "Germany and Britain claim the territory"], ["1942", "Japanese invasion, Kokoda campaign"], ["1975", "Independence from Australia"], ["1989", "Bougainville civil war begins"], ["2019", "Bougainville votes for independence"]],
+    "known": ["Over 800 languages", "Birds of paradise and highland tribes", "Kokoda Track", "Sepik River carving", "Rugby league passion"]
+  },
+  "py": {
+    "about": "Paraguay is a landlocked country in the heart of South America, wedged between Argentina, Brazil and Bolivia, with the Paraguay River dividing the fertile east from the dry Chaco. About 7 million people live in this presidential republic, and most are bilingual in Spanish and Guaraní, the indigenous language that is unusually widely spoken. Independent since 1811, it was devastated by the War of the Triple Alliance in the 1860s, fought Bolivia over the Chaco in the 1930s, and endured Alfredo Stroessner's 35-year dictatorship until a 1989 coup opened the way to democracy.",
+    "dates": [["1811", "Independence from Spain"], ["1864", "War of the Triple Alliance begins"], ["1932", "Chaco War with Bolivia begins"], ["1954", "Stroessner dictatorship begins"], ["1989", "Stroessner overthrown, democracy returns"]],
+    "known": ["Guaraní language and culture", "Tereré iced yerba mate", "Itaipu Dam", "Jesuit mission ruins", "The Gran Chaco wilderness"]
+  },
+  "pe": {
+    "about": "Peru lies on South America's Pacific coast, stretching from desert shoreline over the Andes into the Amazon basin. About 34 million people live in this presidential republic, speaking Spanish along with Quechua and Aymara. It was the centre of the Inca Empire until Francisco Pizarro's conquest in the 1530s, then the richest Spanish viceroyalty, before independence in 1821. The twentieth century brought military rule, the Shining Path insurgency of the 1980s and Alberto Fujimori's authoritarian decade; recent years have seen rapid growth alongside chronic political turmoil.",
+    "dates": [["c. 1438", "Inca Empire begins its expansion"], ["1532", "Pizarro's conquest of the Incas"], ["1821", "Independence proclaimed"], ["1879", "War of the Pacific begins"], ["1980s", "Shining Path insurgency"], ["1990", "Fujimori elected president"]],
+    "known": ["Machu Picchu", "Nazca Lines", "Ceviche and world-class cuisine", "Lake Titicaca and the Andes", "Amazon rainforest"]
+  },
+  "ph": {
+    "about": "The Philippines is an archipelago of more than 7,000 islands in Southeast Asia, home to about 115 million people. Filipino and English are official, and it is Asia's largest predominantly Catholic nation, a legacy of three centuries as a Spanish colony from 1565. Ceded to the United States in 1898, occupied by Japan in the Second World War, it became independent in 1946. Ferdinand Marcos ruled under martial law until the 1986 People Power Revolution restored democracy. It is a presidential republic with a large diaspora of overseas workers.",
+    "dates": [["1521", "Magellan arrives"], ["1565", "Spanish colonisation begins"], ["1898", "Ceded to the United States"], ["1946", "Independence"], ["1972", "Marcos declares martial law"], ["1986", "People Power Revolution"]],
+    "known": ["Boracay and Palawan beaches", "Jeepneys", "Adobo and lechon", "Manny Pacquiao", "Overseas Filipino workers"]
+  },
+  "pn": {
+    "about": "The Pitcairn Islands are a British Overseas Territory in the remote South Pacific, halfway between New Zealand and Peru. Only Pitcairn itself is inhabited, by around 50 people, making it the least populous jurisdiction in the world. The islanders descend from the mutineers of HMS Bounty and their Tahitian companions, who settled there in 1790 to hide from the Royal Navy. English and the Pitkern creole are spoken. The territory is administered from New Zealand by a British governor, and its waters form one of the largest marine reserves on earth.",
+    "dates": [["1767", "Sighted by a British ship"], ["1790", "Bounty mutineers settle the island"], ["1838", "Becomes a British colony"], ["1856", "Islanders relocated to Norfolk Island"], ["2016", "Vast marine reserve created"]],
+    "known": ["Mutiny on the Bounty", "Tiny population of about 50", "Pitkern language", "Honey and handicrafts", "Extreme remoteness"]
+  },
+  "pl": {
+    "about": "Poland is a large Central European country on the Baltic Sea, with about 38 million Polish-speaking people and a parliamentary republic. A kingdom from the tenth century, it formed the vast Polish-Lithuanian Commonwealth in 1569, was wiped off the map by partitions in 1795, and reappeared in 1918. The Nazi and Soviet invasion of 1939 began a brutal occupation; after the war Poland became a Soviet-bloc communist state. The Solidarity movement led by Lech Wałęsa helped end communism in 1989, and Poland joined NATO in 1999 and the EU in 2004.",
+    "dates": [["966", "Baptism of Poland"], ["1569", "Polish-Lithuanian Commonwealth formed"], ["1795", "Third partition erases Poland"], ["1918", "Independence regained"], ["1939", "German and Soviet invasion"], ["1989", "Communism ends, Solidarity wins"]],
+    "known": ["Chopin, Copernicus and Marie Curie", "Pope John Paul II", "Pierogi and vodka", "Kraków's old town", "Solidarity movement"]
+  },
+  "pt": {
+    "about": "Portugal occupies the western edge of the Iberian Peninsula along the Atlantic, together with the Azores and Madeira islands. About 10.5 million people speak Portuguese in this semi-presidential republic. A kingdom since 1143, it led the Age of Discovery in the fifteenth and sixteenth centuries and built an empire from Brazil to Macau. Lisbon was levelled by an earthquake in 1755; the monarchy fell in 1910 and the Salazar dictatorship followed until the peaceful Carnation Revolution of 1974, after which Portugal shed its colonies and joined the European Community in 1986.",
+    "dates": [["1143", "Kingdom of Portugal recognised"], ["1498", "Vasco da Gama reaches India"], ["1755", "Great Lisbon earthquake"], ["1910", "Republic proclaimed"], ["1974", "Carnation Revolution ends dictatorship"], ["1986", "Joins European Community"]],
+    "known": ["Port wine and pastéis de nata", "Fado music", "Cristiano Ronaldo", "Azulejo tiles and Lisbon trams", "Algarve beaches"]
+  },
+  "pr": {
+    "about": "Puerto Rico is an unincorporated territory of the United States in the northeastern Caribbean, with about 3.2 million mostly Spanish-speaking residents. Puerto Ricans have been US citizens since 1917, yet cannot vote for president and have no voting member of Congress; the island has its own elected governor and legislature under a 1952 constitution. Settled by Spain from 1508, it was ceded to the United States after the Spanish-American War of 1898. Debates over statehood, independence or continued commonwealth status recur, and Hurricane Maria in 2017 caused lasting damage.",
+    "dates": [["1493", "Columbus lands on the island"], ["1508", "Spanish settlement begins"], ["1898", "Ceded to the United States"], ["1917", "Residents granted US citizenship"], ["1952", "Commonwealth constitution adopted"], ["2017", "Hurricane Maria devastates the island"]],
+    "known": ["Old San Juan's forts", "Reggaeton and Bad Bunny", "Salsa music", "El Yunque rainforest", "Piña colada"]
+  },
+  "qa": {
+    "about": "Qatar is a small peninsula jutting into the Persian Gulf from the Arabian mainland, bordering only Saudi Arabia. Its roughly 3 million residents are mostly foreign workers; citizens number a few hundred thousand. Arabic-speaking and ruled as an absolute monarchy by the Al Thani family, it was a British protectorate until independence in 1971. Vast natural gas reserves have made it one of the richest countries per capita, funding the Al Jazeera network, a global airline and the 2022 World Cup. A Saudi-led blockade isolated it from 2017 to 2021.",
+    "dates": [["1868", "Britain recognises Al Thani rule"], ["1916", "Becomes British protectorate"], ["1971", "Independence"], ["1995", "Emir Hamad takes power"], ["2017", "Saudi-led blockade begins"], ["2022", "Hosts the FIFA World Cup"]],
+    "known": ["Natural gas wealth", "Al Jazeera", "2022 World Cup", "Doha skyline and Museum of Islamic Art", "Qatar Airways"]
+  },
+  "cg": {
+    "about": "The Republic of the Congo, often called Congo-Brazzaville, sits on the Atlantic coast of Central Africa, facing its larger namesake across the Congo River. About 6 million people live there, speaking French, Lingala and Kituba, with most concentrated in Brazzaville and the port of Pointe-Noire. A French colony within French Equatorial Africa, it gained independence in 1960, declared itself a Marxist people's republic in 1969, and has been dominated by Denis Sassou Nguesso, president from 1979 to 1992 and again since a 1997 civil war. Oil drives the economy.",
+    "dates": [["1880", "Brazza signs treaty with local ruler"], ["1910", "Part of French Equatorial Africa"], ["1960", "Independence from France"], ["1969", "Marxist People's Republic declared"], ["1997", "Civil war returns Sassou Nguesso to power"]],
+    "known": ["Brazzaville facing Kinshasa across the river", "Oil exports", "Odzala rainforest and gorillas", "Sapeurs dandy subculture"]
+  },
+  "ro": {
+    "about": "Romania lies in southeastern Europe, where the Carpathian Mountains curve through the country and the Danube reaches the Black Sea. About 19 million people speak Romanian, a Romance language descended from Roman settlers in ancient Dacia. It is a semi-presidential republic and member of NATO and the EU. The principalities of Wallachia and Moldavia united in 1859, independence from the Ottomans came in 1878, and Transylvania was added in 1918. Communist rule after 1947 culminated in Nicolae Ceaușescu's dictatorship, overthrown in a violent revolution in December 1989.",
+    "dates": [["106", "Rome conquers Dacia"], ["1859", "Wallachia and Moldavia unite"], ["1878", "Independence from the Ottoman Empire"], ["1918", "Transylvania joins Romania"], ["1989", "Revolution overthrows Ceaușescu"], ["2007", "Joins the European Union"]],
+    "known": ["Transylvania and Dracula legend", "Painted monasteries of Bukovina", "Danube Delta", "Nadia Comăneci", "Palace of the Parliament"]
+  },
+  "ru": {
+    "about": "Russia is the largest country on earth, spanning eleven time zones from the Baltic to the Pacific across Eastern Europe and northern Asia. About 144 million people, mostly Russian-speaking, live under a federal presidential system dominated by Vladimir Putin since 2000. The state grew from medieval Kievan Rus and Muscovy into the tsarist empire, was transformed by the 1917 Revolution into the Soviet Union, bore the brunt of defeating Nazi Germany, and was a superpower until the USSR collapsed in 1991. Its 2022 invasion of Ukraine has left it isolated from the West.",
+    "dates": [["988", "Kievan Rus adopts Christianity"], ["1547", "Ivan the Terrible crowned tsar"], ["1703", "Peter the Great founds St Petersburg"], ["1917", "Russian Revolution"], ["1991", "Soviet Union dissolves"], ["2022", "Full-scale invasion of Ukraine"]],
+    "known": ["Kremlin and Red Square", "Tolstoy, Dostoevsky and Tchaikovsky", "Bolshoi ballet", "Trans-Siberian Railway", "Yuri Gagarin and spaceflight"]
+  },
+  "rw": {
+    "about": "Rwanda is a small, densely populated, landlocked country in East Africa's Great Lakes region, known as the land of a thousand hills. About 14 million people speak Kinyarwanda, with English, French and Swahili also official. Colonised by Germany and then Belgium, it became independent in 1962 amid Hutu-Tutsi tensions that exploded in the 1994 genocide, when some 800,000 Tutsi and moderate Hutu were killed in about a hundred days. Under President Paul Kagame, in power since 2000, it has rebuilt into one of Africa's most orderly and fast-growing states, though with tight political control.",
+    "dates": [["1899", "German colonial rule begins"], ["1916", "Belgium takes control"], ["1962", "Independence"], ["1994", "Genocide against the Tutsi"], ["2000", "Paul Kagame becomes president"]],
+    "known": ["Mountain gorillas in Volcanoes National Park", "Genocide memorial in Kigali", "Spotless Kigali, plastic bag ban", "Coffee and tea", "Lake Kivu"]
+  },
+  "bl": {
+    "about": "Saint Barthélemy, or St Barts, is a tiny French island in the Leeward Islands of the Caribbean with about 10,000 residents. It is an overseas collectivity of France, having separated administratively from Guadeloupe in 2007, and uses the euro. France first settled it in 1648, then ceded it to Sweden in 1784; the capital Gustavia still bears the name of the Swedish king, and the island returned to France in 1878. Dry and short of fresh water, it has become one of the world's most exclusive resorts, drawing yachts and celebrities.",
+    "dates": [["1648", "French settlement begins"], ["1784", "Ceded to Sweden"], ["1878", "Returned to France"], ["2007", "Becomes a French overseas collectivity"]],
+    "known": ["Luxury villas and superyachts", "Gustavia harbour", "Celebrity holiday destination", "Swedish colonial heritage", "Duty-free shopping"]
+  },
+  "sh": {
+    "about": "Saint Helena is a rugged volcanic island in the South Atlantic, about 2,000 kilometres from Africa, and one of the most remote inhabited places on earth. Around 4,000 English-speaking islanders, known as Saints, live in this British Overseas Territory, which also governs Ascension and Tristan da Cunha. Discovered by the Portuguese in 1502 and settled by the East India Company in 1659, it is best known as the place of Napoleon's final exile from 1815 until his death in 1821. An airport finally opened in 2017 after centuries of access only by ship.",
+    "dates": [["1502", "Discovered by Portuguese navigators"], ["1659", "East India Company settlement"], ["1815", "Napoleon exiled to the island"], ["1834", "Becomes a British Crown colony"], ["2017", "Airport opens"]],
+    "known": ["Napoleon's exile and death", "Jonathan, the world's oldest tortoise", "Jacob's Ladder staircase in Jamestown", "Extreme isolation", "Rare island coffee"]
+  },
+  "kn": {
+    "about": "Saint Kitts and Nevis is a two-island federation in the Leeward Islands of the eastern Caribbean. With about 48,000 people, it is the smallest sovereign state in the Americas by both area and population. English is spoken, and it is a parliamentary democracy and Commonwealth realm. Saint Kitts was England's first Caribbean colony in 1623 and became a sugar powerhouse worked by enslaved Africans; Britain's hold was confirmed in 1783. Independence came in 1983. Nevis narrowly voted against secession in 1998, and the country pioneered citizenship-by-investment schemes.",
+    "dates": [["1623", "First English colony in the Caribbean"], ["1783", "British control confirmed"], ["1983", "Independence"], ["1998", "Nevis secession referendum fails"]],
+    "known": ["Brimstone Hill Fortress", "Sugar heritage and scenic railway", "Citizenship by investment", "Alexander Hamilton's birthplace on Nevis", "Nevis Peak"]
+  },
+  "lc": {
+    "about": "Saint Lucia is a mountainous volcanic island in the Windward Islands of the eastern Caribbean, home to about 180,000 people. English is official and a French-based creole is widely spoken, reflecting a colonial past in which the island changed hands between France and Britain fourteen times before Britain prevailed in 1814. It is a parliamentary democracy and Commonwealth realm, independent since 1979, with an economy based on tourism and bananas. Remarkably for its size, it has produced two Nobel laureates, the economist Arthur Lewis and the poet Derek Walcott.",
+    "dates": [["1660s", "French settlement established"], ["1814", "Ceded to Britain"], ["1967", "Self-governing associated state"], ["1979", "Independence"]],
+    "known": ["The twin Pitons", "Derek Walcott, Nobel poet", "Drive-in Sulphur Springs volcano", "Julien Alfred's Olympic sprint gold", "Jazz festival and Creole cuisine"]
+  },
+  "mf": {
+    "about": "Saint Martin is the French northern part of a small Caribbean island shared with Dutch Sint Maarten, the smallest inhabited island in the world divided between two countries. About 32,000 people live in this French overseas collectivity, which split administratively from Guadeloupe in 2007 and uses the euro. The island was partitioned by the Treaty of Concordia in 1648, and the open border has held ever since. Tourism dominates, with beaches, duty-free shopping and a reputation for fine dining. Hurricane Irma caused enormous destruction in 2017.",
+    "dates": [["1493", "Sighted by Columbus"], ["1648", "Island divided between France and Netherlands"], ["2007", "Becomes a French overseas collectivity"], ["2017", "Hurricane Irma devastates the island"]],
+    "known": ["Island shared with Dutch Sint Maarten", "Gourmet restaurants of Grand Case", "Orient Bay beach", "Marigot market and harbour", "Duty-free shopping"]
+  },
+  "pm": {
+    "about": "Saint Pierre and Miquelon is a small French archipelago just south of Newfoundland, the last remnant of France's North American empire. Its roughly 6,000 inhabitants speak French, use the euro and live in a French overseas collectivity. Claimed by France in the sixteenth century, the islands were repeatedly contested with Britain before being confirmed as French in the early 1800s. Cod fishing sustained them for centuries, and during US Prohibition they boomed as a base for liquor smuggling. A 1992 ruling limited their fishing zone, hurting the economy.",
+    "dates": [["1536", "Jacques Cartier claims the islands"], ["1763", "Returned to France after loss of Canada"], ["1816", "Definitively restored to France"], ["1920s", "Prohibition smuggling boom"], ["1985", "Becomes a territorial collectivity"], ["1992", "Fishing boundary with Canada settled"]],
+    "known": ["Last French foothold in North America", "Cod fishing heritage", "Prohibition-era rum running", "Basque, Breton and Norman roots", "Colourful wooden houses"]
+  },
+  "vc": {
+    "about": "Saint Vincent and the Grenadines consists of the volcanic main island of Saint Vincent and a chain of smaller Grenadine islands in the eastern Caribbean, with about 110,000 English-speaking people. It is a parliamentary democracy and Commonwealth realm. Indigenous Caribs and the mixed-ancestry Garifuna resisted European settlement fiercely; after Britain took control the Garifuna were deported in 1797. Independence came in 1979, the year La Soufrière volcano erupted, as it did again in 2021. Bananas and tourism, especially sailing among the Grenadines, support the economy.",
+    "dates": [["1763", "Ceded to Britain by France"], ["1797", "Garifuna deported after Carib War"], ["1902", "La Soufrière eruption kills thousands"], ["1979", "Independence"], ["2021", "La Soufrière erupts again"]],
+    "known": ["Sailing the Grenadines, Bequia and Mustique", "La Soufrière volcano", "Pirates of the Caribbean filming", "Garifuna heritage", "Bananas and arrowroot"]
+  },
+  "ws": {
+    "about": "Samoa is a Polynesian nation of two main islands, Upolu and Savai'i, in the South Pacific, with about 220,000 people who speak Samoan and English. It is a parliamentary democracy in which only chiefly titleholders, or matai, may stand for parliament, blending Westminster rules with the traditional fa'a Samoa way of life. Germany took the western islands in 1900, New Zealand seized them in 1914, and in 1962 Samoa became the first Pacific island state to regain independence. In 2011 it jumped westward across the International Date Line to align with Australia and New Zealand.",
+    "dates": [["1899", "Western islands assigned to Germany"], ["1914", "New Zealand occupies Samoa"], ["1962", "First independent Pacific island state"], ["1997", "Renamed from Western Samoa"], ["2011", "Crosses the International Date Line"]],
+    "known": ["Fa'a Samoa and matai chief system", "Traditional tatau tattooing", "Rugby prowess", "Robert Louis Stevenson's home", "To Sua Ocean Trench"]
+  },
+  "sm": {
+    "about": "San Marino is a microstate of 61 square kilometres entirely surrounded by Italy, perched on Mount Titano near the Adriatic coast. About 34,000 Italian-speaking people live in what claims to be the world's oldest surviving republic, founded by tradition in 301 AD by the stonemason Saint Marinus. It is governed by two Captains Regent elected every six months, an arrangement dating to the Middle Ages. Protected by Italy and sharing its currency, it survived Italian unification intact and even had Western Europe's first freely elected communist-led government from 1945 to 1957.",
+    "dates": [["301", "Traditional founding by Saint Marinus"], ["1600", "Written constitution adopted"], ["1862", "Friendship treaty with Italy"], ["1945", "Communist-led coalition takes office"], ["1992", "Joins the United Nations"]],
+    "known": ["Oldest republic in the world", "Three towers of Mount Titano", "Captains Regent elected twice a year", "Collectible stamps and coins", "Tax-light shopping and tourism"]
+  },
+  "st": {
+    "about": "São Tomé and Príncipe is a two-island nation in the Gulf of Guinea off Central Africa, and the continent's second-smallest country, with about 230,000 Portuguese-speaking people. Uninhabited until Portuguese settlers arrived in the 1490s, the islands became sugar and later cocoa plantations worked by enslaved and contract labourers; by the early 1900s they were the world's top cocoa producer. Independence came in 1975 as a one-party socialist state, and multiparty democracy followed in 1991. It is a semi-presidential republic with a small economy based on cocoa, tourism and aid.",
+    "dates": [["1470", "Portuguese discover the islands"], ["1493", "Settlement begins"], ["1953", "Batepá massacre of plantation workers"], ["1975", "Independence from Portugal"], ["1991", "First multiparty elections"]],
+    "known": ["Cocoa and fine chocolate", "Historic roça plantations", "Pico Cão Grande volcanic spire", "Rainforest and endemic birds", "Obô National Park"]
+  },
+  "sa": {
+    "about": "Saudi Arabia covers most of the Arabian Peninsula, a land of deserts including the vast Rub' al Khali. About 36 million people, a third of them foreign workers, live under an absolute monarchy ruled by the House of Saud with Islamic law. As guardian of Mecca and Medina, Islam's holiest cities, it hosts millions of pilgrims each year. The kingdom was forged in 1932 by Ibn Saud, and the discovery of oil in 1938 made it a global energy power. Crown Prince Mohammed bin Salman has pushed sweeping social and economic reforms since 2017.",
+    "dates": [["1744", "First Saudi state founded"], ["1902", "Ibn Saud captures Riyadh"], ["1932", "Kingdom of Saudi Arabia proclaimed"], ["1938", "Oil discovered"], ["1979", "Grand Mosque seizure in Mecca"], ["2017", "Mohammed bin Salman becomes crown prince"]],
+    "known": ["Mecca, Medina and the Hajj", "Oil and Saudi Aramco", "Rub' al Khali desert", "AlUla's Nabataean tombs", "NEOM megaproject"]
+  },
+  "sn": {
+    "about": "Senegal is the westernmost country of mainland Africa, on the Atlantic coast at the edge of the Sahel. About 18 million people live in this presidential republic; French is official and Wolof the common tongue, and Islam predominates. France founded Saint-Louis in 1659 and made Dakar the capital of French West Africa. Independent since 1960 under the poet-president Léopold Senghor, Senegal is one of Africa's most stable democracies, with peaceful transfers of power in 2000, 2012 and 2024. Gorée Island near Dakar is a memorial to the Atlantic slave trade.",
+    "dates": [["1659", "France founds Saint-Louis"], ["1895", "Capital of French West Africa"], ["1960", "Independence under Léopold Senghor"], ["2000", "First peaceful change of ruling party"], ["2024", "Bassirou Diomaye Faye elected president"]],
+    "known": ["Gorée Island", "Youssou N'Dour and mbalax music", "Thieboudienne fish and rice", "Teranga hospitality", "Traditional wrestling"]
+  },
+  "rs": {
+    "about": "Serbia is a landlocked country in the central Balkans, with about 6.6 million Serbian-speaking, mostly Orthodox people. A parliamentary republic and EU candidate, it maintains close ties with Russia. A powerful medieval kingdom fell to the Ottomans in the fifteenth century; independence was recognised in 1878, and in 1918 Serbia became the core of Yugoslavia. The federation's bloody breakup in the 1990s, the Kosovo war and NATO's 1999 bombing left deep scars. Montenegro left the union in 2006, and Kosovo declared independence in 2008, which Serbia does not recognise.",
+    "dates": [["1389", "Battle of Kosovo against the Ottomans"], ["1878", "Independence recognised"], ["1918", "Yugoslavia founded"], ["1999", "NATO bombing over Kosovo"], ["2006", "Becomes independent after Montenegro leaves"], ["2008", "Kosovo declares independence"]],
+    "known": ["Novak Djokovic", "Belgrade nightlife and Kalemegdan", "Nikola Tesla heritage", "Rakija and grilled meats", "Basketball and water polo"]
+  },
+  "sc": {
+    "about": "The Seychelles are an archipelago of 115 islands in the Indian Ocean off East Africa, with about 100,000 people, the smallest population of any African country. Seychellois Creole, English and French are official. Uninhabited until the French settled in 1770, the islands passed to Britain in 1814 and became independent in 1976. A coup the next year brought France-Albert René's one-party rule until multiparty politics returned in 1993. Tourism and tuna have given it Africa's highest income per person, and nearly half its land area is protected as nature reserves.",
+    "dates": [["1770", "First French settlement"], ["1814", "Ceded to Britain"], ["1976", "Independence"], ["1977", "Coup by France-Albert René"], ["1993", "Return to multiparty democracy"], ["2020", "First opposition presidential victory"]],
+    "known": ["Anse Source d'Argent granite beaches", "Coco de mer palm", "Aldabra Atoll giant tortoises", "Vallée de Mai", "Luxury resort tourism"]
+  },
+  "sl": {
+    "about": "Sierra Leone lies on West Africa's Atlantic coast, with about 8.5 million people who speak English officially and Krio as a common language. It is a presidential republic. Freetown was founded in the late 1700s by British abolitionists as a home for freed slaves, and the colony became a hub of West African education. Independent since 1961, the country suffered a devastating civil war from 1991 to 2002, fuelled by diamond wealth, followed by the 2014 Ebola epidemic. It remains poor but has held several peaceful elections since the war.",
+    "dates": [["1787", "Freed slaves settle Freetown"], ["1808", "Becomes a British Crown colony"], ["1961", "Independence"], ["1991", "Civil war begins"], ["2002", "Civil war ends"], ["2014", "Ebola epidemic strikes"]],
+    "known": ["Freetown, haven for freed slaves", "Diamonds and the blood diamond trade", "Bunce Island slave fort", "Beaches of the Freetown peninsula", "Fourah Bay College"]
+  },
+  "sg": {
+    "about": "Singapore is a city-state on an island at the tip of the Malay Peninsula, with about 6 million people packed into 730 square kilometres. English, Malay, Mandarin and Tamil are official, reflecting its Chinese, Malay and Indian mix. Founded as a British trading post by Stamford Raffles in 1819, it fell to Japan in 1942, joined Malaysia in 1963 and was expelled into independence in 1965. Under Lee Kuan Yew and the People's Action Party, which has governed continuously, it became one of the world's richest and most orderly states, a global port and financial hub.",
+    "dates": [["1819", "Raffles founds a trading post"], ["1942", "Falls to Japan"], ["1959", "Self-government under Lee Kuan Yew"], ["1963", "Joins Malaysia"], ["1965", "Independence after expulsion from Malaysia"]],
+    "known": ["Marina Bay Sands and Gardens by the Bay", "Changi Airport", "Hawker centres and chicken rice", "Global financial hub", "Strict laws and cleanliness"]
+  },
+  "sx": {
+    "about": "Sint Maarten is the Dutch southern part of a small Caribbean island shared with French Saint Martin, and one of the four constituent countries of the Kingdom of the Netherlands. About 45,000 people live there, speaking Dutch and English. The island was divided by the Treaty of Concordia in 1648, and Sint Maarten was part of the Netherlands Antilles until that federation dissolved in 2010, when it gained its own government under the Dutch crown. Tourism dominates, with cruise ships, casinos and the famous beach beside the airport runway. Hurricane Irma caused severe damage in 2017.",
+    "dates": [["1648", "Island divided between Netherlands and France"], ["1954", "Part of the Netherlands Antilles"], ["2010", "Becomes a constituent country"], ["2017", "Hurricane Irma devastates the island"]],
+    "known": ["Maho Beach jets landing overhead", "Princess Juliana Airport", "Cruise port of Philipsburg", "Casinos and duty-free shopping", "Shared island with French Saint Martin"]
+  },
+  "sk": {
+    "about": "Slovakia is a landlocked Central European country of about 5.4 million Slovak-speaking people, with the Tatra Mountains in the north and the Danube in the south. A parliamentary republic, it joined the EU and NATO in 2004 and the eurozone in 2009. Slovak lands were part of the Kingdom of Hungary for nearly a thousand years before joining the Czechs in Czechoslovakia in 1918. A Nazi-aligned Slovak state existed during the Second World War, followed by communist rule until the 1989 Velvet Revolution. The peaceful Velvet Divorce from the Czech Republic created independent Slovakia in 1993.",
+    "dates": [["1918", "Czechoslovakia founded"], ["1939", "Wartime Slovak state created"], ["1989", "Velvet Revolution ends communism"], ["1993", "Independence in the Velvet Divorce"], ["2004", "Joins EU and NATO"], ["2009", "Adopts the euro"]],
+    "known": ["High Tatras mountains", "Spiš Castle and medieval towns", "World's top car production per capita", "Ice hockey", "Bryndzové halušky dumplings"]
+  },
+  "si": {
+    "about": "Slovenia is a small Central European country of about 2.1 million Slovene-speaking people, stretching from the Julian Alps to a short Adriatic coastline. A parliamentary republic, it joined the EU and NATO in 2004 and the euro in 2007, the first former Yugoslav republic to do so. Slovene lands were under Habsburg rule for centuries before joining the new Yugoslav kingdom in 1918 and Tito's socialist federation after 1945. It declared independence in 1991 and secured it after a brief Ten-Day War, escaping the worse conflicts that followed elsewhere in Yugoslavia.",
+    "dates": [["1918", "Joins the Kingdom of Yugoslavia"], ["1945", "Part of socialist Yugoslavia"], ["1991", "Independence after the Ten-Day War"], ["2004", "Joins EU and NATO"], ["2007", "Adopts the euro"]],
+    "known": ["Lake Bled", "Postojna Cave", "Mount Triglav and the Julian Alps", "Tadej Pogačar and Luka Dončić", "Ljubljana's Dragon Bridge"]
+  },
+  "sb": {
+    "about": "The Solomon Islands are a Melanesian nation of hundreds of islands east of Papua New Guinea, with about 750,000 people speaking more than 70 languages; English is official and Pijin the lingua franca. It is a parliamentary democracy and Commonwealth realm. A British protectorate from 1893, it saw the pivotal Battle of Guadalcanal in the Second World War and became independent in 1978. Ethnic violence around 2000 prompted an Australian-led intervention that lasted until 2017. In 2019 it switched diplomatic recognition from Taiwan to China, and a 2022 security pact with Beijing drew wide attention.",
+    "dates": [["1568", "Spanish explorer Mendaña names the islands"], ["1893", "British protectorate declared"], ["1942", "Battle of Guadalcanal"], ["1978", "Independence"], ["2003", "Australian-led RAMSI intervention"], ["2019", "Switches recognition from Taiwan to China"]],
+    "known": ["Guadalcanal battlefields and wreck diving", "Marovo Lagoon", "Traditional wood carving", "Linguistic and cultural diversity", "Rich coral reefs"]
+  },
+  "so": {
+    "about": "Somalia occupies the Horn of Africa, with the longest coastline on the African mainland, and about 18 million mostly Somali-speaking Muslim people. Formed in 1960 by merging British and Italian Somaliland, it was ruled by Siad Barre from 1969 until his fall in 1991 plunged the country into clan warfare and state collapse. Since 2012 a federal government in Mogadishu has slowly rebuilt, still fighting the al-Shabaab insurgency. Somaliland in the northwest has run itself as a de facto independent state since 1991 but is not internationally recognised. Piracy off its coast peaked around 2010.",
+    "dates": [["1960", "Independence and union of two Somalilands"], ["1969", "Siad Barre seizes power"], ["1977", "Ogaden War with Ethiopia"], ["1991", "Barre falls, state collapses"], ["1993", "Battle of Mogadishu, Black Hawk Down"], ["2012", "Federal government established"]],
+    "known": ["Nation of poets", "Camels and nomadic pastoralism", "Frankincense and myrrh", "Piracy off the Horn of Africa", "Self-governing Somaliland"]
+  },
+  "za": {
+    "about": "South Africa occupies the southern tip of the continent, with about 62 million people and twelve official languages including Zulu, Xhosa, Afrikaans and English. A parliamentary republic, it spreads government across three capitals: Pretoria for the executive, Cape Town for parliament and Bloemfontein for the courts. Dutch settlers arrived in 1652, Britain later took the Cape, and the Boer War of 1899 to 1902 preceded union in 1910. The apartheid system of racial segregation imposed in 1948 ended with Nelson Mandela's release in 1990 and the first democratic election in 1994. It is Africa's most industrialised economy.",
+    "dates": [["1652", "Dutch settlement at the Cape"], ["1899", "Second Boer War begins"], ["1910", "Union of South Africa formed"], ["1948", "Apartheid introduced"], ["1990", "Mandela freed"], ["1994", "First democratic elections"]],
+    "known": ["Nelson Mandela", "Table Mountain and Cape Town", "Kruger National Park safaris", "Springboks rugby", "Gold, diamonds and Cape wine"]
+  },
+  "kr": {
+    "about": "South Korea occupies the southern half of the Korean Peninsula in East Asia, with about 52 million Korean-speaking people, half of them in the Seoul metropolitan area. It is a presidential republic and a technological and cultural powerhouse. The Joseon dynasty ruled a unified Korea for five centuries until Japan annexed it in 1910. Liberation in 1945 brought division at the 38th parallel, then the Korean War of 1950 to 1953, which ended in an armistice rather than peace. Decades of authoritarian rule and breakneck industrialisation gave way to democracy in 1987 and today's prosperity.",
+    "dates": [["1392", "Joseon dynasty founded"], ["1910", "Annexed by Japan"], ["1945", "Liberation and division of Korea"], ["1950", "Korean War begins"], ["1987", "Democratisation"], ["1988", "Seoul Olympics"]],
+    "known": ["K-pop and BTS", "Samsung and Hyundai", "Kimchi and Korean barbecue", "Films like Parasite and Squid Game", "The DMZ border"]
+  },
+  "ss": {
+    "about": "South Sudan is a landlocked country in east-central Africa and the world's newest sovereign state, independent since 2011. About 11 million people live there; English is official, and Dinka and Nuer are the largest of many ethnic groups, mostly Christian or following traditional beliefs. It separated from Sudan after two long civil wars, in 1955 to 1972 and 1983 to 2005, and an overwhelming referendum vote. A presidential republic led by Salva Kiir since independence, it collapsed into its own civil war in 2013; a 2018 peace deal holds uneasily. Oil provides nearly all revenue, yet poverty is severe.",
+    "dates": [["1955", "First Sudanese civil war begins"], ["1983", "Second Sudanese civil war begins"], ["2005", "Comprehensive Peace Agreement"], ["2011", "Independence from Sudan"], ["2013", "Civil war erupts"], ["2018", "Peace agreement signed"]],
+    "known": ["World's newest country", "Sudd wetland on the White Nile", "Cattle-centred Dinka and Nuer culture", "Vast antelope migrations", "Oil fields"]
+  },
+  "es": {
+    "about": "Spain covers most of the Iberian Peninsula in southwestern Europe, plus the Balearic and Canary Islands and two enclaves in North Africa. About 48 million people live in this parliamentary monarchy of 17 autonomous regions; Spanish is national, with Catalan, Basque and Galician co-official regionally. Roman and Visigothic rule gave way to Muslim al-Andalus from 711 until the Reconquista ended in 1492, the year Columbus sailed and a global empire began. Decline, civil war in the 1930s and Franco's dictatorship until 1975 were followed by a swift transition to democracy and EU membership in 1986.",
+    "dates": [["711", "Muslim conquest of Iberia begins"], ["1492", "Fall of Granada, Columbus sails"], ["1808", "Peninsular War against Napoleon"], ["1936", "Civil War begins"], ["1975", "Franco dies, democracy restored"], ["1986", "Joins the European Community"]],
+    "known": ["Sagrada Família and Gaudí", "Flamenco", "Tapas and paella", "Real Madrid and FC Barcelona", "The Alhambra and Prado"]
+  }
+}

@@ -1,7 +1,9 @@
-/* Wiring: tabs, the map tab's info card, and the quiz panels. */
-import { loadData, flagUrl, CONTINENTS, getStats, record, resetStats, loadSetting, saveSetting } from './data.js';
+/* Wiring: tabs, the map tab's info card, the quiz panels and the sync settings. */
+import { loadData, loadInfo, flagUrl, CONTINENTS, loadSetting, saveSetting } from './data.js';
+import * as store from './store.js';
+import { githubBackend } from './sync-github.js';
 import { createMap } from './map.js';
-import { MODES, pool, makeQuestion } from './quiz.js';
+import { MODES, pool, makeQuestion, makePileQuestion } from './quiz.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
@@ -23,6 +25,7 @@ function showTab(t) {
   document.body.className = 'tab-' + t;
   $('#tab-map').setAttribute('aria-selected', t === 'map');
   $('#tab-quiz').setAttribute('aria-selected', t === 'quiz');
+  $('#settings').hidden = true;
   if (t === 'map') {
     $('#setup').hidden = $('#question').hidden = true;
     world.mark({});
@@ -41,7 +44,7 @@ function applyFlags() {
   $('#hint').hidden = settings.showFlags;
   world.setMarkers(settings.showFlags);
 }
-function openInfo(id) {
+async function openInfo(id) {
   const c = data.byId.get(id);
   if (!c) return closeInfo();
   infoId = id;
@@ -54,7 +57,15 @@ function openInfo(id) {
   const hide = !settings.showFlags;
   card.classList.toggle('hidden-answer', hide);
   card.querySelector('.reveal').hidden = !hide;
+  const more = card.querySelector('.info-more');
+  more.innerHTML = '';
   card.hidden = false;
+  card.scrollTop = 0;
+  const x = (await loadInfo())[id];
+  if (!x || infoId !== id) return;
+  more.innerHTML = `<p class="about">${esc(x.about)}</p>` +
+    (x.dates?.length ? `<ul class="dates">${x.dates.map(([y, e]) => `<li><b>${esc(y)}</b> ${esc(e)}</li>`).join('')}</ul>` : '') +
+    (x.known?.length ? `<p class="label">Known for</p><div class="known">${x.known.map((k) => `<span>${esc(k)}</span>`).join('')}</div>` : '');
 }
 function closeInfo() {
   infoId = null;
@@ -63,26 +74,34 @@ function closeInfo() {
 }
 
 // ---- quiz -----------------------------------------------------------------------------------
-let q = null, answered = false, recent = [];
+// session.source: 'pool' (mode + region from setup) or 'pile' (the hard pile, each card in its own mode)
+let session = { source: 'pool' };
+let q = null, phase = 'ask', verdict = null, recent = [];
 let score = { right: 0, total: 0, streak: 0 };
 
 function showSetup() {
   $('#question').hidden = true;
-  const modes = $('#modes');
-  modes.innerHTML = Object.entries(MODES)
+  $('#settings').hidden = true;
+  $('#modes').innerHTML = Object.entries(MODES)
     .map(([k, m]) => `<button data-mode="${k}" aria-pressed="${k === settings.mode}">${esc(m.label)}</button>`).join('');
   $('#regions').innerHTML = ['World', ...CONTINENTS]
     .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === settings.region}">${esc(r)}</button>`).join('');
   $('#territories').checked = settings.territories;
-  const st = Object.values(getStats());
+  const st = Object.values(store.getStats());
   const right = st.reduce((s, x) => s + x.right, 0), total = st.reduce((s, x) => s + x.right + x.wrong, 0);
   const n = pool(data.countries, settings).length;
   $('#progress').textContent = `${n} countries in this pool. ` +
     (total ? `So far: ${total} answers, ${Math.round((100 * right) / total)}% correct.` : 'No answers yet.');
+  const nHard = Object.keys(store.hardCards()).length, due = store.dueCount();
+  $('#pile-info').innerHTML = nHard ? `<b>Hard pile</b> · ${nHard} card${nHard > 1 ? 's' : ''}, ${due} due` : '<b>Hard pile</b> · empty. Add cards after answering.';
+  $('#start-pile').disabled = !nHard;
+  showSyncStatus();
   $('#setup').hidden = false;
+  $('#setup').scrollTop = 0;
 }
 
-function startQuiz() {
+function startQuiz(source) {
+  session = { source };
   score = { right: 0, total: 0, streak: 0 };
   recent = [];
   q = null;
@@ -90,15 +109,22 @@ function startQuiz() {
 }
 
 function nextQuestion() {
-  const list = pool(data.countries, settings);
-  if (!list.length) return;
-  q = makeQuestion(settings.mode, list, data.countries.filter((c) => settings.territories || c.sovereign),
-    { stats: getStats(), avoid: recent });
-  recent = [q.target.id, ...recent].slice(0, Math.min(15, Math.floor(list.length / 2)));
-  answered = false;
+  const all = data.countries.filter((c) => settings.territories || c.sovereign);
+  if (session.source === 'pile') {
+    q = makePileQuestion(store.hardCards(), data.byId, all, { avoid: recent });
+    if (!q) { session.source = 'pool'; return showSetup(); }
+    recent = [store.cardKey(q.mode, q.target.id), ...recent].slice(0, Math.min(5, Math.floor(Object.keys(store.hardCards()).length / 2)));
+  } else {
+    const list = pool(data.countries, settings);
+    if (!list.length) return;
+    q = makeQuestion(settings.mode, list, all, { stats: store.getStats(), avoid: recent });
+    recent = [q.target.id, ...recent].slice(0, Math.min(15, Math.floor(list.length / 2)));
+  }
+  phase = 'ask';
+  verdict = null;
   world.mark({});
   world.setMarkers(false);
-  if (q.answer === 'map') world.flyToRegion(settings.region);
+  if (q.type === 'map') world.flyToRegion(session.source === 'pile' ? q.target.continent : settings.region);
   showQuestion();
 }
 
@@ -107,70 +133,113 @@ const askHtml = (c, what) => what === 'flag'
   : what === 'capital' ? `<div class="q-text"><small>Capital</small>${esc(c.capital)}</div>`
   : `<div class="q-text"><small>Country</small>${esc(c.name)}</div>`;
 
+const hint = { recall: '', map: 'Tap it on the map', choice: '' };
+
 function showQuestion() {
   $('#setup').hidden = true;
+  $('#settings').hidden = true;
   const card = $('#question');
   card.hidden = false;
-  card.classList.toggle('map-q', q.answer === 'map');
-  card.classList.toggle('answered', answered);
-  $('#q-mode').textContent = MODES[q.mode].label;
+  card.classList.toggle('map-q', q.type === 'map');
+  card.classList.toggle('answered', phase === 'done');
+  $('#q-mode').textContent = (session.source === 'pile' ? 'Hard pile · ' : '') + MODES[q.mode].label;
   updateScore();
   $('#q-prompt').innerHTML = askHtml(q.target, q.ask) +
-    (q.answer === 'map' ? '<p class="muted center">Tap it on the map</p>' : '');
+    (hint[q.type] ? `<p class="muted center">${hint[q.type]}</p>` : '') +
+    (q.early && phase === 'ask' ? '<p class="muted center">Nothing due — practising early</p>' : '');
   const opts = $('#q-options');
   opts.className = q.answer === 'flag' ? 'grid flags' : 'grid';
   opts.innerHTML = q.options.map((c) => `<button data-id="${c.id}">${
     q.answer === 'flag' ? `<img src="${flagUrl(c.id)}" alt="">` : esc(q.answer === 'capital' ? c.capital : c.name)}</button>`).join('');
-  $('#q-result').hidden = true;
-  $('#q-next').hidden = true;
-  $('#q-skip').hidden = false;
-  if (answered) renderResult();
+  renderPhase();
 }
 
 function updateScore() {
   $('#q-score').textContent = `${score.right}/${score.total}` + (score.streak > 2 ? ` · 🔥${score.streak}` : '');
 }
 
-let lastResult = null;
-function answer(correct, chosenId) {
-  if (answered) return;
-  answered = true;
-  record(q.target.id, correct);
-  score.total++;
-  if (correct) { score.right++; score.streak++; } else score.streak = 0;
-  const marks = { [q.target.id]: correct ? 'right' : 'target' };
-  if (!correct && chosenId && chosenId !== q.target.id) marks[chosenId] = 'wrong';
-  lastResult = { correct, chosenId };
-  world.mark(marks);
-  world.setMarkers(false, Object.keys(marks));
-  world.flyToCountry(q.target);
-  renderResult();
-}
+const answerHtml = (c) => `<div class="answer">${q.ask === 'flag' ? '' : `<img src="${flagUrl(c.id)}" alt="">`}<div><b>${esc(c.name)}</b><br>Capital: ${esc(c.capital)}</div></div>`;
 
-function renderResult() {
-  const { correct, chosenId } = lastResult;
-  updateScore();
+/** Buttons and result area for the current phase: ask → (revealed, flashcards only) → done. */
+function renderPhase() {
+  const r = $('#q-result'), btns = $('#q-buttons');
+  const key = store.cardKey(q.mode, q.target.id);
+  if (phase === 'ask') {
+    r.hidden = true;
+    btns.innerHTML = q.type === 'recall'
+      ? '<button data-act="reveal" class="primary wide">Show answer</button>'
+      : '<button data-act="skip" class="ghost">Skip</button>';
+    return;
+  }
+  if (phase === 'revealed') {
+    r.innerHTML = answerHtml(q.target);
+    r.hidden = false;
+    btns.innerHTML = '<button data-act="wrong" class="btn-bad wide">✗ Didn\'t know</button><button data-act="right" class="btn-ok wide">✓ Knew it</button>';
+    return;
+  }
+  const { correct, chosenId } = verdict;
+  $('#question').classList.add('answered');
   for (const b of $('#q-options').querySelectorAll('button')) {
     b.disabled = true;
     if (b.dataset.id === q.target.id) b.classList.add('right');
     else if (b.dataset.id === chosenId) b.classList.add('wrong');
   }
-  const c = q.target;
-  const chosen = chosenId && chosenId !== c.id ? data.byId.get(chosenId) : null;
-  $('#question').classList.add('answered');
-  const r = $('#q-result');
-  r.innerHTML = `<p class="verdict ${correct ? 'ok' : 'bad'}">${correct ? '✓ Correct' : chosenId ? '✗ Not quite' : 'Skipped'}</p>
-    <div class="answer"><img src="${flagUrl(c.id)}" alt=""><div><b>${esc(c.name)}</b><br>Capital: ${esc(c.capital)}</div></div>` +
+  const chosen = chosenId && chosenId !== q.target.id ? data.byId.get(chosenId) : null;
+  r.innerHTML = `<p class="verdict ${correct ? 'ok' : 'bad'}">${correct ? '✓ Correct' : verdict.skipped ? 'Skipped' : q.type === 'recall' ? '✗ Not yet' : '✗ Not quite'}</p>` +
+    answerHtml(q.target) +
     (chosen ? `<p class="muted">You picked ${esc(chosen.name)} (${esc(chosen.capital)})</p>` : '');
   r.hidden = false;
-  $('#q-skip').hidden = true;
-  $('#q-next').hidden = false;
+  const inPile = store.isHard(key);
+  btns.innerHTML = `<button data-act="pile" class="pile ${!inPile && !correct ? 'suggest' : ''}">${
+    inPile ? '★ In hard pile · remove' : '☆ Add to hard pile'}</button><button data-act="next" class="primary">Next</button>`;
 }
+
+function answer(correct, chosenId, skipped = false) {
+  if (phase === 'done') return;
+  phase = 'done';
+  verdict = { correct, chosenId, skipped };
+  store.record(q.mode, q.target.id, correct);
+  score.total++;
+  if (correct) { score.right++; score.streak++; } else score.streak = 0;
+  updateScore();
+  const marks = { [q.target.id]: correct ? 'right' : 'target' };
+  if (!correct && chosenId && chosenId !== q.target.id) marks[chosenId] = 'wrong';
+  world.mark(marks);
+  world.setMarkers(false, Object.keys(marks));
+  world.flyToCountry(q.target);
+  renderPhase();
+}
+
+// ---- sync settings --------------------------------------------------------------------------
+let syncing = false, syncTimer = 0;
+function backend() {
+  const cfg = store.syncConfig();
+  return cfg?.kind === 'github' && cfg.token ? githubBackend(cfg) : null;
+}
+function showSyncStatus(msg) {
+  const cfg = store.syncConfig();
+  const text = msg || (backend()
+    ? (cfg.last ? `Synced ${new Date(cfg.last).toLocaleString()}` : 'Sync on')
+    : 'Not synced: progress is kept on this phone only.');
+  $('#sync-status').textContent = text;
+  $('#sync-line').textContent = text;
+  $('#sync-off').hidden = $('#sync-now').hidden = !backend();
+}
+async function runSync() {
+  const b = backend();
+  if (!b || syncing || !navigator.onLine) return;
+  syncing = true;
+  showSyncStatus('Syncing…');
+  try { await store.sync(b); showSyncStatus(); if (!$('#setup').hidden) showSetup(); }
+  catch (e) { showSyncStatus(`Sync failed (${e.message}). Will retry.`); }
+  finally { syncing = false; }
+}
+store.onChange(() => { clearTimeout(syncTimer); syncTimer = setTimeout(runSync, 5000); });
 
 // ---- events -------------------------------------------------------------------------------
 function onMapClick(id, viaMarker, point) {
   if (tab === 'map') { id ? openInfo(id) : closeInfo(); return; }
-  if (!q || answered || q.answer !== 'map') return;
+  if (!q || phase !== 'ask' || q.type !== 'map') return;
   if (!id) return;  // tap on the ocean: ignore
   const t = q.target.id;
   // generous for small countries: a few px around the shape or the capital counts
@@ -199,15 +268,45 @@ function wire() {
   $('#modes').onclick = (e) => { const b = e.target.closest('button'); if (b) { set('mode', b.dataset.mode); showSetup(); } };
   $('#regions').onclick = (e) => { const b = e.target.closest('button'); if (b) { set('region', b.dataset.region); world.flyToRegion(b.dataset.region); showSetup(); } };
   $('#territories').onchange = (e) => { set('territories', e.target.checked); showSetup(); };
-  $('#reset').onclick = () => { if (confirm('Forget all quiz progress?')) { resetStats(); showSetup(); } };
-  $('#start').onclick = startQuiz;
+  $('#reset').onclick = () => { if (confirm('Forget all answer statistics? (The hard pile stays.)')) { store.resetStats(); showSetup(); } };
+  $('#start').onclick = () => startQuiz('pool');
+  $('#start-pile').onclick = () => startQuiz('pile');
   $('#q-back').onclick = () => { q = null; world.mark({}); world.setMarkers(false); showSetup(); };
-  $('#q-next').onclick = nextQuestion;
-  $('#q-skip').onclick = () => answer(false, null);
   $('#q-options').onclick = (e) => {
     const b = e.target.closest('button');
-    if (b && !answered) answer(b.dataset.id === q.target.id, b.dataset.id);
+    if (b && phase === 'ask') answer(b.dataset.id === q.target.id, b.dataset.id);
   };
+  $('#q-buttons').onclick = (e) => {
+    const act = e.target.closest('button')?.dataset.act;
+    if (act === 'reveal') {
+      phase = 'revealed';
+      world.mark({ [q.target.id]: 'target' });
+      world.setMarkers(false, [q.target.id]);
+      world.flyToCountry(q.target);
+      renderPhase();
+    } else if (act === 'right' || act === 'wrong') answer(act === 'right', null);
+    else if (act === 'skip') answer(false, null, true);
+    else if (act === 'next') nextQuestion();
+    else if (act === 'pile') {
+      const key = store.cardKey(q.mode, q.target.id);
+      store.isHard(key) ? store.removeHard(key) : store.addHard(key);
+      renderPhase();
+    }
+  };
+
+  $('#open-settings').onclick = () => { $('#setup').hidden = true; $('#settings').hidden = false; showSyncStatus(); };
+  $('#settings .close').onclick = showSetup;
+  $('#sync-save').onclick = () => {
+    const token = $('#sync-token').value.trim();
+    if (!token) return;
+    store.setSyncConfig({ kind: 'github', token });
+    $('#sync-token').value = '';
+    runSync();
+  };
+  $('#sync-now').onclick = runSync;
+  $('#sync-off').onclick = () => { if (confirm('Turn off sync on this phone? Progress stays on the phone.')) { store.setSyncConfig(null); showSyncStatus(); } };
+  // sync when the app is put away (save) and when it comes back (pick up changes from elsewhere)
+  document.addEventListener('visibilitychange', runSync);
 }
 
 async function start() {
@@ -215,9 +314,10 @@ async function start() {
   world = createMap($('#map'), {
     countries: data.countries, world: data.world, projection: settings.projection, onClick: onMapClick,
   });
-  window.__app = { data, world };  // for debugging / screenshots
+  window.__app = { data, world, store };  // for debugging / screenshots
   wire();
   world.map.on('load', () => showTab('map'));
+  runSync();
 }
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');

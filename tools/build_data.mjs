@@ -15,8 +15,14 @@
  *       Natural Earth 1:10m populated places (public domain), via nvkelso/natural-earth-vector
  *       Entries missing there are filled from the CAPITAL_COORDS table below.
  *   - Country shapes:
- *       Natural Earth 1:50m admin-0 countries (public domain), as world-atlas@2 countries-50m.json
- *       (TopoJSON, ids = ISO 3166-1 numeric), converted with topojson-client.
+ *       Natural Earth 1:50m admin-0 countries (public domain), the GeoJSON from
+ *       nvkelso/natural-earth-vector. Its rings are already cut at the antimeridian
+ *       (no ring jumps from +180 to -180), which MapLibre's globe needs. Somaliland, N. Cyprus
+ *       and Siachen Glacier are dissolved into Somalia / Cyprus / India (shared border removed).
+ *   - Flag position (fx, fy in countries.json):
+ *       pole of inaccessibility (polylabel algorithm, reimplemented below after
+ *       mapbox/polylabel, ISC) of each country's largest polygon, computed in a plane where
+ *       longitude is scaled by cos(mean latitude) of that polygon.
  *   - Flags:
  *       flag-icons npm package (MIT) https://github.com/lipis/flag-icons, flags/4x3/ set.
  *
@@ -28,7 +34,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,8 +45,7 @@ const FLAG_ICONS_VERSION = '7.5.0';
 const SRC = {
   countries: 'https://raw.githubusercontent.com/mledoze/countries/master/countries.json',
   places: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places_simple.geojson',
-  atlas: 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json',
-  topojson: 'https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.js',
+  shapes: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson',
   flags: `https://registry.npmjs.org/flag-icons/-/flag-icons-${FLAG_ICONS_VERSION}.tgz`,
 };
 
@@ -143,14 +147,14 @@ const NE_NAME_HINT = {
   CL: 'Santiago', JP: 'Tokyo', PH: 'Manila', MA: 'Rabat', SZ: 'Mbabane', LK: 'Colombo',
 };
 
-// world-atlas geometries without an ISO numeric id, keyed by their NE name.
-// value = iso2 to merge into, or null to drop.
-const UNNUMBERED_GEOMETRIES = {
-  'Kosovo': 'XK',
-  'Somaliland': 'SO',       // merged into Somalia
-  'N. Cyprus': 'CY',        // merged into Cyprus
-  'Siachen Glacier': 'IN',  // de facto administered by India
-  'Indian Ocean Ter.': null, // Christmas/Cocos sliver, dropped
+// Natural Earth features whose ISO_A2_EH is not a usable code, keyed by ADM0_A3.
+// value = iso2 to dissolve into, or null to drop.
+const SHAPE_OVERRIDES = {
+  SOL: 'SO',   // Somaliland -> Somalia
+  CYN: 'CY',   // N. Cyprus -> Cyprus
+  KAS: 'IN',   // Siachen Glacier -> India (de facto administered)
+  IOA: null,   // Indian Ocean Territories (Christmas/Cocos sliver, no polygon in the app)
+  ATC: null,   // Ashmore and Cartier Islands (uninhabited)
 };
 
 // ---------------------------------------------------------------------------
@@ -169,6 +173,7 @@ async function download(url, file) {
 
 const readJson = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
 const round3 = (n) => Math.round(n * 1000) / 1000;
+const polygonsOf = (geom) => (geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates);
 
 function continentOf(c) {
   if (c.cca2 === 'TR' || c.cca2 === 'RU') return 'Europe';
@@ -177,6 +182,161 @@ function continentOf(c) {
     case 'Africa': case 'Asia': case 'Europe': case 'Oceania': return c.region;
     default: throw new Error(`no continent for ${c.cca2} (${c.region})`);
   }
+}
+
+// Signed planar area of a ring (shoelace).
+function ringArea(ring) {
+  let a = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) a += (ring[j][0] + ring[i][0]) * (ring[j][1] - ring[i][1]);
+  return a / 2;
+}
+
+// Ray-casting point-in-ring test.
+function pointInRing([x, y], ring) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+const pointInPolygon = (p, poly) => pointInRing(p, poly[0]) && !poly.slice(1).some((h) => pointInRing(p, h));
+
+// ---------------------------------------------------------------------------
+// Polygon dissolve: union of two polygons that share an exact common border (as Natural
+// Earth features do). Directed edges that appear in both directions cancel; the remaining
+// edges are chained back into rings. Rings with the orientation of the original outer ring
+// become outers, the rest holes.
+// ---------------------------------------------------------------------------
+
+function dissolve(polyA, polyB) {
+  const key = (p) => `${p[0]},${p[1]}`;
+  const edges = new Map(); // "from|to" -> [from, to]
+  for (const poly of [polyA, polyB]) for (const ring of poly) {
+    for (let i = 1; i < ring.length; i++) edges.set(`${key(ring[i - 1])}|${key(ring[i])}`, [ring[i - 1], ring[i]]);
+  }
+  for (const k of [...edges.keys()]) {
+    const [a, b] = k.split('|');
+    if (edges.has(`${b}|${a}`)) { edges.delete(k); edges.delete(`${b}|${a}`); }
+  }
+  const next = new Map(); // from -> [edge keys]
+  for (const [k, [a]] of edges) (next.get(key(a)) ?? next.set(key(a), []).get(key(a))).push(k);
+  const rings = [];
+  while (edges.size) {
+    const start = edges.keys().next().value;
+    const ring = [edges.get(start)[0]];
+    let cur = start;
+    while (cur) {
+      const [, to] = edges.get(cur);
+      edges.delete(cur);
+      ring.push(to);
+      const out = (next.get(key(to)) ?? []).filter((k) => edges.has(k));
+      cur = out[0];
+      if (key(to) === key(ring[0])) break;
+    }
+    if (key(ring[0]) !== key(ring[ring.length - 1])) throw new Error('dissolve: open ring');
+    rings.push(ring);
+  }
+  const outerSign = Math.sign(ringArea(polyA[0]));
+  const outers = rings.filter((r) => Math.sign(ringArea(r)) === outerSign);
+  const holes = rings.filter((r) => Math.sign(ringArea(r)) !== outerSign);
+  if (outers.length !== 1) throw new Error(`dissolve: expected 1 outer ring, got ${outers.length}`);
+  return [outers[0], ...holes];
+}
+
+// Merge feature B's polygons into feature A's geometry. Polygons that touch are dissolved,
+// the others are appended as they are.
+function mergeGeometries(geomA, geomB) {
+  const polysA = polygonsOf(geomA).map((p) => p);
+  const polysB = polygonsOf(geomB);
+  const vertexSet = (poly) => new Set(poly.flat().map((p) => `${p[0]},${p[1]}`));
+  for (const pb of polysB) {
+    const vb = vertexSet(pb);
+    const i = polysA.findIndex((pa) => pa[0].some((p) => vb.has(`${p[0]},${p[1]}`)));
+    if (i === -1) polysA.push(pb);
+    else polysA[i] = dissolve(polysA[i], pb);
+  }
+  return polysA.length === 1 ? { type: 'Polygon', coordinates: polysA[0] } : { type: 'MultiPolygon', coordinates: polysA };
+}
+
+// ---------------------------------------------------------------------------
+// Pole of inaccessibility (after mapbox/polylabel, ISC license).
+// ---------------------------------------------------------------------------
+
+function polylabel(polygon, precision = 1e-4) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const [x, y] of polygon[0]) { minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); }
+  const width = maxX - minX, height = maxY - minY;
+  const cellSize = Math.min(width, height);
+  let h = cellSize / 2;
+  if (cellSize === 0) return [minX, minY];
+
+  // distance from point to polygon outline (negative if outside)
+  const segDistSq = (px, py, [ax, ay], [bx, by]) => {
+    let x = ax, y = ay, dx = bx - ax, dy = by - ay;
+    if (dx !== 0 || dy !== 0) {
+      const t = ((px - x) * dx + (py - y) * dy) / (dx * dx + dy * dy);
+      if (t > 1) { x = bx; y = by; } else if (t > 0) { x += dx * t; y += dy * t; }
+    }
+    dx = px - x; dy = py - y;
+    return dx * dx + dy * dy;
+  };
+  const pointToPolygonDist = (x, y) => {
+    let inside = false, minDistSq = Infinity;
+    for (const ring of polygon) {
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const a = ring[i], b = ring[j];
+        if ((a[1] > y) !== (b[1] > y) && x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]) inside = !inside;
+        minDistSq = Math.min(minDistSq, segDistSq(x, y, a, b));
+      }
+    }
+    return (inside ? 1 : -1) * Math.sqrt(minDistSq);
+  };
+  const cell = (x, y, h) => { const d = pointToPolygonDist(x, y); return { x, y, h, d, max: d + h * Math.SQRT2 }; };
+
+  // simple max-heap on `max`
+  const heap = [];
+  const push = (c) => { heap.push(c); let i = heap.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (heap[p].max >= heap[i].max) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+  const pop = () => {
+    const top = heap[0], last = heap.pop();
+    if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l].max > heap[m].max) m = l; if (r < heap.length && heap[r].max > heap[m].max) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } }
+    return top;
+  };
+
+  for (let x = minX; x < maxX; x += cellSize) for (let y = minY; y < maxY; y += cellSize) push(cell(x + h, y + h, h));
+  let best = cell(minX + width / 2, minY + height / 2, 0);
+  // centroid as another candidate
+  { let a = 0, cx = 0, cy = 0; const r = polygon[0];
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const f = r[i][0] * r[j][1] - r[j][0] * r[i][1]; cx += (r[i][0] + r[j][0]) * f; cy += (r[i][1] + r[j][1]) * f; a += f * 3; }
+    const c = a === 0 ? cell(r[0][0], r[0][1], 0) : cell(cx / a, cy / a, 0);
+    if (c.d > best.d) best = c; }
+
+  while (heap.length) {
+    const c = pop();
+    if (c.d > best.d) best = c;
+    if (c.max - best.d <= precision) continue;
+    h = c.h / 2;
+    push(cell(c.x - h, c.y - h, h)); push(cell(c.x + h, c.y - h, h));
+    push(cell(c.x - h, c.y + h, h)); push(cell(c.x + h, c.y + h, h));
+  }
+  return [best.x, best.y];
+}
+
+// Flag anchor: pole of inaccessibility of the largest polygon, in a plane where x is scaled
+// by cos(mean latitude) of that polygon. Returns [lon, lat].
+function flagPoint(geom) {
+  let best = null, bestArea = -1;
+  for (const poly of polygonsOf(geom)) {
+    const lats = poly[0].map((p) => p[1]);
+    const k = Math.cos(((Math.min(...lats) + Math.max(...lats)) / 2) * Math.PI / 180);
+    const scaled = poly.map((ring) => ring.map(([x, y]) => [x * k, y]));
+    const area = Math.abs(ringArea(scaled[0])) - scaled.slice(1).reduce((s, r) => s + Math.abs(ringArea(r)), 0);
+    if (area > bestArea) { bestArea = area; best = { scaled, k, poly }; }
+  }
+  const [sx, sy] = polylabel(best.scaled, 1e-4);
+  const pt = [sx / best.k, sy];
+  if (!pointInPolygon(pt, best.poly)) throw new Error('flag point outside its polygon');
+  return pt;
 }
 
 // ---------------------------------------------------------------------------
@@ -244,36 +404,44 @@ function buildCountries(mledoze, places) {
 // 2. world.geojson
 // ---------------------------------------------------------------------------
 
-function buildWorld(topology, topojson, mledoze, countries) {
-  const n3ToIso = Object.fromEntries(mledoze.map((c) => [c.ccn3, c.cca2]));
+function buildWorld(ne, countries) {
   const wanted = new Set(countries.map((c) => c.id));
 
-  // Group geometries by target iso2 so merges (Somaliland -> SO, ...) dissolve shared borders.
-  const groups = new Map();
-  for (const g of topology.objects.countries.geometries) {
-    let iso;
-    if (/^\d{3}$/.test(g.id ?? '')) iso = n3ToIso[g.id];
-    else iso = UNNUMBERED_GEOMETRIES[g.properties.name];
-    if (iso === undefined) throw new Error(`unmapped geometry: ${g.id} ${g.properties.name}`);
+  // Group NE features by target iso2 (dissolving Somaliland into Somalia etc.).
+  const geoms = new Map();
+  for (const f of ne.features) {
+    const p = f.properties;
+    let iso = p.ADM0_A3 in SHAPE_OVERRIDES ? SHAPE_OVERRIDES[p.ADM0_A3] : p.ISO_A2_EH;
     if (iso === null) continue;
-    (groups.has(iso) ? groups.get(iso) : groups.set(iso, []).get(iso)).push(g);
+    if (!/^[A-Z]{2}$/.test(iso)) throw new Error(`unmapped NE feature: ${p.NAME} (${p.ADM0_A3})`);
+    geoms.set(iso, geoms.has(iso) ? mergeGeometries(geoms.get(iso), f.geometry) : f.geometry);
   }
 
-  const roundRing = (ring) => ring.map(([x, y]) => [round3(x), round3(y)]);
-  const roundGeom = (geom) => {
-    if (geom.type === 'Polygon') return { type: 'Polygon', coordinates: geom.coordinates.map(roundRing) };
-    if (geom.type === 'MultiPolygon') return { type: 'MultiPolygon', coordinates: geom.coordinates.map((p) => p.map(roundRing)) };
-    throw new Error(`unexpected geometry type ${geom.type}`);
+  const roundRing = (ring) => {
+    const out = [];
+    for (const [x, y] of ring) {
+      const p = [round3(x), round3(y)];
+      const last = out[out.length - 1];
+      if (!last || last[0] !== p[0] || last[1] !== p[1]) out.push(p); // drop duplicates created by rounding
+    }
+    return out;
   };
+  const roundPoly = (poly) => poly.map(roundRing).filter((r) => r.length >= 4);
 
   const features = [];
-  for (const [iso, geoms] of groups) {
-    const geom = geoms.length === 1
-      ? topojson.feature(topology, geoms[0]).geometry
-      : topojson.merge(topology, geoms);
-    features.push({ type: 'Feature', properties: { id: iso.toLowerCase() }, geometry: roundGeom(geom) });
+  for (const [iso, geom] of geoms) {
+    const polys = polygonsOf(geom).map(roundPoly).filter((p) => p.length && p[0].length >= 4);
+    const rounded = polys.length === 1 ? { type: 'Polygon', coordinates: polys[0] } : { type: 'MultiPolygon', coordinates: polys };
+    features.push({ type: 'Feature', properties: { id: iso.toLowerCase() }, geometry: rounded });
   }
   features.sort((a, b) => (a.properties.id < b.properties.id ? -1 : 1));
+
+  // MapLibre's globe cannot handle rings that jump across the antimeridian.
+  for (const f of features) for (const poly of polygonsOf(f.geometry)) for (const ring of poly) {
+    for (let i = 1; i < ring.length; i++) {
+      if (Math.abs(ring[i][0] - ring[i - 1][0]) > 180) throw new Error(`antimeridian jump in ${f.properties.id} at ${ring[i - 1]} -> ${ring[i]}`);
+    }
+  }
 
   const withPolygon = new Set(features.map((f) => f.properties.id));
   const noPolygon = countries.filter((c) => !withPolygon.has(c.id)).map((c) => c.id);
@@ -291,8 +459,7 @@ function buildFlags(tarball, countries) {
     fs.mkdirSync(pkgDir, { recursive: true });
     execFileSync('tar', ['xzf', tarball, '-C', pkgDir]);
   }
-  fs.rmSync(FLAGS_DIR, { recursive: true, force: true });
-  fs.mkdirSync(FLAGS_DIR, { recursive: true });
+  fs.mkdirSync(FLAGS_DIR, { recursive: true }); // files are overwritten in place, nothing else in flags/ is removed
   let bytes = 0;
   for (const c of countries) {
     const src = path.join(pkgDir, 'package', 'flags', '4x3', `${c.id}.svg`);
@@ -309,28 +476,43 @@ async function main() {
   fs.mkdirSync(CACHE, { recursive: true });
   fs.mkdirSync(DATA_DIR, { recursive: true });
 
-  const [countriesFile, placesFile, atlasFile, topoFile, flagsTgz] = await Promise.all([
+  const [countriesFile, placesFile, shapesFile, flagsTgz] = await Promise.all([
     download(SRC.countries, 'mledoze-countries.json'),
     download(SRC.places, 'ne_10m_populated_places_simple.geojson'),
-    download(SRC.atlas, 'countries-50m.json'),
-    download(SRC.topojson, 'topojson-client.cjs'),
+    download(SRC.shapes, 'ne_50m_admin_0_countries.geojson'),
     download(SRC.flags, `flag-icons-${FLAG_ICONS_VERSION}.tgz`),
   ]);
 
   const mledoze = readJson(countriesFile);
   const countries = buildCountries(mledoze, readJson(placesFile));
-  const countriesPath = path.join(DATA_DIR, 'countries.json');
-  fs.writeFileSync(countriesPath, '[\n' + countries.map((c) => '  ' + JSON.stringify(c)).join(',\n') + '\n]\n');
-  const nSov = countries.filter((c) => c.sovereign).length;
-  console.log(`countries.json: ${countries.length} entries (${nSov} sovereign, ${countries.length - nSov} territories), ${fs.statSync(countriesPath).size} bytes`);
 
-  const topojson = createRequire(import.meta.url)(topoFile);
-  const { fc, noPolygon, extra } = buildWorld(readJson(atlasFile), topojson, mledoze, countries);
+  const { fc, noPolygon, extra } = buildWorld(readJson(shapesFile), countries);
   const worldPath = path.join(DATA_DIR, 'world.geojson');
   fs.writeFileSync(worldPath, JSON.stringify(fc));
   console.log(`world.geojson: ${fc.features.length} features, ${fs.statSync(worldPath).size} bytes`);
   console.log(`  ids without polygon (shown as dots): ${noPolygon.join(', ')}`);
   console.log(`  polygons not in countries.json: ${extra.join(', ')}`);
+
+  // Countries whose largest part is not the one people picture: use the part nearest the capital
+  // (Kiribati: Tarawa, not Kiritimati; Malaysia: the peninsula, not Borneo).
+  const FLAG_AT_CAPITAL_PART = new Set(['ki', 'my']);
+  const partNearest = (g, lon, lat) => {
+    const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+    const d = (poly) => Math.min(...poly[0].map(([x, y]) => (x - lon) ** 2 + (y - lat) ** 2));
+    return { type: 'Polygon', coordinates: polys.reduce((a, b) => (d(b) < d(a) ? b : a)) };
+  };
+  // Flag anchor per country (from the written, rounded geometry so it matches what the app draws).
+  const geomById = new Map(fc.features.map((f) => [f.properties.id, f.geometry]));
+  for (const c of countries) {
+    const g = geomById.get(c.id);
+    const [fx, fy] = g ? flagPoint(FLAG_AT_CAPITAL_PART.has(c.id) ? partNearest(g, c.lon, c.lat) : g) : [c.lon, c.lat];
+    c.fx = round3(fx);
+    c.fy = round3(fy);
+  }
+  const countriesPath = path.join(DATA_DIR, 'countries.json');
+  fs.writeFileSync(countriesPath, '[\n' + countries.map((c) => '  ' + JSON.stringify(c)).join(',\n') + '\n]\n');
+  const nSov = countries.filter((c) => c.sovereign).length;
+  console.log(`countries.json: ${countries.length} entries (${nSov} sovereign, ${countries.length - nSov} territories), ${fs.statSync(countriesPath).size} bytes`);
 
   const flagBytes = buildFlags(flagsTgz, countries);
   console.log(`flags/: ${countries.length} svg files, ${flagBytes} bytes`);
