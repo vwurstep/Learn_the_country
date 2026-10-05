@@ -355,14 +355,20 @@ function fitScreen() {
   const safeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0;
   probe.remove();
   const portrait = innerHeight > innerWidth;
-  // In the home-screen app the map simply reaches the physical bottom of the screen; if iOS
-  // already gave the window the full height this is 0. (Values can arrive late: re-run on load.)
-  const extra = navigator.standalone && portrait ? Math.max(0, Math.min(150, screen.height - innerHeight)) : 0;
-  document.documentElement.style.setProperty('--app-extra', `${extra}px`);
+  // In the home-screen app the map reaches down to the physical bottom of the screen.
+  const measured = navigator.standalone && portrait ? Math.max(0, Math.min(150, screen.height - innerHeight)) : 0;
+  // Never shrink within the same screen setup: our own change can make iOS report a taller
+  // window, and reacting to that made the layout flip back and forth (2026-10-05). Only touch
+  // the map when the value really changes: map.resize() cancels a running pinch/drag.
+  const key = `${screen.width}x${screen.height}:${portrait}`;
+  const extra = key === fit.key ? Math.max(fit.extra, measured) : measured;
   screenInfo = `screen ${screen.height}, window ${innerHeight}, top inset ${safeTop}, standalone ${!!navigator.standalone}, extra ${extra}`;
+  if (key === fit.key && extra === fit.extra) return;
+  fit = { key, extra };
+  document.documentElement.style.setProperty('--app-extra', `${extra}px`);
   world?.map.resize();
 }
-let screenInfo = '';
+let fit = { key: '', extra: -1 }, screenInfo = '';
 addEventListener('resize', fitScreen);
 addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
 // iOS can change the window size when the app comes back from the background without a
@@ -370,7 +376,6 @@ addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
 const refit = () => { fitScreen(); setTimeout(fitScreen, 300); setTimeout(fitScreen, 1000); };
 document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && refit());
 addEventListener('pageshow', refit);
-window.visualViewport?.addEventListener('resize', fitScreen);
 fitScreen();
 setTimeout(fitScreen, 500);
 setTimeout(fitScreen, 2000);

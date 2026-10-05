@@ -63,7 +63,10 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **iOS bottom gap** with the translucent status bar: `fitScreen()` in app.js, the same
   fix as in the SA app. The map extends by `--app-extra` = screen.height − innerHeight
   (standalone, portrait, ≤150 px). It is re-measured on resize, on load and when the app
-  returns to the foreground; iOS sometimes reports late. Phil confirmed it mostly works. If the gap comes back,
+  returns to the foreground; iOS sometimes reports late. It never shrinks within a session and
+  only calls map.resize() on a real change. **Don't** listen to visualViewport resize and don't
+  extend html/body: on 2026-10-05 that froze the map (map.resize() cancels gestures) and made
+  the layout flip-flop (the reported height reacts to our own change). Phil confirmed it mostly works. If the gap comes back,
   the settings card shows the measured values (tiny grey line).
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.

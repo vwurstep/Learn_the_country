@@ -11,8 +11,9 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-/* --app-extra: bottom strip iOS leaves empty in home-screen mode (set by fitScreen in app.js, else 0) */
-html, body { margin: 0; height: calc(100% + var(--app-extra, 0px)); overflow: hidden; background: #0e1726; color: var(--ink);
+/* --app-extra: bottom strip iOS leaves empty in home-screen mode (set by fitScreen in app.js, else 0).
+   Only the (fixed) map grows into it; the page itself keeps the window height so nothing can scroll. */
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: #0e1726; color: var(--ink);
   font: 16px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
 button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
 #map { position: fixed; top: 0; left: 0; right: 0; height: calc(100% + var(--app-extra, 0px)); }
