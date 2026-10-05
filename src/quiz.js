@@ -1,5 +1,5 @@
 /* Quiz logic: pure functions, no DOM, no map. A question is
-   {mode, target (country), ask: 'flag'|'name'|'capital', answer: 'flag'|'name'|'capital'|'map',
+   {mode, target (country), ask: 'flag'|'name'|'capital'|'map' (country highlighted), answer: 'flag'|'name'|'capital'|'map',
     type: 'recall'|'choice'|'map', options: [country, ...] (only for 'choice')}.
    recall = flashcard: the answer is revealed and Phil says himself whether he knew it.
    Randomness goes through `rng` so tests can seed it. */
@@ -12,6 +12,7 @@ export const MODES = {
   'map-name':       { label: 'Find the country',  ask: 'name',    answer: 'map',     type: 'map' },
   'map-flag':       { label: 'Find the flag',     ask: 'flag',    answer: 'map',     type: 'map' },
   'map-capital':    { label: 'Find the capital',  ask: 'capital', answer: 'map',     type: 'map' },
+  'shape-name':     { label: 'Map → country',     ask: 'map',     answer: 'name',    type: 'recall' },
   'mixed':          { label: 'Mixed',             ask: null,      answer: null,      type: null },
 };
 

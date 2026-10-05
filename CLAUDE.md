@@ -42,6 +42,9 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   only where it doesn't overlap one already placed. Flags are placed first; capital dots
   then give way to flags until zoomed in. Names appear from zoom 2.6. On the
   globe, markers on the far side are removed.
+- **Zooming to a country** (`flyToCountry`) uses the bbox of its main part plus parts
+  chained within 20° (Corsica, Indonesia's islands), not the whole geometry. The full
+  geometry of France or the Netherlands includes overseas territories.
 - **Country colours = national colours** (2026-10-01, Phil's request; still being iterated).
   - `data/colors.json` gives `{id: {c, alt?, why}}`, chosen by a subagent. It is the colour
     the country identifies with (flag or sports colour).
@@ -91,8 +94,10 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 ## Quiz modes (`MODES` in src/quiz.js)
 
 Each mode has a `type`:
-- **recall** (flashcard): Flag → country, Capital → country, Country → capital. Show
-  answer, then Phil rates himself.
+- **recall** (flashcard): Flag → country, Capital → country, Country → capital, and
+  **Map → country** (`shape-name`, ask `map`, added 2026-10-05). The country is highlighted
+  and zoomed to with its neighbours around it; countries under 1 deg² or without a shape
+  also get their capital dot. Show answer, then Phil rates himself.
 - **choice**: Country → flag, with 4 flags. The wrong options are preferably from the same
   continent.
 - **map**: Find the country / flag / capital on the map.

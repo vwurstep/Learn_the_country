@@ -126,10 +126,21 @@ function nextQuestion() {
   world.mark({});
   world.setMarkers(false);
   if (q.type === 'map') world.flyToRegion(session.source === 'pile' ? q.target.continent : settings.region);
+  if (q.ask === 'map') showOnMap(q.target);
   showQuestion();
 }
 
-const askHtml = (c, what) => what === 'flag'
+/** "Which country is this?": highlight it with its neighbours around; tiny countries (or ones
+    without a shape) also get their capital dot so they can be found. */
+function showOnMap(c) {
+  world.mark({ [c.id]: 'sel' });
+  world.setMarkers(false, c.size < 1 ? [c.id] : null, { dots: true });
+  world.flyToCountry(c, { context: true, maxZoom: 6 });
+}
+
+const askHtml = (c, what) => what === 'map'
+  ? '<div class="q-text">Which country is this?</div>'
+  : what === 'flag'
   ? `<img class="q-flag" src="${flagUrl(c.id)}" alt="Flag">`
   : what === 'capital' ? `<div class="q-text"><small>Capital</small>${esc(c.capital)}</div>`
   : `<div class="q-text"><small>Country</small>${esc(c.name)}</div>`;
@@ -141,7 +152,7 @@ function showQuestion() {
   $('#settings').hidden = true;
   const card = $('#question');
   card.hidden = false;
-  card.classList.toggle('map-q', q.type === 'map');
+  card.classList.toggle('map-q', q.type === 'map' || q.ask === 'map');
   card.classList.toggle('answered', phase === 'done');
   $('#q-mode').textContent = (session.source === 'pile' ? 'Hard pile · ' : '') + MODES[q.mode].label;
   updateScore();
@@ -207,7 +218,7 @@ function answer(correct, chosenId, skipped = false) {
   if (!correct && chosenId && chosenId !== q.target.id) marks[chosenId] = 'wrong';
   world.mark(marks);
   world.setMarkers(false, Object.keys(marks));
-  world.flyToCountry(q.target);
+  if (q.ask !== 'map') world.flyToCountry(q.target);
   renderPhase();
 }
 
@@ -306,7 +317,7 @@ function wire() {
       phase = 'revealed';
       world.mark({ [q.target.id]: 'target' });
       world.setMarkers(false, [q.target.id]);
-      world.flyToCountry(q.target);
+      if (q.ask !== 'map') world.flyToCountry(q.target);  // a map question is already in view
       renderPhase();
     } else if (act === 'right' || act === 'wrong') answer(act === 'right', null);
     else if (act === 'skip') answer(false, null, true);

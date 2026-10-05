@@ -37,13 +37,26 @@ function angularDistance([lon1, lat1], [lon2, lat2]) {
   return (2 * Math.asin(Math.min(1, Math.sqrt(a))) * 180) / Math.PI;
 }
 
+/** Box to zoom to for a country: its biggest part plus the parts near it (Corsica, Java…),
+    leaving out far-away territories (French Guiana for France, Alaska/Hawaii for the USA). */
 function bboxOf(geom) {
-  let x0 = 180, x1 = -180, y0 = 90, y1 = -90;
   const polys = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;
-  for (const p of polys) for (const [x, y] of p[0]) {
-    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  const parts = polys.map((p) => {
+    let x0 = 180, x1 = -180, y0 = 90, y1 = -90;
+    for (const [x, y] of p[0]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    return { b: [x0, y0, x1, y1], cx, cy, area: (x1 - x0) * (y1 - y0) * Math.cos(toRad(cy)) };
+  });
+  // start from the biggest part and keep adding parts within 20° of one already added, so
+  // island chains (Indonesia) stay together while far-away territories drop out
+  const dist = (a, b) => Math.hypot((a.cx - b.cx) * Math.cos(toRad((a.cy + b.cy) / 2)), a.cy - b.cy);
+  const near = [parts.reduce((a, b) => (b.area > a.area ? b : a))];
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const p of parts) if (!near.includes(p) && near.some((q) => dist(p, q) <= 20)) { near.push(p); grew = true; }
   }
-  return [x0, y0, x1, y1];
+  return [Math.min(...near.map((p) => p.b[0])), Math.min(...near.map((p) => p.b[1])),
+          Math.max(...near.map((p) => p.b[2])), Math.max(...near.map((p) => p.b[3]))];
 }
 
 /** Country outlines as lines, without the artificial edges where shapes are cut at the date
@@ -254,9 +267,20 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       for (const [id, m] of Object.entries(marks)) setMark(id, m);
       relayout();
     },
-    flyToCountry(c, { maxZoom = 5 } = {}) {
-      const b = bboxes.get(c.id);
-      if (!b || b[2] - b[0] > 150) { map.flyTo({ center: [c.lon, c.lat], zoom: Math.max(map.getZoom(), 3), duration: 900 }); return; }
+    /** context: zoom out to show the neighbours too (for "which country is this?") */
+    flyToCountry(c, { maxZoom = 5, context = false } = {}) {
+      let b = bboxes.get(c.id);
+      if (!b || b[2] - b[0] > 150) {  // no shape, or spans the date line (Russia, Fiji, USA…)
+        map.flyTo({ center: [c.fx ?? c.lon, c.fy ?? c.lat], zoom: context ? (b ? 2 : 4) : Math.max(map.getZoom(), 3), duration: 900 });
+        return;
+      }
+      if (context) {
+        const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
+        // room around it for the neighbours: generous for small countries, capped for big ones
+        const bw = b[2] - b[0], bh = b[3] - b[1];
+        const w = Math.max(bw + Math.min(bw * 1.1, 30), 14), h = Math.max(bh + Math.min(bh * 1.1, 20), 9);
+        b = [cx - w / 2, Math.max(-80, cy - h / 2), cx + w / 2, Math.min(84, cy + h / 2)];
+      }
       const pad = Math.min(80, el.clientWidth / 6);
       map.fitBounds([[b[0], b[1]], [b[2], b[3]]], {
         padding: { top: pad, left: pad, right: pad, bottom: Math.max(pad, el.clientHeight * 0.4) },
