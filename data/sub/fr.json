@@ -1,0 +1,20 @@
+[
+  {"id":"fr-ara","name":"Auvergne-Rhône-Alpes","capital":"Lyon","lat":45.768,"lon":4.835,"fx":4.84,"fy":45.299,"color":"#2f6fd0","flag":"flags/sub/fr-ara.svg"},
+  {"id":"fr-bfc","name":"Bourgogne-Franche-Comté","capital":"Dijon","lat":47.323,"lon":5.042,"fx":4.471,"fy":47.104,"color":"#2fa84f","flag":"flags/sub/fr-bfc.svg"},
+  {"id":"fr-bre","name":"Brittany","local":"Bretagne","capital":"Rennes","lat":48.114,"lon":-1.681,"fx":-3.298,"fy":48.242,"color":"#e0393e","flag":"flags/sub/fr-bre.svg"},
+  {"id":"fr-cvl","name":"Centre-Val de Loire","capital":"Orléans","lat":47.902,"lon":1.904,"fx":1.705,"fy":47.338,"color":"#e0393e","flag":"flags/sub/fr-cvl.svg"},
+  {"id":"fr-cor","name":"Corsica","local":"Corse","capital":"Ajaccio","lat":41.926,"lon":8.736,"fx":9.116,"fy":42.231,"color":"#e0393e","flag":"flags/sub/fr-cor.svg"},
+  {"id":"fr-gf","name":"French Guiana","local":"Guyane","capital":"Cayenne","lat":4.939,"lon":-52.335,"fx":-53.021,"fy":3.956,"color":"#e0393e","flag":"flags/sub/fr-gf.svg"},
+  {"id":"fr-ges","name":"Grand Est","capital":"Strasbourg","lat":48.573,"lon":7.752,"fx":5.405,"fy":48.693,"color":"#e0393e","flag":null},
+  {"id":"fr-gp","name":"Guadeloupe","capital":"Basse-Terre","lat":15.997,"lon":-61.733,"fx":-61.665,"fy":16.107,"color":"#e0393e","flag":null},
+  {"id":"fr-hdf","name":"Hauts-de-France","capital":"Lille","lat":50.632,"lon":3.058,"fx":2.868,"fy":49.815,"color":"#f29e1f","flag":null},
+  {"id":"fr-idf","name":"Île-de-France","capital":"Paris","lat":48.857,"lon":2.352,"fx":2.66,"fy":48.672,"color":"#2f6fd0","flag":"flags/sub/fr-idf.svg"},
+  {"id":"fr-mq","name":"Martinique","capital":"Fort-de-France","lat":14.6,"lon":-61.067,"fx":-61.071,"fy":14.724,"color":"#e0393e","flag":"flags/sub/fr-mq.svg"},
+  {"id":"fr-yt","name":"Mayotte","capital":"Mamoudzou","lat":-12.781,"lon":45.232,"fx":45.149,"fy":-12.775,"color":"#e0393e","flag":"flags/sub/fr-yt.svg"},
+  {"id":"fr-nor","name":"Normandy","local":"Normandie","capital":"Rouen","lat":49.443,"lon":1.103,"fx":0.258,"fy":48.918,"color":"#2fa84f","flag":"flags/sub/fr-nor.svg"},
+  {"id":"fr-naq","name":"Nouvelle-Aquitaine","capital":"Bordeaux","lat":44.838,"lon":-0.579,"fx":0.503,"fy":45.62,"color":"#2fa84f","flag":"flags/sub/fr-naq.svg"},
+  {"id":"fr-occ","name":"Occitania","local":"Occitanie","capital":"Toulouse","lat":43.604,"lon":1.443,"fx":1.947,"fy":43.564,"color":"#e0393e","flag":"flags/sub/fr-occ.svg"},
+  {"id":"fr-pdl","name":"Pays de la Loire","capital":"Nantes","lat":47.217,"lon":-1.554,"fx":-0.544,"fy":47.59,"color":"#2f6fd0","flag":"flags/sub/fr-pdl.svg"},
+  {"id":"fr-pac","name":"Provence-Alpes-Côte d'Azur","capital":"Marseille","lat":43.297,"lon":5.376,"fx":6.365,"fy":43.903,"color":"#2fa84f","flag":"flags/sub/fr-pac.svg"},
+  {"id":"fr-re","name":"Réunion","local":"La Réunion","capital":"Saint-Denis","lat":-20.879,"lon":55.448,"fx":55.509,"fy":-21.092,"color":"#e0393e","flag":null}
+]

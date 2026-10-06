@@ -1,5 +1,5 @@
 /* Wiring: tabs, the map tab's info card, the quiz panels and the sync settings. */
-import { loadData, loadInfo, loadSubIndex, loadSub, flagOf, CONTINENTS, loadSetting, saveSetting } from './data.js';
+import { loadData, loadInfo, loadSubIndex, loadSub, flagOf, flagUrl, CONTINENTS, loadSetting, saveSetting } from './data.js';
 import * as store from './store.js';
 import { githubBackend } from './sync-github.js';
 import { createMap } from './map.js';
@@ -29,6 +29,12 @@ const cur = () => (scope === 'world' ? worldSet : subs[scope]);
 const capFirst = (t) => t[0].toUpperCase() + t.slice(1);
 const modeLabel = (k) => MODES[k].label.replace('Country', capFirst(cur().kind)).replace('country', cur().kind);
 const scopeLabel = (m) => m.label || `${m.name} ${m.kinds}`;
+// names with the local form when there is one: "Guangdong · 广东", "Munich · München"
+const nameOf = (c) => (c.local ? `${c.name} · ${c.local}` : c.name);
+const capOf = (c) => (c.capitalLocal ? `${c.capital} · ${c.capitalLocal}` : c.capital);
+const hasFlag = (c) => !!flagOf(c);
+// flag questions only where most places have a flag (not for Chinese / South African provinces)
+const flagsOk = () => cur().items.filter(hasFlag).length >= cur().items.length / 2;
 
 async function setScope(id) {
   if (id !== 'world' && !subs[id]) {
@@ -60,7 +66,7 @@ function showTab(t) {
   document.body.className = 'tab-' + t;
   $('#tab-map').setAttribute('aria-selected', t === 'map');
   $('#tab-quiz').setAttribute('aria-selected', t === 'quiz');
-  $('#settings').hidden = true;
+  $('#settings').hidden = $('#learn').hidden = true;
   if (t === 'map') {
     $('#setup').hidden = $('#question').hidden = true;
     world.mark({});
@@ -86,9 +92,14 @@ async function openInfo(id) {
   infoId = id;
   world.select(id);
   const card = $('#info');
-  card.querySelector('.info-flag').src = flagOf(c);
-  card.querySelector('.info-name').textContent = c.name;
-  card.querySelector('.info-cap').textContent = 'Capital: ' + c.capital;
+  // the flag, or (no flag) the local name in its place, e.g. 广东
+  const img = card.querySelector('.info-flag'), local = card.querySelector('.info-local');
+  img.hidden = !hasFlag(c);
+  if (hasFlag(c)) img.src = flagOf(c);
+  local.hidden = hasFlag(c) || !c.local;
+  local.textContent = c.local || '';
+  card.querySelector('.info-name').textContent = hasFlag(c) ? nameOf(c) : c.name;
+  card.querySelector('.info-cap').textContent = 'Capital: ' + capOf(c);
   card.querySelector('.info-meta').textContent = scope === 'world'
     ? c.continent + (c.sovereign ? '' : ' · territory') : `${capFirst(cur().kind)} · ${cur().name}`;
   // countries with subdivision data offer a deep dive
@@ -132,18 +143,47 @@ const MODE_HINT = {
   map: 'Tap it on the map.',
 };
 
-const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : cur().items);
-const allNow = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items);
+const usesFlag = () => { const m = MODES[settings.mode]; return m.ask === 'flag' || m.answer === 'flag'; };
+const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : cur().items.filter((c) => !usesFlag() || hasFlag(c)));
+const allNow = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items.filter(hasFlag));
+
+// ---- what to learn: one button in the setup, opening a searchable list grouped by continent ----
+const learnIcon = (id) => (id === 'world' ? '<span class="globe">🌍</span>' : `<img src="${flagUrl(id)}" alt="">`);
+function renderLearnButton() {
+  const m = subIndex.find((x) => x.id === scope);
+  $('#learn-btn').innerHTML = `${learnIcon(scope)}<span>${esc(m ? scopeLabel(m) : 'Countries of the world')}</span><span class="chev">›</span>`;
+}
+function showLearn() {
+  $('#setup').hidden = true;
+  $('#learn').hidden = false;
+  $('#learn-search').value = '';
+  renderLearnList();
+}
+function renderLearnList() {
+  const term = $('#learn-search').value.trim().toLowerCase();
+  const hit = (...texts) => !term || texts.some((t) => t && t.toLowerCase().includes(term));
+  const row = (id, title, sub) => `<button class="learn-row" data-scope="${id}" aria-pressed="${id === scope}">${learnIcon(id)}<span><b>${esc(title)}</b><small>${esc(sub)}</small></span></button>`;
+  let html = hit('countries of the world', 'world') ? row('world', 'Countries of the world', `${data.countries.filter((c) => c.sovereign).length} countries`) : '';
+  const groups = {};
+  for (const m of subIndex.filter((m) => hit(m.name, m.label, m.kinds))) (groups[data.byId.get(m.id)?.continent || 'Other'] ||= []).push(m);
+  for (const cont of [...CONTINENTS, 'Other']) {
+    if (!groups[cont]) continue;
+    html += `<p class="label">${esc(cont)}</p>` + groups[cont].sort((a, b) => a.name.localeCompare(b.name))
+      .map((m) => row(m.id, m.name, m.count ? `${m.count} ${m.kinds}` : capFirst(m.kinds))).join('');
+  }
+  $('#learn-list').innerHTML = html || '<p class="muted">Nothing found.</p>';
+}
 
 function showSetup() {
   $('#question').hidden = true;
-  $('#settings').hidden = true;
-  $('#scopes').innerHTML = [{ id: 'world', label: 'Countries' }, ...subIndex]
-    .map((m) => `<button data-scope="${m.id}" aria-pressed="${m.id === scope}">${esc(scopeLabel(m))}</button>`).join('');
+  $('#settings').hidden = $('#learn').hidden = true;
+  renderLearnButton();
   $('#world-options').hidden = scope !== 'world';
-  // mode = what is shown + what is asked for
+  // mode = what is shown + what is asked for; no flag questions where places have no flags
+  if (!flagsOk() && usesFlag()) set('mode', 'name-capital');
   const { ask, answer, type } = MODES[settings.mode];
-  const chips = (which, sel, off) => FACETS.map((f) => `<button data-${which}="${f}" aria-pressed="${f === sel}"${f === off ? ' disabled' : ''}>${esc(facetName(f))}</button>`).join('');
+  const chips = (which, sel, off) => FACETS.map((f) => `<button data-${which}="${f}" aria-pressed="${f === sel}"${
+    f === off || (f === 'flag' && !flagsOk()) ? ' disabled' : ''}>${esc(facetName(f))}</button>`).join('');
   $('#ask').innerHTML = chips('ask', ask, null);
   $('#answer').innerHTML = chips('answer', answer, ask);
   $('#mode-hint').textContent = MODE_HINT[type];
@@ -152,8 +192,8 @@ function showSetup() {
   $('#territories').checked = settings.territories;
   const st = Object.values(store.getStats());
   const right = st.reduce((s, x) => s + x.right, 0), total = st.reduce((s, x) => s + x.right + x.wrong, 0);
-  const n = poolNow().length;
-  $('#progress').textContent = `${n} ${cur().kinds} per round. ` +
+  const n = poolNow().length, all = scope === 'world' ? n : cur().items.length;
+  $('#progress').textContent = (n < all ? `${n} of ${all} ${cur().kinds} per round (the others have no flag). ` : `${n} ${cur().kinds} per round. `) +
     (total ? `So far: ${total} answers, ${Math.round((100 * right) / total)}% correct.` : 'No answers yet.');
   // the hard pile of this scope (cards of countries, or of this country's subdivisions)
   const cards = Object.entries(store.hardCards()).filter(([k]) => cur().byId.has(store.parseKey(k).id));
@@ -206,14 +246,14 @@ const askHtml = (c, what) => what === 'map'
   ? `<div class="q-text">Which ${cur().kind} is this?</div>`
   : what === 'flag'
   ? `<img class="q-flag" src="${flagOf(c)}" alt="Flag">`
-  : what === 'capital' ? `<div class="q-text"><small>Capital</small>${esc(c.capital)}</div>`
-  : `<div class="q-text"><small>${capFirst(cur().kind)}</small>${esc(c.name)}</div>`;
+  : what === 'capital' ? `<div class="q-text"><small>Capital</small>${esc(capOf(c))}</div>`
+  : `<div class="q-text"><small>${capFirst(cur().kind)}</small>${esc(nameOf(c))}</div>`;
 
 const hint = { recall: '', map: 'Tap it on the map', choice: '' };
 
 function showQuestion() {
   $('#setup').hidden = true;
-  $('#settings').hidden = true;
+  $('#settings').hidden = $('#learn').hidden = true;
   const card = $('#question');
   card.hidden = false;
   card.classList.toggle('map-q', q.type === 'map' || q.ask === 'map');
@@ -249,7 +289,7 @@ function showRoundDone() {
   $('#q-score').textContent = '';
   const { size, firstRight, missed } = session;
   const what = session.source === 'pile' ? 'cards' : cur().kinds;
-  const names = [...new Set(missed)].map((id) => cur().byId.get(id).name);
+  const names = [...new Set(missed)].map((id) => nameOf(cur().byId.get(id)));
   $('#q-prompt').innerHTML = '<div class="q-text">🎉 Round complete</div>';
   $('#q-options').innerHTML = '';
   const r = $('#q-result');
@@ -259,7 +299,9 @@ function showRoundDone() {
   $('#q-buttons').innerHTML = '<button data-act="setup" class="ghost">Setup</button><button data-act="again" class="primary">New round</button>';
 }
 
-const answerHtml = (c) => `<div class="answer">${q.ask === 'flag' ? '' : `<img src="${flagOf(c)}" alt="">`}<div><b>${esc(c.name)}</b><br>Capital: ${esc(c.capital)}</div></div>`;
+const answerHtml = (c) => `<div class="answer">${
+  q.ask === 'flag' ? '' : hasFlag(c) ? `<img src="${flagOf(c)}" alt="">` : c.local ? `<span class="q-local">${esc(c.local)}</span>` : ''
+}<div><b>${esc(nameOf(c))}</b><br>Capital: ${esc(capOf(c))}</div></div>`;
 
 /** Buttons and result area for the current phase: ask → (revealed, flashcards only) → done. */
 function renderPhase() {
@@ -288,7 +330,7 @@ function renderPhase() {
   const chosen = chosenId && chosenId !== q.target.id ? cur().byId.get(chosenId) : null;
   r.innerHTML = `<p class="verdict ${correct ? 'ok' : 'bad'}">${correct ? '✓ Correct' : verdict.skipped ? 'Skipped' : q.type === 'recall' ? '✗ Not yet' : '✗ Not quite'}</p>` +
     answerHtml(q.target) +
-    (chosen ? `<p class="muted">You picked ${esc(chosen.name)} (${esc(chosen.capital)})</p>` : '');
+    (chosen ? `<p class="muted">You picked ${esc(nameOf(chosen))} (${esc(capOf(chosen))})</p>` : '');
   r.hidden = false;
   const inPile = store.isHard(key);
   btns.innerHTML = `<button data-act="pile" class="pile ${!inPile && !correct ? 'suggest' : ''}">${
@@ -398,11 +440,16 @@ function wire() {
     applyFlags();
   };
   $('#scope-bar .back').onclick = leaveDeepDive;
-  $('#scopes').onclick = async (e) => {
+  $('#learn-btn').onclick = showLearn;
+  $('#learn .close').onclick = showSetup;
+  $('#learn-search').oninput = renderLearnList;
+  $('#learn-list').onclick = async (e) => {
     const id = e.target.closest('button')?.dataset.scope;
-    if (!id || id === scope) return;
-    await setScope(id);
-    if (id === 'world') world.flyToRegion(settings.regions); else world.flyToSet();
+    if (!id) return;
+    if (id !== scope) {
+      await setScope(id);
+      if (id === 'world') world.flyToRegion(settings.regions); else world.flyToSet();
+    }
     showSetup();
   };
   $('#info .reveal').onclick = () => {
@@ -411,10 +458,11 @@ function wire() {
   };
 
   $('#ask').onclick = (e) => {
-    const a = e.target.closest('button')?.dataset.ask;
-    if (!a) return;
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    const a = b.dataset.ask;
     let { answer } = MODES[settings.mode];
-    if (answer === a) answer = a === 'name' ? 'flag' : 'name';  // can't ask for what is shown
+    if (answer === a) answer = a === 'name' ? (flagsOk() ? 'flag' : 'capital') : 'name';  // can't ask for what is shown
     set('mode', modeFor(a, answer));
     showSetup();
   };

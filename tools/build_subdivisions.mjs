@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 /**
  * build_subdivisions.mjs — offline data for the "deep dive" into subdivisions (US states,
- * Swiss cantons).
+ * Swiss cantons, German and Austrian states, Italian and French regions, UK nations).
  *
  *   node tools/build_subdivisions.mjs       (downloads sources into a cache dir, then writes:)
- *     data/sub/index.json       the sets: [{id, name, kind, kinds, label}] (label: quiz chip text)
+ *     data/sub/index.json       the sets: [{id, name, kind, kinds, label, count}] (label: quiz chip
+ *                               text). Entries of sets built by other scripts are kept.
  *     data/sub/<set>.json       one entry per subdivision, sorted by name:
- *                               {id, name, capital, lat, lon, fx, fy, color, flag}
+ *                               {id, name, local?, capital, capitalLocal?, lat, lon, fx, fy, color, flag}
+ *                               local/capitalLocal: the name in the local language when it differs
+ *                               (Bayern, München); flag: path, or null when there is no official flag.
  *     data/sub/<set>.geojson    subdivision polygons, properties.id = the json id
  *     flags/sub/<id>.svg|.png   one flag per subdivision (path in the json `flag` field)
  *
@@ -14,27 +17,35 @@
  *   - Shapes: Natural Earth admin-1 states/provinces (public domain), the GeoJSON from
  *       nvkelso/natural-earth-vector. 1:50m for the US states (it has all 50, Alaska and Hawaii
  *       included; its Alaska stops at 178°W, so no ring crosses the antimeridian), 1:10m for the
- *       Swiss cantons (not in the 50m set). Coordinates are rounded (US 3 decimals, CH 4), nothing
- *       else is simplified, so shared borders stay identical between neighbours.
+ *       others (not in the 50m set). US and CH: coordinates are rounded (3 and 4 decimals), nothing
+ *       else is simplified, so shared borders stay identical between neighbours. The other sets go
+ *       through mapshaper (npm, run with npx): Italian provinces, French départements and UK
+ *       districts are dissolved into regions / nations (`key` below picks the region of a feature),
+ *       then the set is simplified topologically (Visvalingam, weighted, `simplify` = share of
+ *       vertices kept, small shapes kept), so neighbours still share identical borders without gaps.
  *   - Names and capitals: the tables below. Cantons use their own official spelling
- *       (Zürich, Genève, Ticino...), capitals are the official Hauptort / chef-lieu.
+ *       (Zürich, Genève, Ticino...), capitals are the official Hauptort / chef-lieu. The other sets
+ *       use the common English names (Bavaria, Tuscany, Munich) with the local name alongside.
  *   - Capital coordinates (lat, lon): Wikidata (CC0), the subdivision's "capital" (P36) and its
- *       "coordinate location" (P625), one SPARQL query; subdivisions are matched through the
- *       `wikidataid` that Natural Earth carries. Checked to lie inside the subdivision.
+ *       "coordinate location" (P625), one SPARQL query. Subdivisions are matched through the
+ *       `wikidataid` that Natural Earth carries (US, CH) or, for the other sets, through their
+ *       ISO 3166-2 code (P300) or an explicit `qid` in the table. A city-state (Berlin, Vienna) has
+ *       no P36 and uses its own coordinates. Checked to lie inside the subdivision.
  *   - Flag position (fx, fy): pole of inaccessibility (polylabel, tools/geo.mjs, shared with
  *       build_data.mjs) of the largest polygon, cos(lat)-scaled.
  *   - Colours: greedy graph colouring (palette below, 6 hues) over the neighbour graph; two
  *       subdivisions are neighbours when their rounded rings share a vertex. Random restarts with a
  *       fixed seed keep the result reproducible and the number of colours minimal.
  *   - Flags: Wikimedia Commons, the original SVG of "Flag of <state>.svg" /
- *       "Flag of Canton of <canton>.svg", found through the Commons API (which also gives the
- *       licence, recorded in LICENSES.md). Files above 100 KB (seal-heavy US state flags) are
- *       rendered to a 240 px wide PNG with headless Google Chrome and downscaled with sips (macOS),
- *       which keeps the app's offline cache small. Requests carry a descriptive User-Agent and are
- *       sent at most once per second (Wikimedia policy).
+ *       "Flag of Canton of <canton>.svg" (or the title in the table; `flag: null` = no official
+ *       flag, e.g. Northern Ireland), found through the Commons API (which also gives the licence,
+ *       recorded in LICENSES.md). Files above 100 KB (seal-heavy US state flags) are rendered to a
+ *       240 px wide PNG with headless Google Chrome and downscaled with sips (macOS), which keeps
+ *       the app's offline cache small. Requests carry a descriptive User-Agent and are sent at most
+ *       once per second (Wikimedia policy).
  *
  * Only data/sub/, flags/sub/ and the cache directory are written. Runs on Node >= 18 (global
- * fetch); the PNG rendering needs macOS with Google Chrome installed.
+ * fetch) with npm (npx mapshaper); the PNG rendering needs macOS with Google Chrome installed.
  */
 
 import fs from 'node:fs';
@@ -117,15 +128,131 @@ const CH_CANTONS = {
   JU: ['Jura', 'Delémont', 'Flag of Canton of Jura.svg'],
 };
 
+// The tables below use objects: {name, capital, local?, capitalLocal?, flag?, qid?}. `flag` is the
+// Commons title (default "Flag of <name>.svg"; null = no official flag), `qid` the Wikidata item
+// when the ISO 3166-2 code does not find exactly one.
+
+// Common English names; capitals as on Wikidata. The civil flags ("Flag of <state>.svg") are all
+// different from each other.
+const DE_STATES = {
+  BW: { name: 'Baden-Württemberg', capital: 'Stuttgart' },
+  BY: { name: 'Bavaria', local: 'Bayern', capital: 'Munich', capitalLocal: 'München' },
+  BE: { name: 'Berlin', capital: 'Berlin' },
+  BB: { name: 'Brandenburg', capital: 'Potsdam' },
+  HB: { name: 'Bremen', capital: 'Bremen' },
+  HH: { name: 'Hamburg', capital: 'Hamburg' },
+  HE: { name: 'Hesse', local: 'Hessen', capital: 'Wiesbaden' },
+  MV: { name: 'Mecklenburg-Vorpommern', capital: 'Schwerin', flag: 'Flag of Mecklenburg-Western Pomerania.svg' },
+  NI: { name: 'Lower Saxony', local: 'Niedersachsen', capital: 'Hanover', capitalLocal: 'Hannover' },
+  NW: { name: 'North Rhine-Westphalia', local: 'Nordrhein-Westfalen', capital: 'Düsseldorf' },
+  RP: { name: 'Rhineland-Palatinate', local: 'Rheinland-Pfalz', capital: 'Mainz' },
+  SL: { name: 'Saarland', capital: 'Saarbrücken' },
+  SN: { name: 'Saxony', local: 'Sachsen', capital: 'Dresden' },
+  ST: { name: 'Saxony-Anhalt', local: 'Sachsen-Anhalt', capital: 'Magdeburg' },
+  SH: { name: 'Schleswig-Holstein', capital: 'Kiel' },
+  TH: { name: 'Thuringia', local: 'Thüringen', capital: 'Erfurt' },
+};
+
+// The plain civil flags (Landesfarben) repeat (Vienna = Salzburg = Vorarlberg, Tyrol = Upper
+// Austria), so the quiz uses the state flags with the coat of arms ("Flag of <state> (state).svg").
+const AT_STATES = {
+  1: { name: 'Burgenland', capital: 'Eisenstadt', flag: 'Flag of Burgenland (state).svg' },
+  2: { name: 'Carinthia', local: 'Kärnten', capital: 'Klagenfurt', flag: 'Flag of Carinthia (state).svg' },
+  3: { name: 'Lower Austria', local: 'Niederösterreich', capital: 'St. Pölten', flag: 'Flag of Lower Austria (state).svg' },
+  4: { name: 'Upper Austria', local: 'Oberösterreich', capital: 'Linz', flag: 'Flag of Upper Austria (state).svg' },
+  5: { name: 'Salzburg', capital: 'Salzburg', flag: 'Flag of Salzburg (state).svg' },
+  6: { name: 'Styria', local: 'Steiermark', capital: 'Graz', flag: 'Flag of Styria (state).svg' },
+  7: { name: 'Tyrol', local: 'Tirol', capital: 'Innsbruck', flag: 'Flag of Tirol (state).svg' },
+  8: { name: 'Vorarlberg', capital: 'Bregenz', flag: 'Flag of Vorarlberg (state).svg' },
+  9: { name: 'Vienna', local: 'Wien', capital: 'Vienna', capitalLocal: 'Wien', flag: 'Flag of Vienna (state).svg' },
+};
+
+// Codes are the ISO 3166-2 region codes; Natural Earth's provinces carry them as `region_cod`.
+const IT_REGIONS = {
+  65: { name: 'Abruzzo', capital: "L'Aquila" },
+  77: { name: 'Basilicata', capital: 'Potenza' },
+  78: { name: 'Calabria', capital: 'Catanzaro' },
+  72: { name: 'Campania', capital: 'Naples', capitalLocal: 'Napoli' },
+  45: { name: 'Emilia-Romagna', capital: 'Bologna' },
+  36: { name: 'Friuli-Venezia Giulia', capital: 'Trieste' },
+  62: { name: 'Lazio', capital: 'Rome', capitalLocal: 'Roma' },
+  42: { name: 'Liguria', capital: 'Genoa', capitalLocal: 'Genova' },
+  25: { name: 'Lombardy', local: 'Lombardia', capital: 'Milan', capitalLocal: 'Milano' },
+  57: { name: 'Marche', capital: 'Ancona' },
+  67: { name: 'Molise', capital: 'Campobasso' },
+  21: { name: 'Piedmont', local: 'Piemonte', capital: 'Turin', capitalLocal: 'Torino' },
+  75: { name: 'Apulia', local: 'Puglia', capital: 'Bari' },
+  88: { name: 'Sardinia', local: 'Sardegna', capital: 'Cagliari' },
+  82: { name: 'Sicily', local: 'Sicilia', capital: 'Palermo', qid: 'Q1460' }, // IT-82 is also on a second item
+  52: { name: 'Tuscany', local: 'Toscana', capital: 'Florence', capitalLocal: 'Firenze' },
+  32: { name: 'Trentino-Alto Adige', capital: 'Trento', flag: 'Flag of Trentino-South Tyrol.svg' },
+  55: { name: 'Umbria', capital: 'Perugia' },
+  23: { name: 'Aosta Valley', local: "Valle d'Aosta", capital: 'Aosta' },
+  34: { name: 'Veneto', capital: 'Venice', capitalLocal: 'Venezia' },
+};
+
+// The 13 metropolitan regions of 2016 and the 5 overseas regions. Codes as in Natural Earth's
+// `region_cod` (FR_REGION_CODE maps its overseas codes to the usual two letters). Wikidata keys
+// Corsica and the overseas regions under other ISO codes (FR-20R, FR-971...), hence the qids.
+// Flags: what Commons has as "Flag of <region>" (official or logo flags); null where that is the
+// French tricolour (Guadeloupe, Réunion) or only a fan proposal (Grand Est, Hauts-de-France).
+const FR_REGIONS = {
+  ARA: { name: 'Auvergne-Rhône-Alpes', capital: 'Lyon' },
+  BFC: { name: 'Bourgogne-Franche-Comté', capital: 'Dijon' },
+  BRE: { name: 'Brittany', local: 'Bretagne', capital: 'Rennes' },
+  CVL: { name: 'Centre-Val de Loire', capital: 'Orléans' },
+  COR: { name: 'Corsica', local: 'Corse', capital: 'Ajaccio', qid: 'Q14112' },
+  GES: { name: 'Grand Est', capital: 'Strasbourg', flag: null },
+  HDF: { name: 'Hauts-de-France', capital: 'Lille', flag: null },
+  IDF: { name: 'Île-de-France', capital: 'Paris' },
+  NOR: { name: 'Normandy', local: 'Normandie', capital: 'Rouen', flag: 'Flag of Normandie.svg' }, // the two leopards, not the Nordic-cross design
+  NAQ: { name: 'Nouvelle-Aquitaine', capital: 'Bordeaux' },
+  OCC: { name: 'Occitania', local: 'Occitanie', capital: 'Toulouse', flag: 'Flag of Occitanie.svg' }, // the region's flag, not the Occitan cross
+  PDL: { name: 'Pays de la Loire', capital: 'Nantes' },
+  PAC: { name: "Provence-Alpes-Côte d'Azur", capital: 'Marseille' },
+  GP: { name: 'Guadeloupe', capital: 'Basse-Terre', qid: 'Q17012', flag: null },
+  MQ: { name: 'Martinique', capital: 'Fort-de-France', qid: 'Q17054' },
+  GF: { name: 'French Guiana', local: 'Guyane', capital: 'Cayenne', qid: 'Q3769' },
+  RE: { name: 'Réunion', local: 'La Réunion', capital: 'Saint-Denis', qid: 'Q17070', flag: null },
+  YT: { name: 'Mayotte', capital: 'Mamoudzou', qid: 'Q17063' },
+};
+const FR_REGION_CODE = { GUA: 'GP', MTQ: 'MQ', GUF: 'GF', LRE: 'RE', MAY: 'YT' };
+
+// Northern Ireland has had no official flag since 1972 (the Ulster Banner is not used).
+const GB_NATIONS = {
+  ENG: { name: 'England', capital: 'London' },
+  SCT: { name: 'Scotland', capital: 'Edinburgh' },
+  WLS: { name: 'Wales', capital: 'Cardiff' },
+  NIR: { name: 'Northern Ireland', capital: 'Belfast', flag: null },
+};
+const GB_NATION_CODE = { England: 'ENG', Scotland: 'SCT', Wales: 'WLS', 'Northern Ireland': 'NIR' };
+
 // Wikidata lists more than one "capital" for a few subdivisions; pick this item then.
 const CAPITAL_QID = {
   'ch-ar': 'Q63970', // Herisau is the seat of government; Trogen (also listed) only hosts the cantonal court
+  'fr-bfc': 'Q7003', // Dijon is the préfecture; Besançon (also listed) hosts the regional council
+  'fr-yt': 'Q132676', // Mamoudzou is the préfecture; Dzaoudzi (also listed) was the capital until 1977
 };
 
+// id: country id in data/countries.json (the app links the deep dive through it), so the UK is `gb`.
+// key(properties): table code of a Natural Earth feature, or undefined to leave it out (default:
+// the feature's ISO 3166-2 code). Features with the same code are dissolved. simplify: share of
+// vertices kept (mapshaper); without it the shapes are used as they are.
 const SETS = [
   { id: 'us', name: 'United States', kind: 'state', kinds: 'states', label: 'US states', adm0: 'USA', iso: 'US', shapes: 'ne50', decimals: 3, table: US_STATES },
   { id: 'ch', name: 'Switzerland', kind: 'canton', kinds: 'cantons', label: 'Swiss cantons', adm0: 'CHE', iso: 'CH', shapes: 'ne10', decimals: 4, table: CH_CANTONS },
+  { id: 'de', name: 'Germany', kind: 'state', kinds: 'states', label: 'German states', adm0: 'DEU', iso: 'DE', shapes: 'ne10', decimals: 3, simplify: '50%', table: DE_STATES },
+  { id: 'at', name: 'Austria', kind: 'state', kinds: 'states', label: 'Austrian states', adm0: 'AUT', iso: 'AT', shapes: 'ne10', decimals: 3, simplify: '50%', table: AT_STATES },
+  { id: 'it', name: 'Italy', kind: 'region', kinds: 'regions', label: 'Italian regions', adm0: 'ITA', iso: 'IT', shapes: 'ne10', decimals: 3, simplify: '50%', table: IT_REGIONS,
+    key: (p) => (p.region_cod || '').trim().replace(/^IT-/, '') },
+  { id: 'fr', name: 'France', kind: 'region', kinds: 'regions', label: 'French regions', adm0: 'FRA', iso: 'FR', shapes: 'ne10', decimals: 3, simplify: '50%', table: FR_REGIONS,
+    key: (p) => { const c = (p.region_cod || '').trim().replace(/^FR-/, ''); return FR_REGION_CODE[c] || c; } }, // NE: "FR-IDF\t"
+  { id: 'gb', name: 'United Kingdom', kind: 'nation', kinds: 'nations', label: 'UK nations', adm0: 'GBR', iso: 'GB', shapes: 'ne10', decimals: 3, simplify: '50%', table: GB_NATIONS,
+    key: (p) => GB_NATION_CODE[p.geonunit] },
 ];
+
+// Table entry as an object (the US and CH tables use arrays: [name, capital, Commons title]).
+const entryOf = (raw) => (Array.isArray(raw) ? { name: raw[0], capital: raw[1], flag: raw[2] } : raw);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -165,28 +292,92 @@ function writeIfChanged(file, content) {
 // 1. Shapes
 // ---------------------------------------------------------------------------
 
-function buildShapes(ne, set) {
+const isoCode = (set, p) => {
+  const m = /^([A-Z]{2})-([A-Z0-9]{1,3})$/.exec(p.iso_3166_2 || '');
+  return m && m[1] === set.iso ? m[2] : undefined;
+};
+
+async function buildShapes(ne, set) {
   const byCode = new Map();
   for (const f of ne.features) {
     const p = f.properties;
     if (p.adm0_a3 !== set.adm0) continue;
-    const m = /^([A-Z]{2})-([A-Z0-9]{2,3})$/.exec(p.iso_3166_2 || '');
-    if (!m || m[1] !== set.iso) continue;
-    if (!(m[2] in set.table)) continue; // DC, territories
-    if (byCode.has(m[2])) throw new Error(`${set.id}: duplicate feature for ${m[2]}`);
-    byCode.set(m[2], f);
+    const code = (set.key || ((q) => isoCode(set, q)))(p);
+    if (!code || !(code in set.table)) continue; // DC, territories, Jervis Bay...
+    (byCode.get(code) ?? byCode.set(code, []).get(code)).push(f);
   }
   const missing = Object.keys(set.table).filter((c) => !byCode.has(c));
   if (missing.length) throw new Error(`${set.id}: no shape for ${missing.join(', ')}`);
 
-  const features = [...byCode].map(([code, f]) => ({
-    type: 'Feature',
-    properties: { id: `${set.id}-${code.toLowerCase()}`, wikidata: f.properties.wikidataid },
-    geometry: roundGeometry(f.geometry, set.decimals),
-  }));
+  let shapes; // Map code -> {geometry, wikidataid?}
+  const needsDissolve = [...byCode.values()].some((fs) => fs.length > 1);
+  if (set.simplify || needsDissolve) {
+    shapes = mapshape(set, byCode);
+  } else {
+    shapes = new Map([...byCode].map(([code, [f]]) => [code, { geometry: f.geometry, wikidataid: f.properties.wikidataid }]));
+  }
+
+  // Wikidata item of every subdivision: the table's qid, else (sets matched by ISO code) the item
+  // carrying that ISO 3166-2 code, else the id Natural Earth carries.
+  const codes = [...byCode.keys()].sort();
+  const byIso = set.key || set.simplify ? await itemsByIso(set, codes.filter((c) => !entryOf(set.table[c]).qid)) : new Map();
+  const features = codes.map((code) => {
+    const { geometry, wikidataid } = shapes.get(code);
+    const wikidata = entryOf(set.table[code]).qid || byIso.get(`${set.iso}-${code}`) || wikidataid;
+    if (!/^Q\d+$/.test(wikidata || '')) throw new Error(`${set.id}-${code}: no Wikidata item (add qid to the table)`);
+    return {
+      type: 'Feature',
+      properties: { id: `${set.id}-${code.toLowerCase()}`, wikidata },
+      geometry: roundGeometry(geometry, set.decimals),
+    };
+  });
   features.sort((a, b) => (a.properties.id < b.properties.id ? -1 : 1));
   assertNoAntimeridianJumps(features);
   return features;
+}
+
+// Dissolve the features of each code into one shape and simplify the set with mapshaper (npm,
+// via npx), which builds a shared topology first: neighbours keep identical borders, no gaps or
+// overlaps appear, and `keep-shapes` keeps every small island or region. Output coordinates are
+// rounded to the set's decimals by mapshaper itself, so both sides of a border round alike.
+function mapshape(set, byCode) {
+  const dir = path.join(CACHE, 'mapshaper');
+  fs.mkdirSync(dir, { recursive: true });
+  const input = path.join(dir, `${set.id}-in.geojson`);
+  const output = path.join(dir, `${set.id}-out.geojson`);
+  const features = [];
+  for (const [code, fs_] of byCode) for (const f of fs_) features.push({ type: 'Feature', properties: { code }, geometry: f.geometry });
+  fs.writeFileSync(input, JSON.stringify({ type: 'FeatureCollection', features }));
+  const args = [input, '-dissolve', 'code'];
+  if (set.simplify) args.push('-simplify', 'weighted', set.simplify, 'keep-shapes');
+  args.push('-clean', '-o', output, 'format=geojson', `precision=${10 ** -set.decimals}`, 'force');
+  console.log(`mapshaper ${set.id}: ${features.length} features -> ${byCode.size}${set.simplify ? `, simplify ${set.simplify}` : ''}`);
+  execFileSync('npx', ['--yes', 'mapshaper', ...args], { stdio: ['ignore', 'inherit', 'inherit'] });
+  const out = new Map();
+  for (const f of readJson(output).features) {
+    if (!f.geometry || !['Polygon', 'MultiPolygon'].includes(f.geometry.type)) throw new Error(`${set.id}-${f.properties.code}: mapshaper dropped the geometry`);
+    if (out.has(f.properties.code)) throw new Error(`${set.id}-${f.properties.code}: several features after dissolve`);
+    out.set(f.properties.code, { geometry: f.geometry });
+  }
+  for (const code of byCode.keys()) if (!out.has(code)) throw new Error(`${set.id}-${code}: missing after mapshaper`);
+  return out;
+}
+
+// Wikidata items by ISO 3166-2 code (P300): Map "DE-BY" -> "Q980". Codes that match no item or
+// several are left out (the table's qid then decides).
+async function itemsByIso(set, codes) {
+  if (!codes.length) return new Map();
+  const isos = codes.map((c) => `${set.iso}-${c}`);
+  const query = `SELECT ?iso ?adm WHERE { VALUES ?iso { ${isos.map((i) => JSON.stringify(i)).join(' ')} } ?adm wdt:P300 ?iso . }`;
+  const file = await download(`${SRC.sparql}?format=json&query=${encodeURIComponent(query)}`, `wikidata-sub-items-${set.id}.json`, { headers: { Accept: 'application/sparql-results+json' } });
+  const items = new Map();
+  for (const b of readJson(file).results.bindings) (items.get(b.iso.value) ?? items.set(b.iso.value, new Set()).get(b.iso.value)).add(b.adm.value.split('/').pop());
+  const out = new Map();
+  for (const [iso, qids] of items) {
+    if (qids.size > 1) console.warn(`  ${iso}: several Wikidata items (${[...qids].join(', ')}), add qid to the table`);
+    else out.set(iso, [...qids][0]);
+  }
+  return out;
 }
 
 // Neighbour graph: ids whose rounded rings share at least one vertex (a shared border, or a
@@ -241,25 +432,36 @@ function colourGraph(adj, restarts = 3000) {
 // 2. Capital coordinates from Wikidata
 // ---------------------------------------------------------------------------
 
+// A subdivision that is its own capital (Berlin, Vienna) has no P36 on Wikidata; its own
+// coordinates (P625) are used then.
 async function capitalCoords(features, set) {
   const qids = features.map((f) => f.properties.wikidata);
   if (qids.some((q) => !/^Q\d+$/.test(q || ''))) throw new Error('feature without wikidataid');
-  const query = `SELECT ?adm ?cap ?coord WHERE { VALUES ?adm { ${qids.map((q) => 'wd:' + q).join(' ')} } ?adm wdt:P36 ?cap . ?cap wdt:P625 ?coord . }`;
+  const query = `SELECT ?adm ?own ?cap ?coord WHERE { VALUES ?adm { ${qids.map((q) => 'wd:' + q).join(' ')} } OPTIONAL { ?adm wdt:P625 ?own . } OPTIONAL { ?adm wdt:P36 ?cap . ?cap wdt:P625 ?coord . } }`;
   const file = await download(`${SRC.sparql}?format=json&query=${encodeURIComponent(query)}`, `wikidata-sub-capitals-${set.id}.json`, { headers: { Accept: 'application/sparql-results+json' } });
-  const rows = readJson(file).results.bindings.map((b) => {
-    const m = /^Point\((-?[\d.]+) (-?[\d.]+)\)$/.exec(b.coord.value);
-    if (!m) throw new Error(`bad coordinate ${b.coord.value}`);
-    return { adm: b.adm.value.split('/').pop(), cap: b.cap.value.split('/').pop(), lon: +m[1], lat: +m[2] };
-  });
+  const point = (v) => {
+    const m = /^Point\((-?[\d.]+) (-?[\d.]+)\)$/.exec(v);
+    if (!m) throw new Error(`bad coordinate ${v}`);
+    return { lon: +m[1], lat: +m[2] };
+  };
+  const rows = readJson(file).results.bindings.map((b) => ({
+    adm: b.adm.value.split('/').pop(),
+    cap: b.cap?.value.split('/').pop(),
+    ...(b.coord ? point(b.coord.value) : {}),
+    own: b.own ? point(b.own.value) : null,
+  }));
   const out = new Map();
   for (const f of features) {
     const id = f.properties.id;
-    let cands = rows.filter((r) => r.adm === f.properties.wikidata);
+    const mine = rows.filter((r) => r.adm === f.properties.wikidata);
+    let cands = mine.filter((r) => r.cap && r.lat !== undefined);
     const caps = [...new Set(cands.map((r) => r.cap))];
     if (caps.length > 1) {
       if (!CAPITAL_QID[id]) throw new Error(`${id}: several capitals on Wikidata (${caps.join(', ')}), add CAPITAL_QID`);
       cands = cands.filter((r) => r.cap === CAPITAL_QID[id]);
     }
+    const entry = entryOf(set.table[id.slice(set.id.length + 1).toUpperCase()]);
+    if (!cands.length && entry.capital === entry.name && mine.some((r) => r.own)) cands = [mine.find((r) => r.own).own];
     if (!cands.length) throw new Error(`${id}: no capital coordinates on Wikidata (${f.properties.wikidata})`);
     const { lat, lon } = cands[0];
     if (!nearGeometry([lon, lat], f.geometry)) throw new Error(`${id}: capital ${lat},${lon} is outside its shape`);
@@ -361,11 +563,15 @@ async function renderPng(svgFile, width, height, outFile) {
 async function buildFlags(entries, set) {
   fs.mkdirSync(FLAGS_DIR, { recursive: true });
   fs.mkdirSync(path.join(CACHE, 'commons'), { recursive: true });
-  const titles = entries.map((e) => e.commonsTitle);
-  const info = await commonsInfo(titles, `commons-sub-${set.id}.json`);
+  const withFlag = entries.filter((e) => e.commonsTitle);
+  const info = withFlag.length ? await commonsInfo(withFlag.map((e) => e.commonsTitle), `commons-sub-${set.id}.json`) : new Map();
   const credits = [];
   let bytes = 0;
   for (const e of entries) {
+    if (!e.commonsTitle) { // no official flag
+      for (const ext of ['svg', 'png']) fs.rmSync(path.join(FLAGS_DIR, `${e.id}.${ext}`), { force: true });
+      continue;
+    }
     const fi = info.get(e.commonsTitle);
     if (!fi) throw new Error(`no Commons info for ${e.commonsTitle}`);
     const cached = await download(fi.url, path.join('commons', `${e.id}.svg`));
@@ -397,8 +603,9 @@ async function main() {
   for (const key of new Set(SETS.map((s) => s.shapes))) shapeFiles[key] = readJson(await download(SRC[key], path.basename(SRC[key])));
 
   const allCredits = [];
+  const counts = new Map();
   for (const set of SETS) {
-    const features = buildShapes(shapeFiles[set.shapes], set);
+    const features = await buildShapes(shapeFiles[set.shapes], set);
     const coords = await capitalCoords(features, set);
     const adj = adjacency(features);
     const { n: nColours, col } = colourGraph(adj);
@@ -407,11 +614,12 @@ async function main() {
     for (const f of features) {
       const id = f.properties.id;
       const code = id.slice(set.id.length + 1).toUpperCase();
-      const [name, capital, commonsTitle = `Flag of ${name}.svg`] = set.table[code];
+      const { name, local, capital, capitalLocal, flag: title } = entryOf(set.table[code]);
+      const commonsTitle = title === null ? null : title || `Flag of ${name}.svg`;
       const [lat, lon] = coords.get(id);
       const [fx, fy] = flagPoint(f.geometry).map(round3);
       if (!pointInGeometry([fx, fy], f.geometry)) throw new Error(`${id}: flag point outside its shape`);
-      entries.push({ id, name, capital, lat, lon, fx, fy, color: PALETTE[col.get(id)], flag: null, commonsTitle });
+      entries.push({ id, name, ...(local && local !== name ? { local } : {}), capital, ...(capitalLocal && capitalLocal !== capital ? { capitalLocal } : {}), lat, lon, fx, fy, color: PALETTE[col.get(id)], flag: null, commonsTitle });
     }
     entries.sort((a, b) => a.name.localeCompare(b.name, 'en'));
 
@@ -432,12 +640,22 @@ async function main() {
 
     // final checks
     validate(set, rows, fc, adj);
-    const nPng = rows.filter((e) => e.flag.endsWith('.png')).length;
-    console.log(`${set.id}: ${rows.length} ${set.kinds}, ${nColours} colours, ${set.id}.geojson ${geoBytes} B, ${set.id}.json ${fs.statSync(jsonPath).size} B, flags ${flagBytes} B (${rows.length - nPng} svg, ${nPng} png)`);
+    counts.set(set.id, rows.length);
+    const nPng = rows.filter((e) => e.flag && e.flag.endsWith('.png')).length;
+    const nNull = rows.filter((e) => !e.flag).length;
+    console.log(`${set.id}: ${rows.length} ${set.kinds}, ${nColours} colours, ${set.id}.geojson ${geoBytes} B, ${set.id}.json ${fs.statSync(jsonPath).size} B, flags ${flagBytes} B (${rows.length - nPng - nNull} svg, ${nPng} png${nNull ? `, ${nNull} without flag: ${rows.filter((e) => !e.flag).map((e) => e.id).join(' ')}` : ''})`);
   }
 
-  const index = SETS.map(({ id, name, kind, kinds, label }) => ({ id, name, kind, kinds, label }));
-  writeIfChanged(path.join(DATA_DIR, 'index.json'), '[\n' + index.map((e) => '  ' + JSON.stringify(e)).join(',\n') + '\n]\n');
+  // index.json: other scripts add their own sets to it, so only this script's entries are
+  // replaced (in place) or appended; the file is re-read right before writing.
+  const indexPath = path.join(DATA_DIR, 'index.json');
+  const index = fs.existsSync(indexPath) ? readJson(indexPath) : [];
+  for (const { id, name, kind, kinds, label } of SETS) {
+    const entry = { id, name, kind, kinds, label, count: counts.get(id) };
+    const i = index.findIndex((e) => e.id === id);
+    if (i >= 0) index[i] = entry; else index.push(entry);
+  }
+  writeIfChanged(indexPath, '[\n' + index.map((e) => '  ' + JSON.stringify(e)).join(',\n') + '\n]\n');
 
   // Flag credits for LICENSES.md
   const byLicense = {};
@@ -458,7 +676,9 @@ function validate(set, rows, fc, adj) {
   for (const e of rows) {
     const g = geom.get(e.id);
     if (!g) throw new Error(`${e.id}: no geometry`);
-    if (!fs.existsSync(path.join(ROOT, e.flag))) throw new Error(`${e.id}: flag file ${e.flag} missing`);
+    const code = e.id.slice(set.id.length + 1).toUpperCase();
+    if (e.flag === null) { if (entryOf(set.table[code]).flag !== null) throw new Error(`${e.id}: flag missing`); }
+    else if (!/^flags\/sub\/[a-z0-9-]+\.(svg|png)$/.test(e.flag) || !fs.existsSync(path.join(ROOT, e.flag))) throw new Error(`${e.id}: flag file ${e.flag} missing`);
     if (!pointInGeometry([e.fx, e.fy], g)) throw new Error(`${e.id}: fx/fy outside`);
     if (!nearGeometry([e.lon, e.lat], g)) throw new Error(`${e.id}: capital outside`);
     for (const o of adj.get(e.id)) if (colour.get(o) === e.color) throw new Error(`${e.id} and ${o} are neighbours with the same colour`);

@@ -1,0 +1,6 @@
+[
+  {"id":"gb-eng","name":"England","capital":"London","lat":51.507,"lon":-0.127,"fx":-0.854,"fy":52.069,"color":"#e0393e","flag":"flags/sub/gb-eng.svg"},
+  {"id":"gb-nir","name":"Northern Ireland","capital":"Belfast","lat":54.597,"lon":-5.93,"fx":-6.597,"fy":54.742,"color":"#e0393e","flag":null},
+  {"id":"gb-sct","name":"Scotland","capital":"Edinburgh","lat":55.953,"lon":-3.189,"fx":-3.967,"fy":56.869,"color":"#2f6fd0","flag":"flags/sub/gb-sct.svg"},
+  {"id":"gb-wls","name":"Wales","capital":"Cardiff","lat":51.482,"lon":-3.179,"fx":-3.747,"fy":52.008,"color":"#2f6fd0","flag":"flags/sub/gb-wls.svg"}
+]

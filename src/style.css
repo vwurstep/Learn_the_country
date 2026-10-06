@@ -154,3 +154,34 @@ html.deep #hint { top: calc(var(--safe-top) + 112px); }
   color: var(--accent); background: rgba(47, 111, 214, 0.1); }
 .chips button:disabled { opacity: 0.35; cursor: default; }
 #mode-hint { margin: 8px 0 0; }
+
+/* question type: two columns (you see → you find) */
+.pair { display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 10px; align-items: center; margin-top: 4px; }
+.pair .label { margin: 10px 0 6px; }
+.pair .col { display: flex; flex-direction: column; gap: 6px; }
+.pair .col button { padding: 8px 10px; border-radius: 12px; background: rgba(0, 0, 0, 0.06); font-size: 15px; font-weight: 600; }
+.pair .col button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.pair .col button:disabled { opacity: 0.3; cursor: default; }
+.pair .arrow { font-size: 26px; font-weight: 700; color: var(--accent); }
+
+/* places without a flag: the local name (e.g. 广东) is pinned instead */
+.flagpin.namepin { width: auto; height: auto; padding: 1px 6px; font-size: 13px; font-weight: 700; line-height: 18px;
+  white-space: nowrap; color: #9b1c1c; background: rgba(255, 255, 255, 0.92); border-radius: 6px; }
+.info-local { flex: none; min-width: 96px; padding: 10px 12px; font-size: 30px; font-weight: 700; text-align: center;
+  color: #9b1c1c; background: rgba(0, 0, 0, 0.05); border-radius: 8px; }
+#info.hidden-answer .info-local { filter: blur(10px); }
+.q-local { display: block; font-size: 30px; font-weight: 700; color: #9b1c1c; }
+
+/* what to learn: button in the setup + the list */
+.learn-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 12px;
+  background: rgba(0, 0, 0, 0.06); font-weight: 600; text-align: left; }
+.learn-btn img, .learn-row img { width: 30px; height: 22px; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); flex: none; }
+.learn-btn .globe, .learn-row .globe { width: 30px; text-align: center; font-size: 22px; line-height: 1; flex: none; }
+.learn-btn span:nth-child(2) { flex: 1; }
+.learn-btn .chev { font-size: 22px; color: var(--muted); }
+#learn { max-height: calc(100vh - var(--safe-top) - 90px); }
+#learn-search { width: 100%; font: inherit; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.15); background: #fff; margin: 6px 0 4px; }
+.learn-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 10px; border-radius: 12px; text-align: left; margin-top: 4px; }
+.learn-row b { display: block; font-size: 16px; }
+.learn-row small { color: var(--muted); font-size: 13px; }
+.learn-row[aria-pressed="true"] { background: rgba(47, 111, 214, 0.12); }

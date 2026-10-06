@@ -47,13 +47,13 @@ function bboxOf(geom) {
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     return { b: [x0, y0, x1, y1], cx, cy, area: (x1 - x0) * (y1 - y0) * Math.cos(toRad(cy)) };
   });
-  // start from the biggest part and keep adding parts within 20° of one already added, so
+  // start from the biggest part and keep adding parts within 15° of one already added, so
   // island chains (Indonesia) stay together while far-away territories drop out
   const dist = (a, b) => Math.hypot((a.cx - b.cx) * Math.cos(toRad((a.cy + b.cy) / 2)), a.cy - b.cy);
   const near = [parts.reduce((a, b) => (b.area > a.area ? b : a))];
   for (let grew = true; grew;) {
     grew = false;
-    for (const p of parts) if (!near.includes(p) && near.some((q) => dist(p, q) <= 20)) { near.push(p); grew = true; }
+    for (const p of parts) if (!near.includes(p) && near.some((q) => dist(p, q) <= 15)) { near.push(p); grew = true; }
   }
   return [Math.min(...near.map((p) => p.b[0])), Math.min(...near.map((p) => p.b[1])),
           Math.max(...near.map((p) => p.b[2])), Math.max(...near.map((p) => p.b[3]))];
@@ -139,17 +139,25 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     const mk = (node, lngLat) => ({ el: node, on: false,
       marker: new maplibregl.Marker({ element: node, anchor: 'center', opacity: '1', opacityWhenCovered: '0' }).setLngLat(lngLat) });
     for (const c of items) {
-      const f = document.createElement('img');
-      f.className = 'flagpin';
-      f.alt = '';
-      f.loading = 'lazy';
-      f.src = flagOf(c);
+      // the pin in the middle: the flag, or (no flag) the local name, e.g. 广东; or nothing
+      let f = null;
+      if (flagOf(c)) {
+        f = document.createElement('img');
+        f.className = 'flagpin';
+        f.alt = '';
+        f.loading = 'lazy';
+        f.src = flagOf(c);
+      } else if (c.local) {
+        f = document.createElement('span');
+        f.className = 'flagpin namepin';
+        f.textContent = c.local;
+      }
       const cap = document.createElement('div');
       cap.className = 'cap';
       cap.innerHTML = '<i class="dot"></i><span class="lbl"></span>';
       cap.querySelector('.lbl').textContent = c.capital;
-      for (const node of [f, cap]) node.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
-      markers.set(c.id, { item: c, flag: mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
+      for (const node of [f, cap].filter(Boolean)) node.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
+      markers.set(c.id, { item: c, flag: f && mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
     }
     const bboxes = new Map(geo.features.map((f) => [f.properties.id, bboxOf(f.geometry)]));
     const all = [...bboxes.values()];
@@ -188,18 +196,19 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       const m = markers.get(c.id);
       const want = showAll || (only && only.has(c.id));
       const force = !showAll || c.id === selected;  // quiz feedback / selection: always show
-      if (dotsOnly) {  // self-test on the map: capital positions only, no flags, no names
+      if (dotsOnly || !m.flag) {  // self-test (capital positions only), or nothing to pin mid-place
         setOn(m.flag, false);
-        if (want) shown.push([c, m, false]);
+        if (want) shown.push([c, m, dotsOnly ? false : force]);  // still forced for quiz feedback
         else setOn(m.cap, false);
         continue;
       }
       const fp = [c.fx ?? c.lon, c.fy ?? c.lat];
       if (want && !(globe && angularDistance(center, fp) > 75)) {
         const p = map.project(fp);
-        const img = m.flag.el, ar = img.naturalWidth ? img.naturalHeight / img.naturalWidth : 0.75;
-        const fh = Math.round(fw * ar);
-        const box = [p.x - fw / 2 - 1, p.y - fh / 2 - 1, p.x + fw / 2 + 1, p.y + fh / 2 + 1];
+        const img = m.flag.el, name = img.tagName !== 'IMG';
+        const ar = img.naturalWidth ? img.naturalHeight / img.naturalWidth : 0.75;
+        const w = name ? c.local.length * 14 + 12 : fw, h = name ? 22 : Math.round(fw * ar);  // name pin: 13px text
+        const box = [p.x - w / 2 - 1, p.y - h / 2 - 1, p.x + w / 2 + 1, p.y + h / 2 + 1];
         const show = force || free(box);
         if (show) taken.push(box);
         setOn(m.flag, show);
@@ -225,7 +234,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     }
   }
   function setOn(m, on) {
-    if (m.on === on) return;
+    if (!m || m.on === on) return;
     m.on = on;
     on ? m.marker.addTo(map) : m.marker.remove();
   }
@@ -263,6 +272,13 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   };
   const clearMarks = () => { for (const x of marked) setMark(x, null); marked = []; };
 
+  // Fit a box [x0, y0, x1, y1] on screen. MapLibre's fitBounds drifts on the globe away from
+  // the equator (South Africa ended up near the top), so only its zoom is used and the camera
+  // is centred on the middle of the box (inside the padded area).
+  const fitBox = ([x0, y0, x1, y1], pad, maxZoom) => {
+    const cam = map.cameraForBounds([[x0, y0], [x1, y1]], { padding: pad, maxZoom });
+    map.flyTo({ center: [(x0 + x1) / 2, (y0 + y1) / 2], zoom: cam?.zoom ?? map.getZoom(), padding: pad, duration: 900 });
+  };
   const padding = () => {
     const pad = Math.min(80, el.clientWidth / 6);
     return { top: pad, left: pad, right: pad, bottom: Math.max(pad, el.clientHeight * 0.4) };
@@ -312,10 +328,9 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         for find-on-map questions, so the view doesn't hint at outlying answers) */
     flyToSet({ full = false } = {}) {
       if (!cur.extent || cur.id === 'world') { map.flyTo({ ...REGION_VIEWS.World, duration: 900 }); return; }
-      const [x0, y0, x1, y1] = full ? cur.extent : cur.core;
-      const pad = padding();
-      if (!full) pad.bottom = pad.top;  // exploring: no card at the bottom yet
-      map.fitBounds([[x0, y0], [x1, y1]], { padding: pad, maxZoom: cur.maxZoom, duration: 900 });
+      // exploring: no card at the bottom, so use the whole screen below the top bars
+      const pad = full ? padding() : { top: 130, bottom: 24, left: 16, right: 16 };
+      fitBox(full ? cur.extent : cur.core, pad, cur.maxZoom);
     },
     /** show all markers (explore) or only some ids (quiz feedback); dots: capital dots only */
     setMarkers(all, onlyIds = null, { dots = false } = {}) { showAll = all; only = onlyIds ? new Set(onlyIds) : null; dotsOnly = dots; relayout(); },
@@ -348,7 +363,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         const w = Math.max(bw + Math.min(bw * 1.1, 30), mw), h = Math.max(bh + Math.min(bh * 1.1, 20), mh);
         b = [cx - w / 2, Math.max(-80, cy - h / 2), cx + w / 2, Math.min(84, cy + h / 2)];
       }
-      map.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: padding(), maxZoom, duration: 900 });
+      fitBox(b, padding(), maxZoom);
     },
     /** regions: a continent name or a list of them ([] or 'World' = whole world) */
     flyToRegion(regions) {

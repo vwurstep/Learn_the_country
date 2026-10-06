@@ -6,8 +6,9 @@
 export const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
 
 export const flagUrl = (id) => `flags/${id}.svg`;
-/** flag image of a country or a subdivision (those carry their own path, svg or png) */
-export const flagOf = (c) => c.flag || flagUrl(c.id);
+/** flag image of a country or a subdivision (those carry their own path, svg or png, or null
+    when the place has no official flag, e.g. Chinese and South African provinces) */
+export const flagOf = (c) => (c.flag === undefined ? flagUrl(c.id) : c.flag);
 
 export async function loadData() {
   const [countries, world, colors] = await Promise.all([
@@ -49,7 +50,8 @@ export async function loadInfo() {
 
 // ---- subdivisions (deep dive into a country) ---------------------------------------------
 // data/sub/index.json: [{id: 'us', name, kind: 'state', kinds: 'states', label?}];
-// data/sub/<id>.json: [{id: 'us-ca', name, capital, lat, lon, fx, fy, color, flag}];
+// data/sub/<id>.json: [{id: 'us-ca', name, capital, lat, lon, fx, fy, color, flag (or null),
+//   local?, capitalLocal? (names in the local language/script, e.g. 广东 / 广州)}];
 // data/sub/<id>.geojson: shapes with properties.id.
 let subIndex = null;
 export async function loadSubIndex() {

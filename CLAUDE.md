@@ -43,11 +43,24 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   then give way to flags until zoomed in. Names appear from zoom 2.6. On the
   globe, markers on the far side are removed.
 - **Zooming to a country** (`flyToCountry`) uses the bbox of its main part plus parts
-  chained within 20° (Corsica, Indonesia's islands), not the whole geometry. The full
+  chained within 15° (Corsica, Indonesia's islands; 20° pulled in South Africa's
+  Prince Edward Islands), not the whole geometry. The full
   geometry of France or the Netherlands includes overseas territories.
-- **Quiz mode = Show + Find** (2026-10-06): two chip rows (flag / capital / country / map).
-  The 12 pairs are in `MODES` (old keys kept, `modeFor(ask, answer)`). Mixed was removed
-  at Phil's request.
+- **Quiz mode = "You see → You find"** (2026-10-06): two columns of four buttons (flag /
+  capital / country / map) with an arrow between them. Phil found two chip rows
+  confusing. The 12 pairs are in `MODES` (old keys kept, `modeFor(ask, answer)`). Mixed
+  was removed at Phil's request.
+- **Learn picker:** a single button in the setup ("🇨🇭 Swiss cantons ›") opens `#learn`, a
+  searchable list (World first, then deep dives grouped by the parent's continent, with
+  counts). Phil plans about 11 deep dives, not 100.
+- **Places without a flag** (`flag: null`): Chinese and South African provinces, Northern
+  Ireland, maybe some French regions.
+  - The local name is pinned instead (`.namepin`, e.g. 广东), and the info card shows it in
+    the flag's place.
+  - Flag questions are off when fewer than half of a set have flags (`flagsOk`).
+  - Flagless items are left out of flag questions (`poolNow`).
+- **Local names:** `local`/`capitalLocal` are shown as "Guangdong · 广东" (`nameOf`, `capOf`).
+  China has characters at Phil's request; DE/AT/IT/FR have local spellings.
 - **Country colours = national colours** (2026-10-01, Phil's request; still being iterated).
   - `data/colors.json` gives `{id: {c, alt?, why}}`, chosen by a subagent. It is the colour
     the country identifies with (flag or sports colour).
@@ -61,8 +74,11 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
     national colour.
 - **Flags hidden on the map tab = self-test:** only the capital dots remain, with no flags
   or names (`setMarkers(true, null, {dots: true})`). Tapping shows the blurred card.
-- **Offline:** `sw.js` precaches everything on install: code, data and all flags (256
-  files), with no external requests. The settings card (Quiz → Sync & offline…) asks the
+- **Offline:** `sw.js` precaches everything, including all deep dives, listed in `files.json`
+  with a content hash per file. `tools/release.py` writes files.json.
+  - **An update downloads only files whose hash changed** and copies the rest from the
+    previous cache (tested: one changed flag means one download).
+  - Always run release.py before pushing, or phones won't get the new files. The settings card (Quiz → Sync & offline…) asks the
   worker via `postMessage` (`offline-status` / `download`, reply on a MessageChannel) and
   shows "✓ Everything is on this phone". Tested with Chrome offline (Playwright
   `channel: 'chrome'`; WebKit in Playwright has no service workers).
@@ -122,9 +138,18 @@ the pile only by hand.
 
 ## Deep dives: states and cantons (2026-10-06, option A Phil chose)
 
-- **Countries:** US (50 states, no DC) and Switzerland (26 cantons, names in the local
-  language: Genève, Ticino, Luzern…). Each has name, capital and flag only, without
-  summaries (Phil's choice: "if I like it we'll add more").
+- **Countries (11, 2026-10-06):**
+  - US (50 states, no DC) and CH (26 cantons, names in the local language: Genève,
+    Ticino, Luzern…).
+  - DE 16, AT 9, IT 20, FR 18 (13 + 5 overseas), GB 4 nations (set id `gb`, matching the
+    country id, otherwise the Explore link breaks).
+  - CA 13, AU 8, ZA 9 (no flags), CN 31 (no flags, Chinese names).
+  - Phil wants about this many, not 100. Name, capital and flag only, no summaries.
+  - Builders: `tools/build_subdivisions.mjs` (US CH DE AT IT FR GB), `build_sub_cn.mjs`,
+    `build_sub_ca_au_za.mjs`. Each merges only its own entries into index.json.
+    Simplification uses `npx mapshaper`.
+  - Null flags: all of CN and ZA, Northern Ireland, Grand Est, Hauts-de-France,
+    Guadeloupe and Réunion.
 - **Map tab:** a country that has subdivision data shows "Explore the states →" on its card.
   That switches the **scope**: the map shows that set, the other countries are dimmed
   (`dim` layer), and the "‹ World" bar (`#scope-bar`) goes back.
@@ -140,6 +165,8 @@ the pile only by hand.
   - To add a country: extend `SETS` in that script.
 - **Map code:** the "sets" in map.js are world + one per deep dive, each with its own markers,
   bboxes and source (`world` / `sub`); `useSet(id)` switches between them.
+  - Views use `fitBox` (camera centred on the box, zoom from cameraForBounds), because
+    MapLibre's fitBounds drifts on the globe away from the equator.
   - `flyToSet()` shows the core: places within 30° of the median, so the US view is the
     lower 48 without zooming out for Alaska and Hawaii.
   - `flyToSet({full: true})` is used for find-on-map questions, so the view doesn't hint

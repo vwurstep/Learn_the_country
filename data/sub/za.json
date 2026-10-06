@@ -1,0 +1,11 @@
+[
+  {"id":"za-ec","name":"Eastern Cape","capital":"Bhisho","lat":-32.849,"lon":27.438,"fx":26.665,"fy":-32.063,"color":"#e0393e","flag":null},
+  {"id":"za-fs","name":"Free State","capital":"Bloemfontein","lat":-29.1,"lon":26.217,"fx":26.126,"fy":-28.829,"color":"#2f6fd0","flag":null},
+  {"id":"za-gp","name":"Gauteng","capital":"Johannesburg","lat":-26.204,"lon":28.042,"fx":28.043,"fy":-26.25,"color":"#2fa84f","flag":null},
+  {"id":"za-kzn","name":"KwaZulu-Natal","capital":"Pietermaritzburg","lat":-29.601,"lon":30.38,"fx":30.805,"fy":-28.358,"color":"#2fa84f","flag":null},
+  {"id":"za-lp","name":"Limpopo","capital":"Polokwane","lat":-23.9,"lon":29.45,"fx":29.495,"fy":-23.678,"color":"#2f6fd0","flag":null},
+  {"id":"za-mp","name":"Mpumalanga","capital":"Mbombela","lat":-25.466,"lon":30.985,"fx":29.831,"fy":-26.274,"color":"#e0393e","flag":null},
+  {"id":"za-nw","name":"North West","capital":"Mahikeng","lat":-25.865,"lon":25.644,"fx":25.252,"fy":-26.731,"color":"#e0393e","flag":null},
+  {"id":"za-nc","name":"Northern Cape","capital":"Kimberley","lat":-28.738,"lon":24.764,"fx":21.984,"fy":-29.519,"color":"#2fa84f","flag":null},
+  {"id":"za-wc","name":"Western Cape","capital":"Cape Town","lat":-33.925,"lon":18.424,"fx":19.939,"fy":-33.718,"color":"#2f6fd0","flag":null}
+]

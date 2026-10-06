@@ -1,0 +1,18 @@
+[
+  {"id":"de-bw","name":"Baden-Württemberg","capital":"Stuttgart","lat":48.778,"lon":9.18,"fx":8.955,"fy":48.439,"color":"#e0393e","flag":"flags/sub/de-bw.svg"},
+  {"id":"de-by","name":"Bavaria","local":"Bayern","capital":"Munich","capitalLocal":"München","lat":48.138,"lon":11.575,"fx":11.815,"fy":48.738,"color":"#2f6fd0","flag":"flags/sub/de-by.svg"},
+  {"id":"de-be","name":"Berlin","capital":"Berlin","lat":52.517,"lon":13.383,"fx":13.374,"fy":52.515,"color":"#2f6fd0","flag":"flags/sub/de-be.svg"},
+  {"id":"de-bb","name":"Brandenburg","capital":"Potsdam","lat":52.401,"lon":13.059,"fx":13.917,"fy":51.949,"color":"#e0393e","flag":"flags/sub/de-bb.svg"},
+  {"id":"de-hb","name":"Bremen","capital":"Bremen","lat":53.076,"lon":8.807,"fx":8.787,"fy":53.111,"color":"#e0393e","flag":"flags/sub/de-hb.svg"},
+  {"id":"de-hh","name":"Hamburg","capital":"Hamburg","lat":53.55,"lon":10,"fx":10.006,"fy":53.545,"color":"#e0393e","flag":"flags/sub/de-hh.svg"},
+  {"id":"de-he","name":"Hesse","local":"Hessen","capital":"Wiesbaden","lat":50.083,"lon":8.24,"fx":9.108,"fy":50.65,"color":"#2fa84f","flag":"flags/sub/de-he.svg"},
+  {"id":"de-ni","name":"Lower Saxony","local":"Niedersachsen","capital":"Hanover","capitalLocal":"Hannover","lat":52.374,"lon":9.739,"fx":9.833,"fy":52.844,"color":"#f29e1f","flag":"flags/sub/de-ni.svg"},
+  {"id":"de-mv","name":"Mecklenburg-Vorpommern","capital":"Schwerin","lat":53.629,"lon":11.415,"fx":12.764,"fy":53.768,"color":"#2fa84f","flag":"flags/sub/de-mv.svg"},
+  {"id":"de-nw","name":"North Rhine-Westphalia","local":"Nordrhein-Westfalen","capital":"Düsseldorf","lat":51.226,"lon":6.777,"fx":7.482,"fy":51.509,"color":"#e0393e","flag":"flags/sub/de-nw.svg"},
+  {"id":"de-rp","name":"Rhineland-Palatinate","local":"Rheinland-Pfalz","capital":"Mainz","lat":49.999,"lon":8.274,"fx":7.146,"fy":50.021,"color":"#2f6fd0","flag":"flags/sub/de-rp.svg"},
+  {"id":"de-sl","name":"Saarland","capital":"Saarbrücken","lat":49.233,"lon":7,"fx":6.949,"fy":49.403,"color":"#e0393e","flag":"flags/sub/de-sl.png"},
+  {"id":"de-sn","name":"Saxony","local":"Sachsen","capital":"Dresden","lat":51.049,"lon":13.738,"fx":13.212,"fy":51.012,"color":"#2fa84f","flag":"flags/sub/de-sn.svg"},
+  {"id":"de-st","name":"Saxony-Anhalt","local":"Sachsen-Anhalt","capital":"Magdeburg","lat":52.132,"lon":11.64,"fx":11.647,"fy":51.855,"color":"#2f6fd0","flag":"flags/sub/de-st.svg"},
+  {"id":"de-sh","name":"Schleswig-Holstein","capital":"Kiel","lat":54.323,"lon":10.139,"fx":9.663,"fy":54.142,"color":"#2f6fd0","flag":"flags/sub/de-sh.svg"},
+  {"id":"de-th","name":"Thuringia","local":"Thüringen","capital":"Erfurt","lat":50.978,"lon":11.029,"fx":10.853,"fy":50.841,"color":"#e0393e","flag":"flags/sub/de-th.svg"}
+]

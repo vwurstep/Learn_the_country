@@ -44,6 +44,7 @@
     <button class="close" aria-label="Close">×</button>
     <div class="info-body">
       <img class="info-flag" alt="">
+      <div class="info-local" hidden></div>
       <div>
         <h2 class="info-name"></h2>
         <p class="info-cap"></p>
@@ -63,11 +64,14 @@
       <button id="start-pile" class="primary">Practise</button>
     </div>
     <p class="label">Learn</p>
-    <div id="scopes" class="chips"></div>
-    <p class="label">Show</p>
-    <div id="ask" class="chips"></div>
-    <p class="label">Find</p>
-    <div id="answer" class="chips"></div>
+    <button id="learn-btn" class="learn-btn"></button>
+    <!-- question type: what you see → what you find -->
+    <div class="pair">
+      <p class="label">You see</p><span></span><p class="label">You find</p>
+      <div id="ask" class="col"></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div id="answer" class="col"></div>
+    </div>
     <p id="mode-hint" class="muted"></p>
     <div id="world-options">
       <p class="label">Region <span class="hint">· tap several to combine</span></p>
@@ -83,6 +87,14 @@
       <span id="sync-line" class="muted"></span>
       <button id="open-settings" class="ghost small">Sync &amp; offline…</button>
     </div>
+  </section>
+
+  <!-- quiz tab: choose what to learn (countries, or the states/regions of a country) -->
+  <section id="learn" class="card glass only-quiz" hidden>
+    <button class="close" aria-label="Close">×</button>
+    <h2>What to learn</h2>
+    <input id="learn-search" type="search" placeholder="Search…" autocomplete="off">
+    <div id="learn-list"></div>
   </section>
 
   <!-- quiz tab: sync settings -->

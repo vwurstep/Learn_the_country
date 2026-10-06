@@ -1,0 +1,10 @@
+[
+  {"id":"au-act","name":"Australian Capital Territory","capital":"Canberra","lat":-35.293,"lon":149.127,"fx":148.957,"fy":-35.497,"color":"#e0393e","flag":"flags/sub/au-act.svg"},
+  {"id":"au-nsw","name":"New South Wales","capital":"Sydney","lat":-33.868,"lon":151.21,"fx":146.491,"fy":-32.462,"color":"#2f6fd0","flag":"flags/sub/au-nsw.svg"},
+  {"id":"au-nt","name":"Northern Territory","capital":"Darwin","lat":-12.438,"lon":130.841,"fx":133.5,"fy":-21.734,"color":"#2f6fd0","flag":"flags/sub/au-nt.svg"},
+  {"id":"au-qld","name":"Queensland","capital":"Brisbane","lat":-27.468,"lon":153.028,"fx":145.027,"fy":-23.6,"color":"#2fa84f","flag":"flags/sub/au-qld.svg"},
+  {"id":"au-sa","name":"South Australia","capital":"Adelaide","lat":-34.927,"lon":138.6,"fx":136.127,"fy":-29.41,"color":"#e0393e","flag":"flags/sub/au-sa.svg"},
+  {"id":"au-tas","name":"Tasmania","capital":"Hobart","lat":-42.883,"lon":147.317,"fx":146.657,"fy":-42.046,"color":"#e0393e","flag":"flags/sub/au-tas.svg"},
+  {"id":"au-vic","name":"Victoria","capital":"Melbourne","lat":-37.814,"lon":144.963,"fx":142.894,"fy":-36.859,"color":"#2fa84f","flag":"flags/sub/au-vic.svg"},
+  {"id":"au-wa","name":"Western Australia","capital":"Perth","lat":-31.956,"lon":115.86,"fx":121.633,"fy":-26.51,"color":"#2fa84f","flag":"flags/sub/au-wa.svg"}
+]

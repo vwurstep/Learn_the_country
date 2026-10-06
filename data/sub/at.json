@@ -1,0 +1,11 @@
+[
+  {"id":"at-1","name":"Burgenland","capital":"Eisenstadt","lat":47.846,"lon":16.523,"fx":16.795,"fy":47.852,"color":"#2fa84f","flag":"flags/sub/at-1.png"},
+  {"id":"at-2","name":"Carinthia","local":"Kärnten","capital":"Klagenfurt","lat":46.617,"lon":14.3,"fx":14.289,"fy":46.721,"color":"#2fa84f","flag":"flags/sub/at-2.svg"},
+  {"id":"at-3","name":"Lower Austria","local":"Niederösterreich","capital":"St. Pölten","lat":48.2,"lon":15.617,"fx":15.607,"fy":48.429,"color":"#2f6fd0","flag":"flags/sub/at-3.svg"},
+  {"id":"at-5","name":"Salzburg","capital":"Salzburg","lat":47.8,"lon":13.045,"fx":13.261,"fy":47.315,"color":"#2f6fd0","flag":"flags/sub/at-5.svg"},
+  {"id":"at-6","name":"Styria","local":"Steiermark","capital":"Graz","lat":47.071,"lon":15.439,"fx":15.406,"fy":47.275,"color":"#e0393e","flag":"flags/sub/at-6.png"},
+  {"id":"at-7","name":"Tyrol","local":"Tirol","capital":"Innsbruck","lat":47.268,"lon":11.393,"fx":10.758,"fy":47.143,"color":"#e0393e","flag":"flags/sub/at-7.svg"},
+  {"id":"at-4","name":"Upper Austria","local":"Oberösterreich","capital":"Linz","lat":48.306,"lon":14.286,"fx":13.871,"fy":48.152,"color":"#2fa84f","flag":"flags/sub/at-4.png"},
+  {"id":"at-9","name":"Vienna","local":"Wien","capital":"Vienna","capitalLocal":"Wien","lat":48.208,"lon":16.372,"fx":16.402,"fy":48.232,"color":"#e0393e","flag":"flags/sub/at-9.svg"},
+  {"id":"at-8","name":"Vorarlberg","capital":"Bregenz","lat":47.507,"lon":9.738,"fx":9.868,"fy":47.222,"color":"#2f6fd0","flag":"flags/sub/at-8.svg"}
+]

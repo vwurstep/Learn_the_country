@@ -1,0 +1,15 @@
+[
+  {"id":"ca-ab","name":"Alberta","capital":"Edmonton","lat":53.533,"lon":-113.5,"fx":-115,"fy":56.209,"color":"#2f6fd0","flag":"flags/sub/ca-ab.svg"},
+  {"id":"ca-bc","name":"British Columbia","capital":"Victoria","lat":48.422,"lon":-123.366,"fx":-125.158,"fy":57.004,"color":"#2fa84f","flag":"flags/sub/ca-bc.svg"},
+  {"id":"ca-mb","name":"Manitoba","capital":"Winnipeg","lat":49.896,"lon":-97.139,"fx":-97.108,"fy":55.754,"color":"#2f6fd0","flag":"flags/sub/ca-mb.svg"},
+  {"id":"ca-nb","name":"New Brunswick","capital":"Fredericton","lat":45.95,"lon":-66.667,"fx":-66.359,"fy":46.414,"color":"#2f6fd0","flag":"flags/sub/ca-nb.svg"},
+  {"id":"ca-nl","name":"Newfoundland and Labrador","capital":"St. John's","lat":47.561,"lon":-52.712,"fx":-64.914,"fy":53.671,"color":"#2f6fd0","flag":"flags/sub/ca-nl.svg"},
+  {"id":"ca-nt","name":"Northwest Territories","capital":"Yellowknife","lat":62.442,"lon":-114.397,"fx":-121.869,"fy":64.161,"color":"#e0393e","flag":"flags/sub/ca-nt.svg"},
+  {"id":"ca-ns","name":"Nova Scotia","capital":"Halifax","lat":44.648,"lon":-63.571,"fx":-65.346,"fy":44.227,"color":"#e0393e","flag":"flags/sub/ca-ns.svg"},
+  {"id":"ca-nu","name":"Nunavut","capital":"Iqaluit","lat":63.749,"lon":-68.522,"fx":-97.807,"fy":65.047,"color":"#2fa84f","flag":"flags/sub/ca-nu.svg"},
+  {"id":"ca-on","name":"Ontario","capital":"Toronto","lat":43.67,"lon":-79.387,"fx":-88.457,"fy":51.983,"color":"#2fa84f","flag":"flags/sub/ca-on.svg"},
+  {"id":"ca-pe","name":"Prince Edward Island","capital":"Charlottetown","lat":46.235,"lon":-63.127,"fx":-62.78,"fy":46.294,"color":"#e0393e","flag":"flags/sub/ca-pe.png"},
+  {"id":"ca-qc","name":"Quebec","capital":"Québec City","lat":46.816,"lon":-71.224,"fx":-72.745,"fy":51.68,"color":"#e0393e","flag":"flags/sub/ca-qc.svg"},
+  {"id":"ca-sk","name":"Saskatchewan","capital":"Regina","lat":50.455,"lon":-104.607,"fx":-105.799,"fy":51.433,"color":"#f29e1f","flag":"flags/sub/ca-sk.svg"},
+  {"id":"ca-yt","name":"Yukon","capital":"Whitehorse","lat":60.717,"lon":-135.056,"fx":-135.378,"fy":62.392,"color":"#2f6fd0","flag":"flags/sub/ca-yt.svg"}
+]

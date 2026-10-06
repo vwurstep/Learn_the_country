@@ -1,0 +1,22 @@
+[
+  {"id":"it-65","name":"Abruzzo","capital":"L'Aquila","lat":42.354,"lon":13.392,"fx":13.886,"fy":42.172,"color":"#f29e1f","flag":"flags/sub/it-65.svg"},
+  {"id":"it-23","name":"Aosta Valley","local":"Valle d'Aosta","capital":"Aosta","lat":45.737,"lon":7.321,"fx":7.229,"fy":45.69,"color":"#e0393e","flag":"flags/sub/it-23.svg"},
+  {"id":"it-75","name":"Apulia","local":"Puglia","capital":"Bari","lat":41.125,"lon":16.867,"fx":15.486,"fy":41.522,"color":"#e0393e","flag":"flags/sub/it-75.svg"},
+  {"id":"it-77","name":"Basilicata","capital":"Potenza","lat":40.633,"lon":15.8,"fx":16.185,"fy":40.416,"color":"#2f6fd0","flag":"flags/sub/it-77.svg"},
+  {"id":"it-78","name":"Calabria","capital":"Catanzaro","lat":38.91,"lon":16.588,"fx":16.555,"fy":39.241,"color":"#e0393e","flag":"flags/sub/it-78.svg"},
+  {"id":"it-72","name":"Campania","capital":"Naples","capitalLocal":"Napoli","lat":40.836,"lon":14.249,"fx":14.76,"fy":41.035,"color":"#2fa84f","flag":"flags/sub/it-72.svg"},
+  {"id":"it-45","name":"Emilia-Romagna","capital":"Bologna","lat":44.494,"lon":11.343,"fx":11.03,"fy":44.533,"color":"#e0393e","flag":"flags/sub/it-45.svg"},
+  {"id":"it-36","name":"Friuli-Venezia Giulia","capital":"Trieste","lat":45.65,"lon":13.77,"fx":12.951,"fy":46.156,"color":"#e0393e","flag":"flags/sub/it-36.png"},
+  {"id":"it-62","name":"Lazio","capital":"Rome","capitalLocal":"Roma","lat":41.893,"lon":12.483,"fx":12.567,"fy":42.037,"color":"#e0393e","flag":"flags/sub/it-62.png"},
+  {"id":"it-42","name":"Liguria","capital":"Genoa","capitalLocal":"Genova","lat":44.407,"lon":8.934,"fx":7.852,"fy":43.981,"color":"#2fa84f","flag":"flags/sub/it-42.svg"},
+  {"id":"it-25","name":"Lombardy","local":"Lombardia","capital":"Milan","capitalLocal":"Milano","lat":45.467,"lon":9.19,"fx":9.78,"fy":45.676,"color":"#2fa84f","flag":"flags/sub/it-25.svg"},
+  {"id":"it-57","name":"Marche","capital":"Ancona","lat":43.617,"lon":13.517,"fx":13.327,"fy":43.174,"color":"#2fa84f","flag":"flags/sub/it-57.svg"},
+  {"id":"it-67","name":"Molise","capital":"Campobasso","lat":41.561,"lon":14.668,"fx":14.61,"fy":41.598,"color":"#2f6fd0","flag":"flags/sub/it-67.svg"},
+  {"id":"it-21","name":"Piedmont","local":"Piemonte","capital":"Turin","capitalLocal":"Torino","lat":45.079,"lon":7.676,"fx":7.804,"fy":44.997,"color":"#2f6fd0","flag":"flags/sub/it-21.svg"},
+  {"id":"it-88","name":"Sardinia","local":"Sardegna","capital":"Cagliari","lat":39.215,"lon":9.11,"fx":9.06,"fy":40.484,"color":"#e0393e","flag":"flags/sub/it-88.svg"},
+  {"id":"it-82","name":"Sicily","local":"Sicilia","capital":"Palermo","lat":38.116,"lon":13.361,"fx":14.47,"fy":37.533,"color":"#e0393e","flag":"flags/sub/it-82.svg"},
+  {"id":"it-32","name":"Trentino-Alto Adige","capital":"Trento","lat":46.067,"lon":11.117,"fx":11.219,"fy":46.367,"color":"#e0393e","flag":"flags/sub/it-32.svg"},
+  {"id":"it-52","name":"Tuscany","local":"Toscana","capital":"Florence","capitalLocal":"Firenze","lat":43.771,"lon":11.254,"fx":11.26,"fy":43.426,"color":"#2f6fd0","flag":"flags/sub/it-52.png"},
+  {"id":"it-55","name":"Umbria","capital":"Perugia","lat":43.112,"lon":12.389,"fx":12.432,"fy":42.959,"color":"#f29e1f","flag":"flags/sub/it-55.svg"},
+  {"id":"it-34","name":"Veneto","capital":"Venice","capitalLocal":"Venezia","lat":45.44,"lon":12.332,"fx":11.584,"fy":45.43,"color":"#2f6fd0","flag":"flags/sub/it-34.png"}
+]
