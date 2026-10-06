@@ -1,5 +1,5 @@
 /* Wiring: tabs, the map tab's info card, the quiz panels and the sync settings. */
-import { loadData, loadInfo, flagUrl, CONTINENTS, loadSetting, saveSetting } from './data.js';
+import { loadData, loadInfo, loadSubIndex, loadSub, flagOf, CONTINENTS, loadSetting, saveSetting } from './data.js';
 import * as store from './store.js';
 import { githubBackend } from './sync-github.js';
 import { createMap } from './map.js';
@@ -15,10 +15,44 @@ const settings = {
   // continents to quiz ([] = whole world); older versions stored a single 'region'
   regions: loadSetting('regions', null) ?? ((r) => (r && r !== 'World' ? [r] : []))(loadSetting('region', 'World')),
   territories: loadSetting('territories', false),
+  scope: loadSetting('scope', 'world'),
 };
 const set = (k, v) => { settings[k] = v; saveSetting(k, v); };
 
 let data, world, tab = 'map';
+
+// ---- scope: the world's countries, or the subdivisions of one country (deep dive) -----------
+// Both tabs follow the same scope: the map shows that set, the quiz asks about it.
+let subIndex = [], scope = 'world', worldSet = null;
+const subs = {};  // id -> {id, name, kind, kinds, label?, items, byId, geo, smallSize}
+const cur = () => (scope === 'world' ? worldSet : subs[scope]);
+const capFirst = (t) => t[0].toUpperCase() + t.slice(1);
+const modeLabel = (k) => MODES[k].label.replace('Country', capFirst(cur().kind)).replace('country', cur().kind);
+const scopeLabel = (m) => m.label || `${m.name} ${m.kinds}`;
+
+async function setScope(id) {
+  if (id !== 'world' && !subs[id]) {
+    const meta = subIndex.find((m) => m.id === id);
+    try {
+      const sub = await loadSub(id);
+      const sizes = sub.items.map((c) => c.size).sort((a, b) => a - b);
+      subs[id] = { ...meta, ...sub, smallSize: sizes[Math.floor(sizes.length / 2)] * 0.15 };
+      world.addSubdivisions(id, sub.items, sub.geo);
+    } catch { id = 'world'; }
+  }
+  if (id !== scope) { q = null; closeInfo(); }
+  scope = id;
+  set('scope', id);
+  world.useSet(id);
+  document.documentElement.classList.toggle('deep', id !== 'world');
+  if (id !== 'world') $('#scope-bar .scope-name').textContent = `${subs[id].name} · ${subs[id].kinds}`;
+}
+async function leaveDeepDive() {
+  const parent = data.byId.get(scope);
+  await setScope('world');
+  if (parent) world.flyToCountry(parent);
+  applyFlags();
+}
 
 // ---- tabs ---------------------------------------------------------------------------------
 function showTab(t) {
@@ -47,15 +81,21 @@ function applyFlags() {
   world.setMarkers(true, null, { dots: !settings.showFlags });
 }
 async function openInfo(id) {
-  const c = data.byId.get(id);
+  const c = cur().byId.get(id);
   if (!c) return closeInfo();
   infoId = id;
   world.select(id);
   const card = $('#info');
-  card.querySelector('.info-flag').src = flagUrl(id);
+  card.querySelector('.info-flag').src = flagOf(c);
   card.querySelector('.info-name').textContent = c.name;
   card.querySelector('.info-cap').textContent = 'Capital: ' + c.capital;
-  card.querySelector('.info-meta').textContent = c.continent + (c.sovereign ? '' : ' · territory');
+  card.querySelector('.info-meta').textContent = scope === 'world'
+    ? c.continent + (c.sovereign ? '' : ' · territory') : `${capFirst(cur().kind)} · ${cur().name}`;
+  // countries with subdivision data offer a deep dive
+  const dive = scope === 'world' && subIndex.find((m) => m.id === id);
+  const explore = card.querySelector('.explore');
+  explore.hidden = !dive;
+  if (dive) explore.textContent = `Explore the ${dive.kinds} →`;
   const hide = !settings.showFlags;
   card.classList.toggle('hidden-answer', hide);
   card.querySelector('.reveal').hidden = !hide;
@@ -63,6 +103,7 @@ async function openInfo(id) {
   more.innerHTML = '';
   card.hidden = false;
   card.scrollTop = 0;
+  if (scope !== 'world') return;  // summaries exist for countries only
   const x = (await loadInfo())[id];
   if (!x || infoId !== id) return;
   more.innerHTML = `<p class="about">${esc(x.about)}</p>` +
@@ -83,20 +124,28 @@ let session = { source: 'pool', deck: [] };
 let q = null, phase = 'ask', verdict = null;
 let score = { right: 0, total: 0, streak: 0 };
 
+const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : cur().items);
+const allNow = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items);
+
 function showSetup() {
   $('#question').hidden = true;
   $('#settings').hidden = true;
-  $('#modes').innerHTML = Object.entries(MODES)
-    .map(([k, m]) => `<button data-mode="${k}" aria-pressed="${k === settings.mode}">${esc(m.label)}</button>`).join('');
+  $('#scopes').innerHTML = [{ id: 'world', label: 'Countries' }, ...subIndex]
+    .map((m) => `<button data-scope="${m.id}" aria-pressed="${m.id === scope}">${esc(scopeLabel(m))}</button>`).join('');
+  $('#world-options').hidden = scope !== 'world';
+  $('#modes').innerHTML = Object.keys(MODES)
+    .map((k) => `<button data-mode="${k}" aria-pressed="${k === settings.mode}">${esc(modeLabel(k))}</button>`).join('');
   $('#regions').innerHTML = ['World', ...CONTINENTS]
     .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === 'World' ? !settings.regions.length : settings.regions.includes(r)}">${esc(r)}</button>`).join('');
   $('#territories').checked = settings.territories;
   const st = Object.values(store.getStats());
   const right = st.reduce((s, x) => s + x.right, 0), total = st.reduce((s, x) => s + x.right + x.wrong, 0);
-  const n = pool(data.countries, settings).length;
-  $('#progress').textContent = `${n} countries per round. ` +
+  const n = poolNow().length;
+  $('#progress').textContent = `${n} ${cur().kinds} per round. ` +
     (total ? `So far: ${total} answers, ${Math.round((100 * right) / total)}% correct.` : 'No answers yet.');
-  const nHard = Object.keys(store.hardCards()).length, due = store.dueCount();
+  // the hard pile of this scope (cards of countries, or of this country's subdivisions)
+  const cards = Object.entries(store.hardCards()).filter(([k]) => cur().byId.has(store.parseKey(k).id));
+  const nHard = cards.length, due = cards.filter(([, c]) => c.due <= Date.now()).length;
   $('#pile-info').innerHTML = nHard ? `<b>Hard pile</b> · ${nHard} card${nHard > 1 ? 's' : ''}, ${due} due` : '<b>Hard pile</b> · empty. Add cards after answering.';
   $('#start-pile').disabled = !nHard;
   showSyncStatus();
@@ -106,8 +155,8 @@ function showSetup() {
 
 function startQuiz(source) {
   let deck, early = false;
-  if (source === 'pile') ({ deck, early } = makePileDeck(store.hardCards(), data.byId));
-  else deck = makeDeck(settings.mode, pool(data.countries, settings));
+  if (source === 'pile') ({ deck, early } = makePileDeck(store.hardCards(), cur().byId));
+  else deck = makeDeck(settings.mode, poolNow());
   if (!deck.length) return showSetup();
   session = { source, deck, early, size: deck.length, seen: new Set(), firstRight: 0, missed: [] };
   score = { right: 0, total: 0, streak: 0 };
@@ -117,15 +166,17 @@ function startQuiz(source) {
 
 function nextQuestion() {
   if (!session.deck.length) return showRoundDone();
-  const all = data.countries.filter((c) => settings.territories || c.sovereign);
   [session.current, ...session.deck] = session.deck;
-  q = makeQuestion(session.current, data.byId, all);
+  q = makeQuestion(session.current, cur().byId, allNow());
   q.early = session.early;
   phase = 'ask';
   verdict = null;
   world.mark({});
   world.setMarkers(false);
-  if (q.type === 'map') world.flyToRegion(session.source === 'pile' ? [q.target.continent] : settings.regions);
+  if (q.type === 'map') {
+    if (scope !== 'world') world.flyToSet({ full: true });
+    else world.flyToRegion(session.source === 'pile' ? [q.target.continent] : settings.regions);
+  }
   if (q.ask === 'map') showOnMap(q.target);
   showQuestion();
 }
@@ -134,16 +185,17 @@ function nextQuestion() {
     without a shape) also get their capital dot so they can be found. */
 function showOnMap(c) {
   world.mark({ [c.id]: 'sel' });
-  world.setMarkers(false, c.size < 1 ? [c.id] : null, { dots: true });
-  world.flyToCountry(c, { context: true, maxZoom: 6 });
+  const small = scope === 'world' ? 1 : cur().smallSize;
+  world.setMarkers(false, c.size < small ? [c.id] : null, { dots: true });
+  world.flyToCountry(c, { context: true });
 }
 
 const askHtml = (c, what) => what === 'map'
-  ? '<div class="q-text">Which country is this?</div>'
+  ? `<div class="q-text">Which ${cur().kind} is this?</div>`
   : what === 'flag'
-  ? `<img class="q-flag" src="${flagUrl(c.id)}" alt="Flag">`
+  ? `<img class="q-flag" src="${flagOf(c)}" alt="Flag">`
   : what === 'capital' ? `<div class="q-text"><small>Capital</small>${esc(c.capital)}</div>`
-  : `<div class="q-text"><small>Country</small>${esc(c.name)}</div>`;
+  : `<div class="q-text"><small>${capFirst(cur().kind)}</small>${esc(c.name)}</div>`;
 
 const hint = { recall: '', map: 'Tap it on the map', choice: '' };
 
@@ -154,7 +206,7 @@ function showQuestion() {
   card.hidden = false;
   card.classList.toggle('map-q', q.type === 'map' || q.ask === 'map');
   card.classList.toggle('answered', phase === 'done');
-  $('#q-mode').textContent = (session.source === 'pile' ? 'Hard pile · ' : '') + MODES[q.mode].label;
+  $('#q-mode').textContent = (session.source === 'pile' ? 'Hard pile · ' : '') + modeLabel(q.mode);
   updateScore();
   $('#q-prompt').innerHTML = askHtml(q.target, q.ask) +
     (hint[q.type] ? `<p class="muted center">${hint[q.type]}</p>` : '') +
@@ -162,7 +214,7 @@ function showQuestion() {
   const opts = $('#q-options');
   opts.className = q.answer === 'flag' ? 'grid flags' : 'grid';
   opts.innerHTML = q.options.map((c) => `<button data-id="${c.id}">${
-    q.answer === 'flag' ? `<img src="${flagUrl(c.id)}" alt="">` : esc(q.answer === 'capital' ? c.capital : c.name)}</button>`).join('');
+    q.answer === 'flag' ? `<img src="${flagOf(c)}" alt="">` : esc(q.answer === 'capital' ? c.capital : c.name)}</button>`).join('');
   renderPhase();
 }
 
@@ -181,11 +233,11 @@ function showRoundDone() {
   const card = $('#question');
   card.hidden = false;
   card.classList.remove('map-q', 'answered');
-  $('#q-mode').textContent = session.source === 'pile' ? 'Hard pile' : MODES[settings.mode].label;
+  $('#q-mode').textContent = session.source === 'pile' ? 'Hard pile' : modeLabel(settings.mode);
   $('#q-score').textContent = '';
   const { size, firstRight, missed } = session;
-  const what = session.source === 'pile' ? 'cards' : 'countries';
-  const names = [...new Set(missed)].map((id) => data.byId.get(id).name);
+  const what = session.source === 'pile' ? 'cards' : cur().kinds;
+  const names = [...new Set(missed)].map((id) => cur().byId.get(id).name);
   $('#q-prompt').innerHTML = '<div class="q-text">🎉 Round complete</div>';
   $('#q-options').innerHTML = '';
   const r = $('#q-result');
@@ -195,7 +247,7 @@ function showRoundDone() {
   $('#q-buttons').innerHTML = '<button data-act="setup" class="ghost">Setup</button><button data-act="again" class="primary">New round</button>';
 }
 
-const answerHtml = (c) => `<div class="answer">${q.ask === 'flag' ? '' : `<img src="${flagUrl(c.id)}" alt="">`}<div><b>${esc(c.name)}</b><br>Capital: ${esc(c.capital)}</div></div>`;
+const answerHtml = (c) => `<div class="answer">${q.ask === 'flag' ? '' : `<img src="${flagOf(c)}" alt="">`}<div><b>${esc(c.name)}</b><br>Capital: ${esc(c.capital)}</div></div>`;
 
 /** Buttons and result area for the current phase: ask → (revealed, flashcards only) → done. */
 function renderPhase() {
@@ -221,7 +273,7 @@ function renderPhase() {
     if (b.dataset.id === q.target.id) b.classList.add('right');
     else if (b.dataset.id === chosenId) b.classList.add('wrong');
   }
-  const chosen = chosenId && chosenId !== q.target.id ? data.byId.get(chosenId) : null;
+  const chosen = chosenId && chosenId !== q.target.id ? cur().byId.get(chosenId) : null;
   r.innerHTML = `<p class="verdict ${correct ? 'ok' : 'bad'}">${correct ? '✓ Correct' : verdict.skipped ? 'Skipped' : q.type === 'recall' ? '✗ Not yet' : '✗ Not quite'}</p>` +
     answerHtml(q.target) +
     (chosen ? `<p class="muted">You picked ${esc(chosen.name)} (${esc(chosen.capital)})</p>` : '');
@@ -327,6 +379,20 @@ function wire() {
     world.setProjection(settings.projection);
   };
   $('#info .close').onclick = closeInfo;
+  $('#info .explore').onclick = async () => {
+    const id = infoId;
+    await setScope(id);
+    world.flyToSet();
+    applyFlags();
+  };
+  $('#scope-bar .back').onclick = leaveDeepDive;
+  $('#scopes').onclick = async (e) => {
+    const id = e.target.closest('button')?.dataset.scope;
+    if (!id || id === scope) return;
+    await setScope(id);
+    if (id === 'world') world.flyToRegion(settings.regions); else world.flyToSet();
+    showSetup();
+  };
   $('#info .reveal').onclick = () => {
     $('#info').classList.remove('hidden-answer');
     $('#info .reveal').hidden = true;
@@ -393,9 +459,15 @@ async function start() {
   world = createMap($('#map'), {
     countries: data.countries, world: data.world, colors: data.colors, projection: settings.projection, onClick: onMapClick,
   });
-  window.__app = { data, world, store };  // for debugging / screenshots
+  worldSet = { id: 'world', name: 'World', kind: 'country', kinds: 'countries', items: data.countries, byId: data.byId };
+  subIndex = await loadSubIndex();
+  window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
-  world.map.on('load', () => { fitScreen(); showTab('map'); });
+  world.map.on('load', async () => {
+    fitScreen();
+    if (settings.scope !== 'world') { await setScope(settings.scope); world.flyToSet(); }
+    showTab('map');
+  });
   runSync();
 }
 

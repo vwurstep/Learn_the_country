@@ -1,0 +1,16 @@
+[
+ {
+  "id": "us",
+  "name": "United States",
+  "kind": "state",
+  "kinds": "states",
+  "label": "US states"
+ },
+ {
+  "id": "ch",
+  "name": "Switzerland",
+  "kind": "canton",
+  "kinds": "cantons",
+  "label": "Swiss cantons"
+ }
+]

@@ -1,7 +1,7 @@
 /* World map: MapLibre GL with only our own country shapes (no tiles, no roads, no labels from
    a tile server), plus HTML markers at each capital (dot + flag + name). Knows the data schema
    from data.js but nothing about panels or quiz rules. */
-import { flagUrl } from './data.js';
+import { flagOf } from './data.js';
 
 const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
 // fallback land colours (by hash of the id) for shapes without a national colour
@@ -83,16 +83,21 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     const nat = colors[f.properties.id]?.c;
     f.properties.col = nat ? tint(nat) : LAND[hash(f.properties.id) % LAND.length];
   }
-  const bboxes = new Map(world.features.map((f) => [f.properties.id, bboxOf(f.geometry)]));
 
   const markState = ['coalesce', ['feature-state', 'mark'], ''];
+  const fillColor = ['match', markState, 'sel', MARK.sel, 'right', MARK.right, 'wrong', MARK.wrong, 'target', MARK.target, ['get', 'col']];
+  const markLine = {
+    'line-color': ['match', markState, 'sel', '#c77700', 'right', '#1e7a3c', 'target', '#1e7a3c', 'wrong', '#b3261e', 'rgba(0,0,0,0)'],
+    'line-width': ['match', markState, '', 0, 2.5],
+  };
+  const empty = { type: 'FeatureCollection', features: [] };
   const map = new maplibregl.Map({
     container: el,
     attributionControl: false,
     dragRotate: false,
     pitchWithRotate: false,
     renderWorldCopies: false,
-    maxZoom: 9,
+    maxZoom: 10,
     ...REGION_VIEWS.World,
     style: {
       version: 8,
@@ -100,30 +105,22 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       sources: {
         world: { type: 'geojson', data: world, promoteId: 'id' },
         borders: { type: 'geojson', data: borderLines(world) },
+        sub: { type: 'geojson', data: empty, promoteId: 'id' },  // states/cantons of a deep dive
       },
       layers: [
         { id: 'ocean', type: 'background', paint: { 'background-color': OCEAN } },
-        {
-          id: 'land', type: 'fill', source: 'world',
-          paint: {
-            'fill-color': ['match', markState,
-              'sel', MARK.sel, 'right', MARK.right, 'wrong', MARK.wrong, 'target', MARK.target,
-              ['get', 'col']],
-          },
-        },
-        {
-          id: 'border', type: 'line', source: 'borders',
-          paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 4, 1.2, 8, 2] },
-        },
-        {
-          // bold outline for selected / quiz-marked countries (their fill alone can blend in
-          // with a similar national colour)
-          id: 'mark-line', type: 'line', source: 'world',
-          paint: {
-            'line-color': ['match', markState, 'sel', '#c77700', 'right', '#1e7a3c', 'target', '#1e7a3c', 'wrong', '#b3261e', 'rgba(0,0,0,0)'],
-            'line-width': ['match', markState, '', 0, 2.5],
-          },
-        },
+        { id: 'land', type: 'fill', source: 'world', paint: { 'fill-color': fillColor } },
+        // country borders sit below the deep-dive layers: the coarser world shapes would otherwise
+        // draw stray lines across states/cantons (e.g. through Lake Constance)
+        { id: 'border', type: 'line', source: 'borders', paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 4, 1.2, 8, 2] } },
+        // deep dive: every other country fades to grey
+        { id: 'dim', type: 'fill', source: 'world', layout: { visibility: 'none' }, paint: { 'fill-color': '#e9ecf0', 'fill-opacity': 0.8 } },
+        { id: 'sub-fill', type: 'fill', source: 'sub', layout: { visibility: 'none' }, paint: { 'fill-color': fillColor } },
+        { id: 'sub-border', type: 'line', source: 'sub', layout: { visibility: 'none' }, paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 8, 1.5] } },
+        // bold outline for selected / quiz-marked places (their fill alone can blend in with a
+        // similar colour)
+        { id: 'mark-line', type: 'line', source: 'world', paint: markLine },
+        { id: 'sub-mark-line', type: 'line', source: 'sub', layout: { visibility: 'none' }, paint: markLine },
       ],
     },
   });
@@ -131,40 +128,57 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   map.keyboard.disableRotation();
   el.style.background = SPACE;
 
-  // ---- markers: a flag in the middle of each country, a dot + name at its capital ------------
-  const markers = new Map();  // id -> {country, flag, cap} (each {el, marker, on})
-  const mk = (el, lngLat) => ({ el, on: false,
-    marker: new maplibregl.Marker({ element: el, anchor: 'center', opacity: '1', opacityWhenCovered: '0' }).setLngLat(lngLat) });
-  for (const c of countries) {
-    const f = document.createElement('img');
-    f.className = 'flagpin';
-    f.alt = '';
-    f.loading = 'lazy';
-    f.src = flagUrl(c.id);
-    const cap = document.createElement('div');
-    cap.className = 'cap';
-    cap.innerHTML = '<i class="dot"></i><span class="lbl"></span>';
-    cap.querySelector('.lbl').textContent = c.capital;
-    for (const el of [f, cap]) el.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
-    markers.set(c.id, { country: c, flag: mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
+  // ---- sets ------------------------------------------------------------------------------
+  // A set is what the map shows markers for and answers taps with: the world's countries, or
+  // the subdivisions of one country (deep dive). Items: {id, capital, lat, lon, fx, fy, size,
+  // flag?, sovereign?}.
+  const sets = new Map();
+  let cur = null;
+  function makeSet(id, items, geo, opts) {
+    const markers = new Map();  // id -> {item, flag, cap} (each {el, marker, on})
+    const mk = (node, lngLat) => ({ el: node, on: false,
+      marker: new maplibregl.Marker({ element: node, anchor: 'center', opacity: '1', opacityWhenCovered: '0' }).setLngLat(lngLat) });
+    for (const c of items) {
+      const f = document.createElement('img');
+      f.className = 'flagpin';
+      f.alt = '';
+      f.loading = 'lazy';
+      f.src = flagOf(c);
+      const cap = document.createElement('div');
+      cap.className = 'cap';
+      cap.innerHTML = '<i class="dot"></i><span class="lbl"></span>';
+      cap.querySelector('.lbl').textContent = c.capital;
+      for (const node of [f, cap]) node.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
+      markers.set(c.id, { item: c, flag: mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
+    }
+    const bboxes = new Map(geo.features.map((f) => [f.properties.id, bboxOf(f.geometry)]));
+    const all = [...bboxes.values()];
+    const extent = all.length ? [Math.min(...all.map((b) => b[0])), Math.min(...all.map((b) => b[1])),
+      Math.max(...all.map((b) => b[2])), Math.max(...all.map((b) => b[3]))] : null;
+    const order = items.slice().sort((a, b) => (!!b.sovereign - !!a.sovereign) || (b.size - a.size));
+    sets.set(id, { id, items, geo, markers, bboxes, extent, order, ...opts });
   }
-  let showAll = false, only = null, selected = null, dotsOnly = false;
-  const order = countries.slice().sort((a, b) => (b.sovereign - a.sovereign) || (b.size - a.size));
+  makeSet('world', countries, world, {
+    source: 'world', fill: 'land', labelZoom: LABEL_FROM_ZOOM, maxZoom: 5, ctxZoom: 6, minCtx: [14, 9], flagScale: 1,
+  });
+  cur = sets.get('world');
 
-  // Greedy declutter: big countries first; a flag or a name is only shown where it has room.
+  let showAll = false, only = null, selected = null, dotsOnly = false;
+
+  // Greedy declutter: big places first; a flag or a name is only shown where it has room.
   // Capital dots give way to flags when zoomed out; they reappear as the map is zoomed in.
   let raf = 0;
   function layout() {
     raf = 0;
     const z = map.getZoom();
-    const fw = FLAG_W[Math.max(1, Math.min(4, Math.floor(z)))];
-    const fh = Math.round(fw * 0.75);
+    const fw = Math.round(FLAG_W[Math.max(1, Math.min(4, Math.floor(z)))] * cur.flagScale);
     el.style.setProperty('--flag-w', fw + 'px');
     const center = map.getCenter().toArray();
     const globe = map.getProjection()?.type === 'globe';
     const taken = [];
     const free = (b) => !taken.some((t) => b[0] < t[2] && b[2] > t[0] && b[1] < t[3] && b[3] > t[1]);
-    const list = selected ? [markers.get(selected)?.country, ...order].filter(Boolean) : order;
+    const { markers, order } = cur;
+    const list = selected ? [markers.get(selected)?.item, ...order].filter(Boolean) : order;
     const seen = new Set();
     // pass 1: flags; pass 2: capital dots (hidden while they'd sit on a flag) and names
     const shown = [];
@@ -183,6 +197,8 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       const fp = [c.fx ?? c.lon, c.fy ?? c.lat];
       if (want && !(globe && angularDistance(center, fp) > 75)) {
         const p = map.project(fp);
+        const img = m.flag.el, ar = img.naturalWidth ? img.naturalHeight / img.naturalWidth : 0.75;
+        const fh = Math.round(fw * ar);
         const box = [p.x - fw / 2 - 1, p.y - fh / 2 - 1, p.x + fw / 2 + 1, p.y + fh / 2 + 1];
         const show = force || free(box);
         if (show) taken.push(box);
@@ -202,7 +218,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       taken.push(dot);
       const lw = c.capital.length * 6.4 + 8;
       const label = [p.x + 5, p.y - 7, p.x + 5 + lw, p.y + 7];
-      const showLabel = !dotsOnly && (z >= LABEL_FROM_ZOOM || force) && free(label);
+      const showLabel = !dotsOnly && (z >= cur.labelZoom || force) && free(label);
       if (showLabel) taken.push(label);
       m.cap.el.classList.toggle('nolabel', !showLabel);
       m.cap.el.classList.toggle('sel', c.id === selected);
@@ -218,16 +234,16 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   map.on('load', relayout);
 
   // ---- clicks ---------------------------------------------------------------------------
-  // A tap hits a country if its shape is under the finger; tiny countries also count when the
-  // tap is within a few px of their shape or of their capital dot.
+  // A tap hits a place if its shape is under the finger; tiny ones also count when the tap is
+  // within a few px of their shape or of their capital dot.
   function hitTest(point, pad = 0) {
     const box = [[point.x - pad, point.y - pad], [point.x + pad, point.y + pad]];
-    return [...new Set(map.queryRenderedFeatures(pad ? box : point, { layers: ['land'] }).map((f) => f.properties.id))];
+    return [...new Set(map.queryRenderedFeatures(pad ? box : point, { layers: [cur.fill] }).map((f) => f.properties.id))];
   }
   function nearestCapital(point, maxPx) {
     let best = null, bd = maxPx;
     const center = map.getCenter().toArray();
-    for (const c of countries) {
+    for (const c of cur.items) {
       if (map.getProjection()?.type === 'globe' && angularDistance(center, [c.lon, c.lat]) > 80) continue;
       const p = map.project([c.lon, c.lat]);
       const d = Math.hypot(p.x - point.x, p.y - point.y);
@@ -240,52 +256,96 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     onClick?.(under || nearestCapital(e.point, 14) || null, false, e.point);
   });
 
-  const setMark = (id, mark) => {
-    if (!bboxes.has(id)) return;
-    map.setFeatureState({ source: 'world', id }, { mark });
-  };
   let marked = [];
+  const setMark = (id, mark) => {
+    if (!cur.bboxes.has(id)) return;
+    map.setFeatureState({ source: cur.source, id }, { mark });
+  };
+  const clearMarks = () => { for (const x of marked) setMark(x, null); marked = []; };
+
+  const padding = () => {
+    const pad = Math.min(80, el.clientWidth / 6);
+    return { top: pad, left: pad, right: pad, bottom: Math.max(pad, el.clientHeight * 0.4) };
+  };
 
   return {
     map,
     hitTest,
     nearestCapital,
+    /** Register the subdivisions of a country (deep dive). items as for countries, flag paths
+        in item.flag, colours in item.color (tinted here). */
+    addSubdivisions(id, items, geo) {
+      if (sets.has(id)) return;
+      const color = new Map(items.map((c) => [c.id, c.color]));
+      for (const f of geo.features) f.properties.col = color.get(f.properties.id) ? tint(color.get(f.properties.id)) : LAND[hash(f.properties.id) % LAND.length];
+      // smaller flags: subdivisions are small and their flags often square
+      makeSet(id, items, geo, { source: 'sub', fill: 'sub-fill', labelZoom: 0, maxZoom: 9, ctxZoom: 9, parent: id, flagScale: 0.8 });
+      const s = sets.get(id), [x0, y0, x1, y1] = s.extent;
+      s.minCtx = [Math.min(14, (x1 - x0) * 0.4), Math.min(9, (y1 - y0) * 0.4)];
+      // core: the places within 30° of the median flag point, i.e. without far-away parts like
+      // Alaska and Hawaii, so the explore view isn't zoomed out to half the globe
+      const med = (a) => a.slice().sort((p, q) => p - q)[Math.floor(a.length / 2)];
+      const mx = med(items.map((c) => c.fx)), my = med(items.map((c) => c.fy));
+      const core = items.filter((c) => Math.hypot((c.fx - mx) * Math.cos(toRad(my)), c.fy - my) <= 30)
+        .map((c) => s.bboxes.get(c.id)).filter(Boolean);
+      s.core = [Math.min(...core.map((b) => b[0])), Math.min(...core.map((b) => b[1])),
+        Math.max(...core.map((b) => b[2])), Math.max(...core.map((b) => b[3]))];
+    },
+    /** Switch between the world ('world') and a deep dive (a country id added before). */
+    useSet(id) {
+      const next = sets.get(id) || sets.get('world');
+      if (next === cur) return;
+      clearMarks();
+      selected = null;
+      for (const m of cur.markers.values()) { setOn(m.flag, false); setOn(m.cap, false); }
+      cur = next;
+      if (cur.source === 'sub') map.getSource('sub').setData(cur.geo);
+      for (const l of ['sub-fill', 'sub-border', 'sub-mark-line']) map.setLayoutProperty(l, 'visibility', cur.source === 'sub' ? 'visible' : 'none');
+      map.setLayoutProperty('dim', 'visibility', cur.parent ? 'visible' : 'none');
+      if (cur.parent) map.setFilter('dim', ['!=', ['get', 'id'], cur.parent]);
+      relayout();
+    },
+    /** fit the current deep-dive country on screen: its core (default) or everything (full,
+        for find-on-map questions, so the view doesn't hint at outlying answers) */
+    flyToSet({ full = false } = {}) {
+      if (!cur.extent || cur.id === 'world') { map.flyTo({ ...REGION_VIEWS.World, duration: 900 }); return; }
+      const [x0, y0, x1, y1] = full ? cur.extent : cur.core;
+      const pad = padding();
+      if (!full) pad.bottom = pad.top;  // exploring: no card at the bottom yet
+      map.fitBounds([[x0, y0], [x1, y1]], { padding: pad, maxZoom: cur.maxZoom, duration: 900 });
+    },
     /** show all markers (explore) or only some ids (quiz feedback); dots: capital dots only */
     setMarkers(all, onlyIds = null, { dots = false } = {}) { showAll = all; only = onlyIds ? new Set(onlyIds) : null; dotsOnly = dots; relayout(); },
     select(id) {
-      for (const x of marked) setMark(x, null);
-      marked = [];
+      clearMarks();
       selected = id;
       if (id) { setMark(id, 'sel'); marked.push(id); }
       relayout();
     },
-    /** colour countries: marks = {id: 'right'|'wrong'|'target'} */
+    /** colour places: marks = {id: 'sel'|'right'|'wrong'|'target'} */
     mark(marks) {
-      for (const x of marked) setMark(x, null);
+      clearMarks();
       marked = Object.keys(marks);
       selected = null;
       for (const [id, m] of Object.entries(marks)) setMark(id, m);
       relayout();
     },
     /** context: zoom out to show the neighbours too (for "which country is this?") */
-    flyToCountry(c, { maxZoom = 5, context = false } = {}) {
-      let b = bboxes.get(c.id);
+    flyToCountry(c, { context = false } = {}) {
+      let b = cur.bboxes.get(c.id);
+      const maxZoom = context ? cur.ctxZoom : cur.maxZoom;
       if (!b || b[2] - b[0] > 150) {  // no shape, or spans the date line (Russia, Fiji, USA…)
         map.flyTo({ center: [c.fx ?? c.lon, c.fy ?? c.lat], zoom: context ? (b ? 2 : 4) : Math.max(map.getZoom(), 3), duration: 900 });
         return;
       }
       if (context) {
         const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
-        // room around it for the neighbours: generous for small countries, capped for big ones
-        const bw = b[2] - b[0], bh = b[3] - b[1];
-        const w = Math.max(bw + Math.min(bw * 1.1, 30), 14), h = Math.max(bh + Math.min(bh * 1.1, 20), 9);
+        // room around it for the neighbours: generous for small places, capped for big ones
+        const bw = b[2] - b[0], bh = b[3] - b[1], [mw, mh] = cur.minCtx;
+        const w = Math.max(bw + Math.min(bw * 1.1, 30), mw), h = Math.max(bh + Math.min(bh * 1.1, 20), mh);
         b = [cx - w / 2, Math.max(-80, cy - h / 2), cx + w / 2, Math.min(84, cy + h / 2)];
       }
-      const pad = Math.min(80, el.clientWidth / 6);
-      map.fitBounds([[b[0], b[1]], [b[2], b[3]]], {
-        padding: { top: pad, left: pad, right: pad, bottom: Math.max(pad, el.clientHeight * 0.4) },
-        maxZoom, duration: 900,
-      });
+      map.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: padding(), maxZoom, duration: 900 });
     },
     /** regions: a continent name or a list of them ([] or 'World' = whole world) */
     flyToRegion(regions) {
@@ -302,6 +362,5 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       map.flyTo({ center, zoom, duration: 900 });
     },
     setProjection(type) { map.setProjection({ type }); relayout(); },
-    hasShape: (id) => bboxes.has(id),
   };
 }

@@ -6,6 +6,8 @@
 export const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
 
 export const flagUrl = (id) => `flags/${id}.svg`;
+/** flag image of a country or a subdivision (those carry their own path, svg or png) */
+export const flagOf = (c) => c.flag || flagUrl(c.id);
 
 export async function loadData() {
   const [countries, world, colors] = await Promise.all([
@@ -43,4 +45,34 @@ let info = null;
 export async function loadInfo() {
   if (!info) info = fetch('data/info.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   return info;
+}
+
+// ---- subdivisions (deep dive into a country) ---------------------------------------------
+// data/sub/index.json: [{id: 'us', name, kind: 'state', kinds: 'states', label?}];
+// data/sub/<id>.json: [{id: 'us-ca', name, capital, lat, lon, fx, fy, color, flag}];
+// data/sub/<id>.geojson: shapes with properties.id.
+let subIndex = null;
+export async function loadSubIndex() {
+  if (!subIndex) subIndex = fetch('data/sub/index.json').then((r) => (r.ok ? r.json() : [])).catch(() => []);
+  return subIndex;
+}
+const subCache = new Map();
+export function loadSub(id) {
+  if (!subCache.has(id)) {
+    subCache.set(id, Promise.all([
+      fetch(`data/sub/${id}.json`).then((r) => r.json()),
+      fetch(`data/sub/${id}.geojson`).then((r) => r.json()),
+    ]).then(([items, geo]) => {
+      const size = new Map();
+      for (const f of geo.features) {
+        const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+        let x0 = 180, x1 = -180, y0 = 90, y1 = -90;
+        for (const poly of polys) for (const [x, y] of poly[0]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+        size.set(f.properties.id, (x1 - x0) * (y1 - y0));
+      }
+      for (const c of items) c.size = size.get(c.id) || 0;
+      return { items, geo, byId: new Map(items.map((c) => [c.id, c])) };
+    }).catch((e) => { subCache.delete(id); throw e; }));
+  }
+  return subCache.get(id);
 }

@@ -35,6 +35,8 @@
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
     </button>
   </div>
+  <!-- deep dive into a country's states/cantons: way back to the world -->
+  <div id="scope-bar" class="only-map glass"><button class="back">‹ World</button><span class="scope-name"></span></div>
   <div id="hint" class="only-map glass" hidden>Flags hidden: tap a country to test yourself</div>
 
   <!-- map tab: info about the tapped country -->
@@ -49,6 +51,7 @@
       </div>
     </div>
     <button class="reveal primary" hidden>Reveal</button>
+    <button class="explore" hidden></button>
     <div class="info-more"></div>
   </section>
 
@@ -59,11 +62,15 @@
       <span id="pile-info" class="muted"></span>
       <button id="start-pile" class="primary">Practise</button>
     </div>
+    <p class="label">Learn</p>
+    <div id="scopes" class="chips"></div>
     <p class="label">Mode</p>
     <div id="modes" class="chips"></div>
-    <p class="label">Region <span class="hint">· tap several to combine</span></p>
-    <div id="regions" class="chips"></div>
-    <label class="check"><input type="checkbox" id="territories"> Include territories (Greenland, Hong Kong, …)</label>
+    <div id="world-options">
+      <p class="label">Region <span class="hint">· tap several to combine</span></p>
+      <div id="regions" class="chips"></div>
+      <label class="check"><input type="checkbox" id="territories"> Include territories (Greenland, Hong Kong, …)</label>
+    </div>
     <p id="progress" class="muted"></p>
     <div class="row">
       <button id="reset" class="ghost">Reset statistics</button>

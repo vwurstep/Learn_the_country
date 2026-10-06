@@ -117,6 +117,36 @@ days. Right moves a card up a box, wrong sends it back to box 0. Practice is a d
 (`makePileDeck`); when nothing is due it practises all cards early. Cards leave
 the pile only by hand.
 
+## Deep dives: states and cantons (2026-10-06, option A Phil chose)
+
+- **Countries:** US (50 states, no DC) and Switzerland (26 cantons, names in the local
+  language: Genève, Ticino, Luzern…). Each has name, capital and flag only, without
+  summaries (Phil's choice: "if I like it we'll add more").
+- **Map tab:** a country that has subdivision data shows "Explore the states →" on its card.
+  That switches the **scope**: the map shows that set, the other countries are dimmed
+  (`dim` layer), and the "‹ World" bar (`#scope-bar`) goes back.
+- **Quiz:** the setup has a "Learn" row (Countries / US states / Swiss cantons) that sets the
+  same scope. Both tabs follow one scope (`settings.scope`). The mode labels and prompts
+  swap "country" for the kind ("Flag → canton", "Which state is this?").
+- **Data:** the index is `data/sub/index.json` (`{id, name, kind, kinds, label}`).
+  - Items in `data/sub/<id>.json` (`{id: 'us-ca', name, capital, lat, lon, fx, fy, color,
+    flag}`), shapes in `data/sub/<id>.geojson`, flags in `flags/sub/` (svg, or 240 px png
+    for seal-heavy US flags).
+  - Built by `tools/build_subdivisions.mjs`, sharing `tools/geo.mjs` with build_data.mjs.
+  - Colours come from greedy graph colouring, so neighbours differ (4 colours suffice).
+  - To add a country: extend `SETS` in that script.
+- **Map code:** the "sets" in map.js are world + one per deep dive, each with its own markers,
+  bboxes and source (`world` / `sub`); `useSet(id)` switches between them.
+  - `flyToSet()` shows the core: places within 30° of the median, so the US view is the
+    lower 48 without zooming out for Alaska and Hawaii.
+  - `flyToSet({full: true})` is used for find-on-map questions, so the view doesn't hint
+    at outliers.
+  - Subdivision flags are drawn at 0.8× size.
+  - World borders are drawn below the deep-dive layers, because the coarse 50m line
+    crossed Thurgau.
+- The hard pile and its counts are per scope (card ids `mode:us-ca`). The service worker
+  precaches all deep-dive files.
+
 ## Data (`data/`, `flags/`)
 
 - `data/countries.json`: `{id (iso2 lower), name, capital, lat, lon (capital), continent,
