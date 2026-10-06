@@ -302,7 +302,10 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       if (cur.source === 'sub') map.getSource('sub').setData(cur.geo);
       for (const l of ['sub-fill', 'sub-border', 'sub-mark-line']) map.setLayoutProperty(l, 'visibility', cur.source === 'sub' ? 'visible' : 'none');
       map.setLayoutProperty('dim', 'visibility', cur.parent ? 'visible' : 'none');
-      if (cur.parent) map.setFilter('dim', ['!=', ['get', 'id'], cur.parent]);
+      // the deep-dive country's own (coarser) world shape is covered fully: where it sticks out
+      // from under the finer state/canton shapes it then looks like the dimmed neighbours
+      // instead of leaving slivers in its national colour along the border
+      if (cur.parent) map.setPaintProperty('dim', 'fill-opacity', ['case', ['==', ['get', 'id'], cur.parent], 1, 0.8]);
       relayout();
     },
     /** fit the current deep-dive country on screen: its core (default) or everything (full,

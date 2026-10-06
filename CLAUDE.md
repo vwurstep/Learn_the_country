@@ -45,6 +45,9 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Zooming to a country** (`flyToCountry`) uses the bbox of its main part plus parts
   chained within 20° (Corsica, Indonesia's islands), not the whole geometry. The full
   geometry of France or the Netherlands includes overseas territories.
+- **Quiz mode = Show + Find** (2026-10-06): two chip rows (flag / capital / country / map).
+  The 12 pairs are in `MODES` (old keys kept, `modeFor(ask, answer)`). Mixed was removed
+  at Phil's request.
 - **Country colours = national colours** (2026-10-01, Phil's request; still being iterated).
   - `data/colors.json` gives `{id: {c, alt?, why}}`, chosen by a subagent. It is the colour
     the country identifies with (flag or sports colour).
@@ -144,6 +147,8 @@ the pile only by hand.
   - Subdivision flags are drawn at 0.8× size.
   - World borders are drawn below the deep-dive layers, because the coarse 50m line
     crossed Thurgau.
+  - The parent's own world shape is covered fully by the `dim` layer, so its 50m outline
+    doesn't leave national-colour slivers along the finer 10m border.
 - The hard pile and its counts are per scope (card ids `mode:us-ca`). The service worker
   precaches all deep-dive files.
 

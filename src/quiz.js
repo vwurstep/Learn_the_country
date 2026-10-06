@@ -4,17 +4,26 @@
    recall = flashcard: the answer is revealed and Phil says himself whether he knew it.
    Randomness goes through `rng` so tests can seed it. */
 
+// Every mode is a pair: what is shown (ask) and what is asked for (answer). The setup picks
+// the two separately; the key names predate that (kept: hard-pile cards and stats use them).
+// type: recall = flashcard (reveal, rate yourself), choice = pick one of 4 flags, map = tap it.
 export const MODES = {
   'flag-name':      { label: 'Flag → country',    ask: 'flag',    answer: 'name',    type: 'recall' },
+  'flag-capital':   { label: 'Flag → capital',    ask: 'flag',    answer: 'capital', type: 'recall' },
+  'map-flag':       { label: 'Find the flag',     ask: 'flag',    answer: 'map',     type: 'map' },
   'name-flag':      { label: 'Country → flag',    ask: 'name',    answer: 'flag',    type: 'choice' },
-  'capital-name':   { label: 'Capital → country', ask: 'capital', answer: 'name',    type: 'recall' },
   'name-capital':   { label: 'Country → capital', ask: 'name',    answer: 'capital', type: 'recall' },
   'map-name':       { label: 'Find the country',  ask: 'name',    answer: 'map',     type: 'map' },
-  'map-flag':       { label: 'Find the flag',     ask: 'flag',    answer: 'map',     type: 'map' },
+  'capital-flag':   { label: 'Capital → flag',    ask: 'capital', answer: 'flag',    type: 'choice' },
+  'capital-name':   { label: 'Capital → country', ask: 'capital', answer: 'name',    type: 'recall' },
   'map-capital':    { label: 'Find the capital',  ask: 'capital', answer: 'map',     type: 'map' },
+  'shape-flag':     { label: 'Map → flag',        ask: 'map',     answer: 'flag',    type: 'choice' },
   'shape-name':     { label: 'Map → country',     ask: 'map',     answer: 'name',    type: 'recall' },
-  'mixed':          { label: 'Mixed',             ask: null,      answer: null,      type: null },
+  'shape-capital':  { label: 'Map → capital',     ask: 'map',     answer: 'capital', type: 'recall' },
 };
+
+/** The mode for a (shown, asked-for) pair, e.g. modeFor('flag', 'capital') = 'flag-capital'. */
+export const modeFor = (ask, answer) => Object.keys(MODES).find((k) => MODES[k].ask === ask && MODES[k].answer === answer);
 
 /** Countries in the chosen pool. regions: continents to include ([] = the whole world);
     territories: include non-sovereign ones. */
@@ -45,18 +54,16 @@ export function distractors(target, all, n, rng) {
 
 /** Questions needed between a miss and seeing that card again. */
 export const MIN_GAP = 4;
-const concreteModes = () => Object.keys(MODES).filter((m) => m !== 'mixed');
 
-/** Every country of the pool once, in a new random order; 'mixed' gives each its own mode. */
+/** Every country of the pool once, in a new random order. */
 export function makeDeck(mode, countries, rng = Math.random) {
-  const modes = concreteModes();
-  return shuffle(countries, rng).map((c) => ({ id: c.id, mode: mode === 'mixed' ? modes[Math.floor(rng() * modes.length)] : mode }));
+  return shuffle(countries, rng).map((c) => ({ id: c.id, mode }));
 }
 
 /** The hard pile as a deck: the due cards in random order (all cards if none is due). */
 export function makePileDeck(cards, byId, rng = Math.random, now = Date.now()) {
   const items = Object.keys(cards).map((k) => { const i = k.lastIndexOf(':'); return { key: k, id: k.slice(i + 1), mode: k.slice(0, i) }; })
-    .filter((x) => byId.has(x.id) && MODES[x.mode] && x.mode !== 'mixed');
+    .filter((x) => byId.has(x.id) && MODES[x.mode]);
   const due = items.filter((x) => cards[x.key].due <= now);
   const from = due.length ? due : items;
   return { deck: shuffle(from, rng).map(({ id, mode }) => ({ id, mode })), early: !due.length && items.length > 0 };

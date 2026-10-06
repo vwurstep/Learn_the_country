@@ -152,3 +152,5 @@ html.deep body.tab-map #scope-bar { display: flex; }
 html.deep #hint { top: calc(var(--safe-top) + 112px); }
 #info .explore { width: 100%; margin-top: 12px; padding: 10px; border-radius: 12px; font-weight: 600;
   color: var(--accent); background: rgba(47, 111, 214, 0.1); }
+.chips button:disabled { opacity: 0.35; cursor: default; }
+#mode-hint { margin: 8px 0 0; }

@@ -3,7 +3,7 @@ import { loadData, loadInfo, loadSubIndex, loadSub, flagOf, CONTINENTS, loadSett
 import * as store from './store.js';
 import { githubBackend } from './sync-github.js';
 import { createMap } from './map.js';
-import { MODES, pool, makeDeck, makePileDeck, requeue, makeQuestion } from './quiz.js';
+import { MODES, modeFor, pool, makeDeck, makePileDeck, requeue, makeQuestion } from './quiz.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
@@ -11,7 +11,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&
 const settings = {
   showFlags: loadSetting('showFlags', true),
   projection: loadSetting('projection', 'globe'),
-  mode: loadSetting('mode', 'flag-name'),
+  mode: MODES[loadSetting('mode', 'flag-name')] ? loadSetting('mode', 'flag-name') : 'flag-name',  // 'mixed' is gone
   // continents to quiz ([] = whole world); older versions stored a single 'region'
   regions: loadSetting('regions', null) ?? ((r) => (r && r !== 'World' ? [r] : []))(loadSetting('region', 'World')),
   territories: loadSetting('territories', false),
@@ -124,6 +124,14 @@ let session = { source: 'pool', deck: [] };
 let q = null, phase = 'ask', verdict = null;
 let score = { right: 0, total: 0, streak: 0 };
 
+const FACETS = ['flag', 'capital', 'name', 'map'];
+const facetName = (f) => (f === 'name' ? capFirst(cur().kind) : capFirst(f));
+const MODE_HINT = {
+  recall: 'Flashcard: think of the answer, reveal it, then say whether you knew it.',
+  choice: 'Pick the right flag out of four.',
+  map: 'Tap it on the map.',
+};
+
 const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : cur().items);
 const allNow = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items);
 
@@ -133,8 +141,12 @@ function showSetup() {
   $('#scopes').innerHTML = [{ id: 'world', label: 'Countries' }, ...subIndex]
     .map((m) => `<button data-scope="${m.id}" aria-pressed="${m.id === scope}">${esc(scopeLabel(m))}</button>`).join('');
   $('#world-options').hidden = scope !== 'world';
-  $('#modes').innerHTML = Object.keys(MODES)
-    .map((k) => `<button data-mode="${k}" aria-pressed="${k === settings.mode}">${esc(modeLabel(k))}</button>`).join('');
+  // mode = what is shown + what is asked for
+  const { ask, answer, type } = MODES[settings.mode];
+  const chips = (which, sel, off) => FACETS.map((f) => `<button data-${which}="${f}" aria-pressed="${f === sel}"${f === off ? ' disabled' : ''}>${esc(facetName(f))}</button>`).join('');
+  $('#ask').innerHTML = chips('ask', ask, null);
+  $('#answer').innerHTML = chips('answer', answer, ask);
+  $('#mode-hint').textContent = MODE_HINT[type];
   $('#regions').innerHTML = ['World', ...CONTINENTS]
     .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === 'World' ? !settings.regions.length : settings.regions.includes(r)}">${esc(r)}</button>`).join('');
   $('#territories').checked = settings.territories;
@@ -398,7 +410,20 @@ function wire() {
     $('#info .reveal').hidden = true;
   };
 
-  $('#modes').onclick = (e) => { const b = e.target.closest('button'); if (b) { set('mode', b.dataset.mode); showSetup(); } };
+  $('#ask').onclick = (e) => {
+    const a = e.target.closest('button')?.dataset.ask;
+    if (!a) return;
+    let { answer } = MODES[settings.mode];
+    if (answer === a) answer = a === 'name' ? 'flag' : 'name';  // can't ask for what is shown
+    set('mode', modeFor(a, answer));
+    showSetup();
+  };
+  $('#answer').onclick = (e) => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    set('mode', modeFor(MODES[settings.mode].ask, b.dataset.answer));
+    showSetup();
+  };
   // World = everything; continents can be combined (tap again to remove one)
   $('#regions').onclick = (e) => {
     const r = e.target.closest('button')?.dataset.region;

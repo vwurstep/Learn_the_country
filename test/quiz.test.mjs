@@ -1,7 +1,7 @@
 // Run: node test/quiz.test.mjs   (no framework)
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { MODES, pool, makeDeck, makePileDeck, requeue, makeQuestion, distractors, MIN_GAP } from '../src/quiz.js';
+import { MODES, modeFor, pool, makeDeck, makePileDeck, requeue, makeQuestion, distractors, MIN_GAP } from '../src/quiz.js';
 import { merge } from '../src/store.js';
 
 const countries = JSON.parse(readFileSync(new URL('../data/countries.json', import.meta.url)));
@@ -27,7 +27,7 @@ assert.ok(pool(countries, { territories: true }).length > pool(countries).length
 
 // questions for every mode
 const byId = new Map(countries.map((c) => [c.id, c]));
-for (const mode of Object.keys(MODES).filter((m) => m !== 'mixed')) {
+for (const mode of Object.keys(MODES)) {
   for (const c of pool(countries).slice(0, 60)) {
     const q = makeQuestion({ id: c.id, mode }, byId, countries, rng);
     assert.equal(q.target.id, c.id);
@@ -42,12 +42,18 @@ for (const mode of Object.keys(MODES).filter((m) => m !== 'mixed')) {
 const fr = countries.find((c) => c.id === 'fr');
 assert.ok(distractors(fr, countries, 3, rng).every((c) => c.continent === 'Europe'));
 
-// decks: every country exactly once, order differs between rounds, mixed gives concrete modes
+// decks: every country exactly once, order differs between rounds
 const europe = pool(countries, { regions: ['Europe'] });
 const d1 = makeDeck('flag-name', europe, rng), d2 = makeDeck('flag-name', europe, rng);
 assert.deepEqual(d1.map((x) => x.id).sort(), europe.map((c) => c.id).sort());
 assert.notDeepEqual(d1.map((x) => x.id), d2.map((x) => x.id));
-assert.ok(makeDeck('mixed', europe, rng).every((x) => MODES[x.mode] && x.mode !== 'mixed'));
+// modes: every (shown, asked-for) pair of different facets exists exactly once
+const facets = ['flag', 'capital', 'name', 'map'];
+for (const a of facets) for (const b of facets) {
+  const m = modeFor(a, b);
+  if (a === b) assert.equal(m, undefined); else assert.ok(m && MODES[m].ask === a && MODES[m].answer === b, `${a}->${b}`);
+}
+assert.equal(Object.keys(MODES).length, 12);
 
 // requeue: at least MIN_GAP others before the missed card; at the end when fewer are left
 for (let i = 0; i < 500; i++) {
