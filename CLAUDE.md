@@ -103,11 +103,18 @@ Each mode has a `type`:
 - **map**: Find the country / flag / capital on the map.
 - **Mixed** picks a random mode for each question.
 
-Picking weight: `0.3 + 4·missRate + min(daysSinceSeen, 1)`; unseen countries get 3.
+**Rounds (2026-10-06, Phil's request):** a session is a deck (`makeDeck` in quiz.js). Every
+country of the pool comes up once, in a new random order each round. A miss (Didn't know,
+wrong, Skip) goes back in at a random place with at least `MIN_GAP = 4` other questions
+before it (`requeue`), or at the end if fewer are left. The round ends with a summary
+(right first time, missed list). Random weighted picking is gone.
+**Regions:** `settings.regions` lists continents, and several can be combined (`[]` = World;
+the old single `region` setting is migrated). `flyToRegion` takes a list and aims at the
+spherical mean of the continent views.
 
 **Hard pile:** cards are keyed `mode:id` and use Leitner boxes. `BOX_DAYS = [0,1,3,7,21]`
-days. Right moves a card up a box, wrong sends it back to box 0. Practice takes due
-cards first (lower box = likelier). When nothing is due it practises early. Cards leave
+days. Right moves a card up a box, wrong sends it back to box 0. Practice is a deck of the due cards
+(`makePileDeck`); when nothing is due it practises all cards early. Cards leave
 the pile only by hand.
 
 ## Data (`data/`, `flags/`)

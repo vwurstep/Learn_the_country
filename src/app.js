@@ -3,7 +3,7 @@ import { loadData, loadInfo, flagUrl, CONTINENTS, loadSetting, saveSetting } fro
 import * as store from './store.js';
 import { githubBackend } from './sync-github.js';
 import { createMap } from './map.js';
-import { MODES, pool, makeQuestion, makePileQuestion } from './quiz.js';
+import { MODES, pool, makeDeck, makePileDeck, requeue, makeQuestion } from './quiz.js';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
@@ -12,7 +12,8 @@ const settings = {
   showFlags: loadSetting('showFlags', true),
   projection: loadSetting('projection', 'globe'),
   mode: loadSetting('mode', 'flag-name'),
-  region: loadSetting('region', 'World'),
+  // continents to quiz ([] = whole world); older versions stored a single 'region'
+  regions: loadSetting('regions', null) ?? ((r) => (r && r !== 'World' ? [r] : []))(loadSetting('region', 'World')),
   territories: loadSetting('territories', false),
 };
 const set = (k, v) => { settings[k] = v; saveSetting(k, v); };
@@ -75,9 +76,11 @@ function closeInfo() {
 }
 
 // ---- quiz -----------------------------------------------------------------------------------
-// session.source: 'pool' (mode + region from setup) or 'pile' (the hard pile, each card in its own mode)
-let session = { source: 'pool' };
-let q = null, phase = 'ask', verdict = null, recent = [];
+// A session is one round through a deck (see quiz.js): every country of the pool once, in random
+// order; missed ones go back in at least MIN_GAP questions later. source: 'pool' (mode + regions
+// from setup) or 'pile' (the hard pile, each card in its own mode).
+let session = { source: 'pool', deck: [] };
+let q = null, phase = 'ask', verdict = null;
 let score = { right: 0, total: 0, streak: 0 };
 
 function showSetup() {
@@ -86,12 +89,12 @@ function showSetup() {
   $('#modes').innerHTML = Object.entries(MODES)
     .map(([k, m]) => `<button data-mode="${k}" aria-pressed="${k === settings.mode}">${esc(m.label)}</button>`).join('');
   $('#regions').innerHTML = ['World', ...CONTINENTS]
-    .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === settings.region}">${esc(r)}</button>`).join('');
+    .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === 'World' ? !settings.regions.length : settings.regions.includes(r)}">${esc(r)}</button>`).join('');
   $('#territories').checked = settings.territories;
   const st = Object.values(store.getStats());
   const right = st.reduce((s, x) => s + x.right, 0), total = st.reduce((s, x) => s + x.right + x.wrong, 0);
   const n = pool(data.countries, settings).length;
-  $('#progress').textContent = `${n} countries in this pool. ` +
+  $('#progress').textContent = `${n} countries per round. ` +
     (total ? `So far: ${total} answers, ${Math.round((100 * right) / total)}% correct.` : 'No answers yet.');
   const nHard = Object.keys(store.hardCards()).length, due = store.dueCount();
   $('#pile-info').innerHTML = nHard ? `<b>Hard pile</b> · ${nHard} card${nHard > 1 ? 's' : ''}, ${due} due` : '<b>Hard pile</b> · empty. Add cards after answering.';
@@ -102,30 +105,27 @@ function showSetup() {
 }
 
 function startQuiz(source) {
-  session = { source };
+  let deck, early = false;
+  if (source === 'pile') ({ deck, early } = makePileDeck(store.hardCards(), data.byId));
+  else deck = makeDeck(settings.mode, pool(data.countries, settings));
+  if (!deck.length) return showSetup();
+  session = { source, deck, early, size: deck.length, seen: new Set(), firstRight: 0, missed: [] };
   score = { right: 0, total: 0, streak: 0 };
-  recent = [];
   q = null;
   nextQuestion();
 }
 
 function nextQuestion() {
+  if (!session.deck.length) return showRoundDone();
   const all = data.countries.filter((c) => settings.territories || c.sovereign);
-  if (session.source === 'pile') {
-    q = makePileQuestion(store.hardCards(), data.byId, all, { avoid: recent });
-    if (!q) { session.source = 'pool'; return showSetup(); }
-    recent = [store.cardKey(q.mode, q.target.id), ...recent].slice(0, Math.min(5, Math.floor(Object.keys(store.hardCards()).length / 2)));
-  } else {
-    const list = pool(data.countries, settings);
-    if (!list.length) return;
-    q = makeQuestion(settings.mode, list, all, { stats: store.getStats(), avoid: recent });
-    recent = [q.target.id, ...recent].slice(0, Math.min(15, Math.floor(list.length / 2)));
-  }
+  [session.current, ...session.deck] = session.deck;
+  q = makeQuestion(session.current, data.byId, all);
+  q.early = session.early;
   phase = 'ask';
   verdict = null;
   world.mark({});
   world.setMarkers(false);
-  if (q.type === 'map') world.flyToRegion(session.source === 'pile' ? q.target.continent : settings.region);
+  if (q.type === 'map') world.flyToRegion(session.source === 'pile' ? [q.target.continent] : settings.regions);
   if (q.ask === 'map') showOnMap(q.target);
   showQuestion();
 }
@@ -167,7 +167,32 @@ function showQuestion() {
 }
 
 function updateScore() {
-  $('#q-score').textContent = `${score.right}/${score.total}` + (score.streak > 2 ? ` · 🔥${score.streak}` : '');
+  const left = session.deck.length + (phase === 'done' ? 0 : 1);
+  $('#q-score').innerHTML = `${score.right}/${score.total}` + (score.streak > 2 ? ` · 🔥${score.streak}` : '') +
+    `<small>${left} left</small>`;
+}
+
+/** End of the deck: summary, then go again (new order) or back to setup. */
+function showRoundDone() {
+  q = null;
+  world.mark({});
+  world.setMarkers(false);
+  $('#setup').hidden = true;
+  const card = $('#question');
+  card.hidden = false;
+  card.classList.remove('map-q', 'answered');
+  $('#q-mode').textContent = session.source === 'pile' ? 'Hard pile' : MODES[settings.mode].label;
+  $('#q-score').textContent = '';
+  const { size, firstRight, missed } = session;
+  const what = session.source === 'pile' ? 'cards' : 'countries';
+  const names = [...new Set(missed)].map((id) => data.byId.get(id).name);
+  $('#q-prompt').innerHTML = '<div class="q-text">🎉 Round complete</div>';
+  $('#q-options').innerHTML = '';
+  const r = $('#q-result');
+  r.innerHTML = `<p>All ${size} ${what} done. Right the first time: <b>${firstRight} of ${size}</b>.</p>` +
+    (names.length ? `<p class="muted">Missed: ${names.map(esc).join(', ')}</p>` : '<p class="muted">No misses!</p>');
+  r.hidden = false;
+  $('#q-buttons').innerHTML = '<button data-act="setup" class="ghost">Setup</button><button data-act="again" class="primary">New round</button>';
 }
 
 const answerHtml = (c) => `<div class="answer">${q.ask === 'flag' ? '' : `<img src="${flagUrl(c.id)}" alt="">`}<div><b>${esc(c.name)}</b><br>Capital: ${esc(c.capital)}</div></div>`;
@@ -203,7 +228,7 @@ function renderPhase() {
   r.hidden = false;
   const inPile = store.isHard(key);
   btns.innerHTML = `<button data-act="pile" class="pile ${!inPile && !correct ? 'suggest' : ''}">${
-    inPile ? '★ In hard pile · remove' : '☆ Add to hard pile'}</button><button data-act="next" class="primary">Next</button>`;
+    inPile ? '★ In hard pile · remove' : '☆ Add to hard pile'}</button><button data-act="next" class="primary">${session.deck.length ? 'Next' : 'Finish'}</button>`;
 }
 
 function answer(correct, chosenId, skipped = false) {
@@ -211,6 +236,13 @@ function answer(correct, chosenId, skipped = false) {
   phase = 'done';
   verdict = { correct, chosenId, skipped };
   store.record(q.mode, q.target.id, correct);
+  const itemKey = store.cardKey(q.mode, q.target.id);
+  if (!session.seen.has(itemKey) && correct) session.firstRight++;
+  session.seen.add(itemKey);
+  if (!correct) {  // back into this round, at least MIN_GAP questions later
+    session.missed.push(q.target.id);
+    session.deck = requeue(session.deck, session.current);
+  }
   score.total++;
   if (correct) { score.right++; score.streak++; } else score.streak = 0;
   updateScore();
@@ -301,7 +333,16 @@ function wire() {
   };
 
   $('#modes').onclick = (e) => { const b = e.target.closest('button'); if (b) { set('mode', b.dataset.mode); showSetup(); } };
-  $('#regions').onclick = (e) => { const b = e.target.closest('button'); if (b) { set('region', b.dataset.region); world.flyToRegion(b.dataset.region); showSetup(); } };
+  // World = everything; continents can be combined (tap again to remove one)
+  $('#regions').onclick = (e) => {
+    const r = e.target.closest('button')?.dataset.region;
+    if (!r) return;
+    const cur = settings.regions;
+    const next = r === 'World' ? [] : cur.includes(r) ? cur.filter((x) => x !== r) : CONTINENTS.filter((x) => x === r || cur.includes(x));
+    set('regions', next.length === CONTINENTS.length ? [] : next);
+    world.flyToRegion(settings.regions);
+    showSetup();
+  };
   $('#territories').onchange = (e) => { set('territories', e.target.checked); showSetup(); };
   $('#reset').onclick = () => { if (confirm('Forget all answer statistics? (The hard pile stays.)')) { store.resetStats(); showSetup(); } };
   $('#start').onclick = () => startQuiz('pool');
@@ -322,6 +363,8 @@ function wire() {
     } else if (act === 'right' || act === 'wrong') answer(act === 'right', null);
     else if (act === 'skip') answer(false, null, true);
     else if (act === 'next') nextQuestion();
+    else if (act === 'again') startQuiz(session.source);
+    else if (act === 'setup') showSetup();
     else if (act === 'pile') {
       const key = store.cardKey(q.mode, q.target.id);
       store.isHard(key) ? store.removeHard(key) : store.addHard(key);

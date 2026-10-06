@@ -287,9 +287,19 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         maxZoom, duration: 900,
       });
     },
-    flyToRegion(region) {
-      const v = REGION_VIEWS[region] || REGION_VIEWS.World;
-      map.flyTo({ ...v, duration: 900 });
+    /** regions: a continent name or a list of them ([] or 'World' = whole world) */
+    flyToRegion(regions) {
+      const list = (Array.isArray(regions) ? regions : [regions]).filter((r) => REGION_VIEWS[r] && r !== 'World');
+      if (list.length <= 1) { map.flyTo({ ...(REGION_VIEWS[list[0]] || REGION_VIEWS.World), duration: 900 }); return; }
+      // several continents: aim at the middle of their views (averaged on the sphere), zoomed out
+      let x = 0, y = 0, z = 0;
+      for (const r of list) {
+        const [lon, lat] = REGION_VIEWS[r].center.map(toRad);
+        x += Math.cos(lat) * Math.cos(lon); y += Math.cos(lat) * Math.sin(lon); z += Math.sin(lat);
+      }
+      const center = [Math.atan2(y, x) * 180 / Math.PI, Math.atan2(z, Math.hypot(x, y)) * 180 / Math.PI];
+      const zoom = Math.max(REGION_VIEWS.World.zoom, Math.min(...list.map((r) => REGION_VIEWS[r].zoom)) - 0.5 * (list.length - 1));
+      map.flyTo({ center, zoom, duration: 900 });
     },
     setProjection(type) { map.setProjection({ type }); relayout(); },
     hasShape: (id) => bboxes.has(id),

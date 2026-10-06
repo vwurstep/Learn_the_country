@@ -16,26 +16,10 @@ export const MODES = {
   'mixed':          { label: 'Mixed',             ask: null,      answer: null,      type: null },
 };
 
-/** Countries in the chosen pool. region: 'World' or a continent; territories: include non-sovereign. */
-export function pool(countries, { region = 'World', territories = false } = {}) {
-  return countries.filter((c) => (region === 'World' || c.continent === region) && (territories || c.sovereign));
-}
-
-/** Weight for picking a country: unseen and often-missed countries come up more. */
-export function weight(s, now = Date.now()) {
-  if (!s) return 3;
-  const total = s.right + s.wrong;
-  const missRate = (s.wrong + 1) / (total + 2);
-  const hours = (now - s.last) / 3.6e6;
-  return 0.3 + 4 * missRate + Math.min(hours / 24, 1);
-}
-
-function pickWeighted(items, weights, rng) {
-  let sum = 0;
-  for (const w of weights) sum += w;
-  let r = rng() * sum;
-  for (let i = 0; i < items.length; i++) if ((r -= weights[i]) < 0) return items[i];
-  return items[items.length - 1];
+/** Countries in the chosen pool. regions: continents to include ([] = the whole world);
+    territories: include non-sovereign ones. */
+export function pool(countries, { regions = [], territories = false } = {}) {
+  return countries.filter((c) => (!regions.length || regions.includes(c.continent)) && (territories || c.sovereign));
 }
 
 export function shuffle(a, rng) {
@@ -56,41 +40,39 @@ export function distractors(target, all, n, rng) {
   return [...near, ...far].slice(0, n);
 }
 
-/**
- * Next question. `countries` is the pool to ask from; `all` the full list (for distractors);
- * `stats` from store.js; `avoid` = recent target ids not to repeat.
- */
-export function makeQuestion(mode, countries, all, { stats = {}, avoid = [], rng = Math.random, nOptions = 4 } = {}) {
-  if (mode === 'mixed') {
-    const modes = Object.keys(MODES).filter((m) => m !== 'mixed');
-    mode = modes[Math.floor(rng() * modes.length)];
-  }
-  let cands = countries.filter((c) => !avoid.includes(c.id));
-  if (!cands.length) cands = countries;
-  const now = Date.now();
-  const target = pickWeighted(cands, cands.map((c) => weight(stats[c.id], now)), rng);
-  return build(mode, target, all, rng, nOptions);
+// ---- sessions: a deck in random order, no repeats except for missed cards ------------------
+// A deck item is {id, mode}. The next question is always deck[0].
+
+/** Questions needed between a miss and seeing that card again. */
+export const MIN_GAP = 4;
+const concreteModes = () => Object.keys(MODES).filter((m) => m !== 'mixed');
+
+/** Every country of the pool once, in a new random order; 'mixed' gives each its own mode. */
+export function makeDeck(mode, countries, rng = Math.random) {
+  const modes = concreteModes();
+  return shuffle(countries, rng).map((c) => ({ id: c.id, mode: mode === 'mixed' ? modes[Math.floor(rng() * modes.length)] : mode }));
 }
 
-function build(mode, target, all, rng, nOptions = 4) {
-  const { ask, answer, type } = MODES[mode];
+/** The hard pile as a deck: the due cards in random order (all cards if none is due). */
+export function makePileDeck(cards, byId, rng = Math.random, now = Date.now()) {
+  const items = Object.keys(cards).map((k) => { const i = k.lastIndexOf(':'); return { key: k, id: k.slice(i + 1), mode: k.slice(0, i) }; })
+    .filter((x) => byId.has(x.id) && MODES[x.mode] && x.mode !== 'mixed');
+  const due = items.filter((x) => cards[x.key].due <= now);
+  const from = due.length ? due : items;
+  return { deck: shuffle(from, rng).map(({ id, mode }) => ({ id, mode })), early: !due.length && items.length > 0 };
+}
+
+/** Put a missed item back at a random place with at least `gap` other questions before it
+    (at the end if fewer are left). */
+export function requeue(deck, item, rng = Math.random, gap = MIN_GAP) {
+  const pos = deck.length <= gap ? deck.length : gap + Math.floor(rng() * (deck.length - gap + 1));
+  return [...deck.slice(0, pos), item, ...deck.slice(pos)];
+}
+
+/** The question for a deck item. `all` = countries to draw wrong options from. */
+export function makeQuestion(item, byId, all, rng = Math.random, nOptions = 4) {
+  const target = byId.get(item.id);
+  const { ask, answer, type } = MODES[item.mode];
   const options = type === 'choice' ? shuffle([target, ...distractors(target, all, nOptions - 1, rng)], rng) : [];
-  return { mode, target, ask, answer, type, options };
-}
-
-/**
- * Next question from the hard pile. `cards` = {key: {box, due}} with key "mode:id"; due cards
- * come first (lower box = more likely); when nothing is due, any card may come ("practising
- * early"). Returns null for an empty pile.
- */
-export function makePileQuestion(cards, byId, all, { avoid = [], rng = Math.random, now = Date.now() } = {}) {
-  let keys = Object.keys(cards).filter((k) => byId.has(k.slice(k.lastIndexOf(':') + 1)) && MODES[k.slice(0, k.lastIndexOf(':'))]);
-  if (!keys.length) return null;
-  const fresh = keys.filter((k) => !avoid.includes(k));
-  if (fresh.length) keys = fresh;
-  const due = keys.filter((k) => cards[k].due <= now);
-  const from = due.length ? due : keys;
-  const key = pickWeighted(from, from.map((k) => 1 / (1 + cards[k].box)), rng);
-  const i = key.lastIndexOf(':');
-  return { ...build(key.slice(0, i), byId.get(key.slice(i + 1)), all, rng), early: !due.length };
+  return { mode: item.mode, target, ask, answer, type, options };
 }
