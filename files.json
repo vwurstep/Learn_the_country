@@ -482,12 +482,12 @@
 "./manifest.webmanifest": "6be6f6319385",
 "./src/app.js": "9c5619556413",
 "./src/data.js": "c048ccd464a9",
-"./src/map.js": "5ada53811ff5",
+"./src/map.js": "d03a09119fce",
 "./src/quiz.js": "f7911893de08",
 "./src/store.js": "cef45c02e538",
 "./src/style.css": "09e83e9f170a",
 "./src/sync-github.js": "3136f9e140b4",
 "./src/water.js": "b46a3d56097c"
 },
-"version": "2026-10-07.125948"
+"version": "2026-10-07.130500"
 }

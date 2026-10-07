@@ -161,8 +161,9 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         { id: 'sub-fill', type: 'fill', source: 'sub', layout: { visibility: 'none' }, paint: { 'fill-color': fillColor } },
         { id: 'sub-border', type: 'line', source: 'sub', layout: { visibility: 'none' }, paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 8, 1.5] } },
         // lakes on top of the land (not rivers: Phil found them distracting while learning
-        // countries); each feature has k (lake/river) and z (zoom from which it shows)
-        { id: 'lakes', type: 'fill', source: 'water', filter: ['all', ['==', ['get', 'k'], 'lake'], ['>=', ['zoom'], ['get', 'z']]],
+        // countries); each feature has k (lake/river)
+        // always drawn, at every zoom (Phil found lakes popping up while zooming odd)
+        { id: 'lakes', type: 'fill', source: 'water', filter: ['==', ['get', 'k'], 'lake'],
           paint: { 'fill-color': OCEAN } },
         // "Rivers & lakes" mode (experimental): the learnable ones (with an id), strong blue
         { id: 'w-lakes', type: 'fill', source: 'water', layout: { visibility: 'none' },

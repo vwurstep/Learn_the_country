@@ -65,7 +65,8 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   the globe). Show the card first, then fly (nextQuestion, answer).
 - **Lakes** (2026-10-07): `data/water.geojson` comes from Natural Earth 10m plus the Europe
   supplements (`tools/build_water.mjs`), with features `{k: lake|river, z, n, id?}`.
-  - The country map shows **lakes only** (`lakes` layer, from zoom `z`). Rivers were removed
+  - The country map shows **lakes only** (`lakes` layer), all of them at every zoom: Phil
+    found lakes appearing on zoom odd. Rivers were removed
     there at Phil's request; they now live in the Rivers & lakes mode.
   - Lakes are drawn below Geneva's communes, which are clipped to land (`landOnly`).
   - The deep-dive `dim` layer is a mask polygon (world minus the set's outline, from
