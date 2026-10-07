@@ -4,6 +4,12 @@ Personal app for Phil to learn the **flags and capitals** of the world's countri
 on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 `../LP_South_Africa`.
 
+## TODO (open)
+
+- **User accounts** (Phil, 2026-10-07): progress lives only on the phone. The GitHub token
+  sync UI was removed; `store.sync(backend)` and `sync-github.js` stay, so a real account
+  backend (Firebase was suggested) can be plugged in later.
+
 ## Goal and phases
 
 1. **Prototype (now, started 2026-10-01):** two tabs.
@@ -50,6 +56,40 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   capital / country / map) with an arrow between them. Phil found two chip rows
   confusing. The 12 pairs are in `MODES` (old keys kept, `modeFor(ask, answer)`). Mixed
   was removed at Phil's request.
+- **Setup card** (2026-10-07): no mode hints and no "per round"/"so far" text, just the count
+  ("26 cantons"). The tabs sit above all cards (`#top` z-index 20), and cards stop below
+  them; Phil couldn't get back to the map from the setup.
+- **Camera insets:** `createMap({insets})` → app's `mapInsets()` reports the free screen area
+  (below the tabs or the deep-dive bar, above the open card). `fitBox` fits the box with a 6%
+  margin into it, with the zoom from Mercator maths (MapLibre's cameraForBounds threw on
+  the globe). Show the card first, then fly (nextQuestion, answer).
+- **Lakes and rivers** (2026-10-07): `data/water.geojson` (1.6 MB, Natural Earth 10m plus the
+  Europe supplements, `tools/build_water.mjs`) has features `{k: lake|river, z, n}`.
+  - The `lakes`/`rivers` layers show a feature from zoom `z` on (giants at 1, Lake Zurich
+    and the Aare at 5, Thun/Zug/Reuss/Limmat at 6). Loaded after start.
+  - Lakes are drawn above the land and above state shapes, but below Geneva's communes,
+    which are clipped to land (`landOnly` in index.json).
+  - The deep-dive `dim` layer is a mask polygon (world minus the set's outline, built with
+    `outlineMask`), drawn above the water, so the neighbours' rivers are dimmed too. The
+    parent's own world shape is painted grey (`DIMMED`), so no slivers show along the
+    finer border.
+- **Nested deep dive: Geneva's communes** (Phil's Easter egg for his mum, 2026-10-07): set
+  `ch-ge` with `parent: 'ch'` and `parentItem: 'ch-ge'`.
+  - The Geneva canton card in the CH deep dive shows "Explore the communes →", and the bar
+    shows "‹ Switzerland".
+  - 45 communes with their coats of arms (Wikidata P94) and BFS population 2025.
+    swisstopo boundaries, with the Léman clipped out using the OSM lake polygon (ODbL).
+  - Communes have no capital (`noCapital`): the capital facet is off, and the name sits
+    under the coat of arms (`.cap.nameonly`).
+- **Population** (2026-10-07): `pop` in countries.json comes from the World Bank SP.POP.TOTL
+  latest year, with Wikidata for 21 territories (build_data.mjs).
+  - The info card shows "Population: 68.7 million" (`formatPop`).
+  - Two modes in a "Population" chip row under the see → find grid:
+    - `pop-compare`: two places, tap the bigger one; the opponent is within a factor of
+      1.15–6.
+    - `pop-guess`: a log slider from 100 to 3 bn with −/+ (±5%) and ticks 1k…1B; right
+      within ±50% (`GUESS_OK`).
+  - Only shown where items have `pop`.
 - **Learn picker:** a single button in the setup ("🇨🇭 Swiss cantons ›") opens `#learn`, a
   searchable list (World first, then deep dives grouped by the parent's continent, with
   counts). Phil plans about 11 deep dives, not 100.
@@ -146,7 +186,7 @@ the pile only by hand.
   - CA 13, AU 8, ZA 9 (no flags), CN 31 (no flags, Chinese names).
   - Phil wants about this many, not 100. Name, capital and flag only, no summaries.
   - Builders: `tools/build_subdivisions.mjs` (US CH DE AT IT FR GB), `build_sub_cn.mjs`,
-    `build_sub_ca_au_za.mjs`. Each merges only its own entries into index.json.
+    `build_sub_ca_au_za.mjs`, `build_sub_ch_ge.mjs`. Each merges only its own entries into index.json.
     Simplification uses `npx mapshaper`.
   - Null flags: all of CN and ZA, Northern Ireland, Grand Est, Hauts-de-France,
     Guadeloupe and Réunion.

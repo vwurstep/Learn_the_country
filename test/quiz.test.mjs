@@ -1,7 +1,7 @@
 // Run: node test/quiz.test.mjs   (no framework)
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { MODES, modeFor, pool, makeDeck, makePileDeck, requeue, makeQuestion, distractors, MIN_GAP } from '../src/quiz.js';
+import { MODES, modeFor, pool, makeDeck, makePileDeck, requeue, makeQuestion, distractors, opponent, offBy, MIN_GAP } from '../src/quiz.js';
 import { merge } from '../src/store.js';
 
 const countries = JSON.parse(readFileSync(new URL('../data/countries.json', import.meta.url)));
@@ -27,7 +27,7 @@ assert.ok(pool(countries, { territories: true }).length > pool(countries).length
 
 // questions for every mode
 const byId = new Map(countries.map((c) => [c.id, c]));
-for (const mode of Object.keys(MODES)) {
+for (const mode of Object.keys(MODES).filter((m) => MODES[m].ask !== 'pop')) {
   for (const c of pool(countries).slice(0, 60)) {
     const q = makeQuestion({ id: c.id, mode }, byId, countries, rng);
     assert.equal(q.target.id, c.id);
@@ -53,7 +53,25 @@ for (const a of facets) for (const b of facets) {
   const m = modeFor(a, b);
   if (a === b) assert.equal(m, undefined); else assert.ok(m && MODES[m].ask === a && MODES[m].answer === b, `${a}->${b}`);
 }
-assert.equal(Object.keys(MODES).length, 12);
+assert.equal(Object.keys(MODES).filter((m) => MODES[m].ask !== 'pop').length, 12);
+
+// population
+const withPop = countries.filter((c) => c.pop);
+if (withPop.length) {
+  assert.equal(withPop.length, countries.length, 'every country has a population');
+  for (const c of withPop) assert.ok(Number.isInteger(c.pop) && c.pop > 0, `${c.id} pop`);
+  const fr2 = byId.get('fr');
+  for (let i = 0; i < 50; i++) {
+    const o = opponent(fr2, withPop, rng);
+    const f = offBy(o.pop, fr2.pop);
+    assert.ok(o.id !== 'fr' && f >= 1.14 && f <= 6.1, 'fair opponent');
+    const q = makeQuestion({ id: 'fr', mode: 'pop-compare' }, byId, withPop, rng);
+    assert.equal(q.options.length, 2);
+    assert.ok(q.options.some((c) => c.id === 'fr'));
+  }
+}
+assert.equal(offBy(150, 100), 1.5);
+assert.equal(offBy(50, 100), 2);
 
 // requeue: at least MIN_GAP others before the missed card; at the end when fewer are left
 for (let i = 0; i < 500; i++) {

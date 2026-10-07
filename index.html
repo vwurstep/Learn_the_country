@@ -48,6 +48,7 @@
       <div>
         <h2 class="info-name"></h2>
         <p class="info-cap"></p>
+        <p class="info-pop" hidden></p>
         <p class="info-meta"></p>
       </div>
     </div>
@@ -72,7 +73,10 @@
       <div class="arrow" aria-hidden="true">→</div>
       <div id="answer" class="col"></div>
     </div>
-    <p id="mode-hint" class="muted"></p>
+    <div id="pop-row" hidden>
+      <p class="label">Population</p>
+      <div id="popmodes" class="chips"></div>
+    </div>
     <div id="world-options">
       <p class="label">Region <span class="hint">· tap several to combine</span></p>
       <div id="regions" class="chips"></div>
@@ -83,10 +87,6 @@
       <button id="reset" class="ghost">Reset statistics</button>
       <button id="start" class="primary">Start</button>
     </div>
-    <div class="row tight sync-row">
-      <span id="sync-line" class="muted"></span>
-      <button id="open-settings" class="ghost small">Sync &amp; offline…</button>
-    </div>
   </section>
 
   <!-- quiz tab: choose what to learn (countries, or the states/regions of a country) -->
@@ -95,31 +95,6 @@
     <h2>What to learn</h2>
     <input id="learn-search" type="search" placeholder="Search…" autocomplete="off">
     <div id="learn-list"></div>
-  </section>
-
-  <!-- quiz tab: sync settings -->
-  <section id="settings" class="card glass only-quiz" hidden>
-    <button class="close" aria-label="Close">×</button>
-    <h2>Sync progress</h2>
-    <p class="muted">Your statistics and hard pile are saved on this phone. To keep them safe across
-      reinstalls and devices, they can be synced to the <code>userdata</code> branch of the app's GitHub repo
-      (<b>readable by anyone</b>, since the repo is public). Paste a fine-grained GitHub token with
-      <i>Contents: read and write</i> on <code>vwurstep/Learn_the_country</code> only.</p>
-    <input id="sync-token" type="password" placeholder="github_pat_…" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <div class="row">
-      <button id="sync-off" class="ghost">Turn off</button>
-      <button id="sync-now" class="ghost">Sync now</button>
-      <button id="sync-save" class="primary">Save token</button>
-    </div>
-    <p id="sync-status" class="muted"></p>
-    <h2 class="sub">Offline</h2>
-    <p class="muted">The whole app (map, flags, summaries) is saved on the phone and works without
-      internet, e.g. on a plane. Progress is saved on the phone and syncs when back online.</p>
-    <div class="row tight">
-      <span id="offline-status" class="muted"></span>
-      <button id="offline-download" class="ghost">Download</button>
-    </div>
-    <p id="screen-info" class="muted tiny"></p>
   </section>
 
   <!-- quiz tab: question -->

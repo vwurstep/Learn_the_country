@@ -1,13 +1,14 @@
 [
-  {"id":"us","name":"United States","kind":"state","kinds":"states","label":"US states","count":50},
-  {"id":"ch","name":"Switzerland","kind":"canton","kinds":"cantons","label":"Swiss cantons","count":26},
-  {"id":"cn","name":"China","kind":"province","kinds":"provinces","label":"Chinese provinces","count":31},
-  {"id":"ca","name":"Canada","kind":"province","kinds":"provinces","label":"Canadian provinces","count":13},
-  {"id":"au","name":"Australia","kind":"state","kinds":"states","label":"Australian states","count":8},
-  {"id":"za","name":"South Africa","kind":"province","kinds":"provinces","label":"SA provinces","count":9},
-  {"id":"de","name":"Germany","kind":"state","kinds":"states","label":"German states","count":16},
-  {"id":"at","name":"Austria","kind":"state","kinds":"states","label":"Austrian states","count":9},
-  {"id":"it","name":"Italy","kind":"region","kinds":"regions","label":"Italian regions","count":20},
-  {"id":"fr","name":"France","kind":"region","kinds":"regions","label":"French regions","count":18},
-  {"id":"gb","name":"United Kingdom","kind":"nation","kinds":"nations","label":"UK nations","count":4}
+  {"id": "us", "name": "United States", "kind": "state", "kinds": "states", "label": "US states", "count": 50},
+  {"id": "ch", "name": "Switzerland", "kind": "canton", "kinds": "cantons", "label": "Swiss cantons", "count": 26},
+  {"id": "ch-ge", "parent": "ch", "parentItem": "ch-ge", "name": "Geneva", "kind": "commune", "kinds": "communes", "label": "Geneva communes", "count": 45, "noCapital": true, "landOnly": true},
+  {"id": "cn", "name": "China", "kind": "province", "kinds": "provinces", "label": "Chinese provinces", "count": 31},
+  {"id": "ca", "name": "Canada", "kind": "province", "kinds": "provinces", "label": "Canadian provinces", "count": 13},
+  {"id": "au", "name": "Australia", "kind": "state", "kinds": "states", "label": "Australian states", "count": 8},
+  {"id": "za", "name": "South Africa", "kind": "province", "kinds": "provinces", "label": "SA provinces", "count": 9},
+  {"id": "de", "name": "Germany", "kind": "state", "kinds": "states", "label": "German states", "count": 16},
+  {"id": "at", "name": "Austria", "kind": "state", "kinds": "states", "label": "Austrian states", "count": 9},
+  {"id": "it", "name": "Italy", "kind": "region", "kinds": "regions", "label": "Italian regions", "count": 20},
+  {"id": "fr", "name": "France", "kind": "region", "kinds": "regions", "label": "French regions", "count": 18},
+  {"id": "gb", "name": "United Kingdom", "kind": "nation", "kinds": "nations", "label": "UK nations", "count": 4}
 ]

@@ -3,7 +3,8 @@
    from data.js but nothing about panels or quiz rules. */
 import { flagOf } from './data.js';
 
-const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
+const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff', RIVER = '#5b9ccc';
+const DIMMED = '#e4e7eb';  // about what the dim layer makes of a country's colour
 // fallback land colours (by hash of the id) for shapes without a national colour
 const LAND = ['#e8dcb5', '#d5e3b5', '#f0c9a8', '#cfd9c0', '#e9d1d9', '#d8cfe8'];
 const MARK = { sel: '#f2a541', right: '#4caf6a', wrong: '#e0574f', target: '#4caf6a' };
@@ -78,7 +79,46 @@ function borderLines(world) {
   return { type: 'Feature', properties: {}, geometry: { type: 'MultiLineString', coordinates: lines } };
 }
 
-export function createMap(el, { countries, world, colors = {}, projection = 'globe', onClick }) {
+/** A grey mask over the whole world except the deep-dive country: the outline of its
+    states/cantons (shared edges cancel out, the rest is chained into rings) cut out as holes.
+    Enclaves of other countries (Lesotho in South Africa) stay covered. */
+function outlineMask(geo) {
+  const k = (p) => p[0] + ',' + p[1];
+  const edges = new Map();  // "a>b" -> [a, b]
+  for (const f of geo.features) {
+    const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+    for (const poly of polys) for (const ring of poly) for (let i = 1; i < ring.length; i++) {
+      const a = ring[i - 1], b = ring[i];
+      if (k(a) === k(b)) continue;
+      const back = k(b) + '>' + k(a);
+      if (edges.has(back)) edges.delete(back); else edges.set(k(a) + '>' + k(b), [a, b]);
+    }
+  }
+  const from = new Map();
+  for (const [key, e] of edges) { const s = k(e[0]); if (!from.has(s)) from.set(s, []); from.get(s).push(key); }
+  const rings = [];
+  for (const [key0, e0] of edges) {
+    if (!edges.has(key0)) continue;
+    const ring = [e0[0]];
+    for (let cur = key0; cur;) {
+      const e = edges.get(cur);
+      edges.delete(cur);
+      ring.push(e[1]);
+      if (k(e[1]) === k(ring[0])) break;
+      cur = (from.get(k(e[1])) || []).find((x) => edges.has(x));
+    }
+    if (ring.length > 3 && k(ring[0]) === k(ring[ring.length - 1])) rings.push(ring);
+  }
+  // the orientation covering most area is the outline; rings the other way round are enclaves
+  const area = (r) => { let a = 0; for (let i = 1; i < r.length; i++) a += r[i - 1][0] * r[i][1] - r[i][0] * r[i - 1][1]; return a / 2; };
+  const sum = rings.reduce((t, r) => t + area(r), 0);
+  const outer = rings.filter((r) => Math.sign(area(r)) === Math.sign(sum));
+  const enclaves = rings.filter((r) => Math.sign(area(r)) !== Math.sign(sum));
+  const world = [[-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]];
+  return { type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: [[world, ...outer], ...enclaves.map((r) => [r])] } };
+}
+
+export function createMap(el, { countries, world, colors = {}, projection = 'globe', onClick, insets }) {
   for (const f of world.features) {
     const nat = colors[f.properties.id]?.c;
     f.properties.col = nat ? tint(nat) : LAND[hash(f.properties.id) % LAND.length];
@@ -97,7 +137,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     dragRotate: false,
     pitchWithRotate: false,
     renderWorldCopies: false,
-    maxZoom: 10,
+    maxZoom: 12,
     ...REGION_VIEWS.World,
     style: {
       version: 8,
@@ -106,6 +146,8 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         world: { type: 'geojson', data: world, promoteId: 'id' },
         borders: { type: 'geojson', data: borderLines(world) },
         sub: { type: 'geojson', data: empty, promoteId: 'id' },  // states/cantons of a deep dive
+        water: { type: 'geojson', data: empty },  // lakes + major rivers, loaded after start
+        mask: { type: 'geojson', data: empty },   // deep dive: everything outside the country
       },
       layers: [
         { id: 'ocean', type: 'background', paint: { 'background-color': OCEAN } },
@@ -113,10 +155,16 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         // country borders sit below the deep-dive layers: the coarser world shapes would otherwise
         // draw stray lines across states/cantons (e.g. through Lake Constance)
         { id: 'border', type: 'line', source: 'borders', paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 4, 1.2, 8, 2] } },
-        // deep dive: every other country fades to grey
-        { id: 'dim', type: 'fill', source: 'world', layout: { visibility: 'none' }, paint: { 'fill-color': '#e9ecf0', 'fill-opacity': 0.8 } },
         { id: 'sub-fill', type: 'fill', source: 'sub', layout: { visibility: 'none' }, paint: { 'fill-color': fillColor } },
         { id: 'sub-border', type: 'line', source: 'sub', layout: { visibility: 'none' }, paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 8, 1.5] } },
+        // water on top of the land: each feature has k (lake/river) and z (zoom from which it shows)
+        { id: 'lakes', type: 'fill', source: 'water', filter: ['all', ['==', ['get', 'k'], 'lake'], ['>=', ['zoom'], ['get', 'z']]],
+          paint: { 'fill-color': OCEAN } },
+        { id: 'rivers', type: 'line', source: 'water', filter: ['all', ['==', ['get', 'k'], 'river'], ['>=', ['zoom'], ['get', 'z']]],
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-color': RIVER, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.7, 5, 1.5, 7, 2.2, 10, 3.2] } },
+        // deep dive: every other country fades to grey, water and borders included
+        { id: 'dim', type: 'fill', source: 'mask', layout: { visibility: 'none' }, paint: { 'fill-color': '#e9ecf0', 'fill-opacity': 0.8 } },
         // bold outline for selected / quiz-marked places (their fill alone can blend in with a
         // similar colour)
         { id: 'mark-line', type: 'line', source: 'world', paint: markLine },
@@ -124,6 +172,8 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       ],
     },
   });
+  map.once('load', () => fetch('data/water.geojson').then((r) => (r.ok ? r.json() : null))
+    .then((w) => w && map.getSource('water').setData(w)).catch(() => {}));
   map.touchZoomRotate.disableRotation();
   map.keyboard.disableRotation();
   el.style.background = SPACE;
@@ -153,9 +203,9 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         f.textContent = c.local;
       }
       const cap = document.createElement('div');
-      cap.className = 'cap';
+      cap.className = c.capital ? 'cap' : 'cap nameonly';
       cap.innerHTML = '<i class="dot"></i><span class="lbl"></span>';
-      cap.querySelector('.lbl').textContent = c.capital;
+      cap.querySelector('.lbl').textContent = c.capital || c.name;
       for (const node of [f, cap].filter(Boolean)) node.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
       markers.set(c.id, { item: c, flag: f && mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
     }
@@ -218,6 +268,14 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       else setOn(m.cap, false);
     }
     for (const [c, m, force] of shown) {
+      if (!c.capital) {  // no capital: the name under the flag, when there's room (never in the self-test)
+        const p = map.project([c.lon, c.lat]), lw = c.name.length * 6.4 + 8;
+        const label = [p.x - lw / 2, p.y + 9, p.x + lw / 2, p.y + 23];
+        const on = !dotsOnly && (force || free(label));
+        if (on) taken.push(label);
+        setOn(m.cap, on);
+        continue;
+      }
       const capOk = !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
       const p = capOk && map.project([c.lon, c.lat]);
       const dot = p && [p.x - 5, p.y - 5, p.x + 5, p.y + 5];
@@ -272,16 +330,28 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   };
   const clearMarks = () => { for (const x of marked) setMark(x, null); marked = []; };
 
-  // Fit a box [x0, y0, x1, y1] on screen. MapLibre's fitBounds drifts on the globe away from
-  // the equator (South Africa ended up near the top), so only its zoom is used and the camera
-  // is centred on the middle of the box (inside the padded area).
+  // Fit a box [x0, y0, x1, y1] on screen, centred in the padded (free) area. MapLibre's
+  // fitBounds drifts on the globe away from the equator (South Africa ended up near the top).
   const fitBox = ([x0, y0, x1, y1], pad, maxZoom) => {
-    const cam = map.cameraForBounds([[x0, y0], [x1, y1]], { padding: pad, maxZoom });
-    map.flyTo({ center: [(x0 + x1) / 2, (y0 + y1) / 2], zoom: cam?.zoom ?? map.getZoom(), padding: pad, duration: 900 });
+    // a comfortable margin around the box: 6% of its size on each side
+    const mx = (x1 - x0) * 0.06, my = (y1 - y0) * 0.06;
+    // zoom from Web Mercator maths (MapLibre's cameraForBounds throws on the globe for some
+    // paddings): the box must fit the free width and height; world = 512·2^zoom px
+    const mercY = (lat) => Math.log(Math.tan(Math.PI / 4 + toRad(Math.max(-85, Math.min(85, lat))) / 2));
+    const fx = (x1 - x0 + 2 * mx) / 360, fy = (mercY(y1 + my) - mercY(y0 - my)) / (2 * Math.PI);
+    const w = Math.max(40, el.clientWidth - pad.left - pad.right), h = Math.max(40, el.clientHeight - pad.top - pad.bottom);
+    const zoom = Math.min(maxZoom, Math.log2(Math.min(w / (512 * Math.max(fx, 1e-6)), h / (512 * Math.max(fy, 1e-6)))));
+    map.flyTo({ center: [(x0 + x1) / 2, (y0 + y1) / 2], zoom, padding: pad, duration: 900 });
   };
+  // the free part of the screen: below the top bar(s), above the card at the bottom (the app
+  // tells us via insets()); without it, assume a card covering 40%
   const padding = () => {
-    const pad = Math.min(80, el.clientWidth / 6);
-    return { top: pad, left: pad, right: pad, bottom: Math.max(pad, el.clientHeight * 0.4) };
+    const side = 12;
+    const h = el.clientHeight;
+    const ins = insets?.() || { top: 70, bottom: h * 0.4 };
+    const top = Math.min(ins.top + 8, h * 0.3);
+    const bottom = Math.max(side, Math.min(ins.bottom + 8, h * 0.7 - top));  // keep ≥ 30% for the map
+    return { top, left: side, right: side, bottom };
   };
 
   return {
@@ -290,12 +360,12 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     nearestCapital,
     /** Register the subdivisions of a country (deep dive). items as for countries, flag paths
         in item.flag, colours in item.color (tinted here). */
-    addSubdivisions(id, items, geo) {
+    addSubdivisions(id, items, geo, country = id, { landOnly = false } = {}) {
       if (sets.has(id)) return;
       const color = new Map(items.map((c) => [c.id, c.color]));
       for (const f of geo.features) f.properties.col = color.get(f.properties.id) ? tint(color.get(f.properties.id)) : LAND[hash(f.properties.id) % LAND.length];
       // smaller flags: subdivisions are small and their flags often square
-      makeSet(id, items, geo, { source: 'sub', fill: 'sub-fill', labelZoom: 0, maxZoom: 9, ctxZoom: 9, parent: id, flagScale: 0.8 });
+      makeSet(id, items, geo, { source: 'sub', fill: 'sub-fill', labelZoom: 0, maxZoom: 12, ctxZoom: 12, parent: country, flagScale: 0.8, landOnly, mask: outlineMask(geo) });
       const s = sets.get(id), [x0, y0, x1, y1] = s.extent;
       s.minCtx = [Math.min(14, (x1 - x0) * 0.4), Math.min(9, (y1 - y0) * 0.4)];
       // core: the places within 30° of the median flag point, i.e. without far-away parts like
@@ -318,10 +388,15 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       if (cur.source === 'sub') map.getSource('sub').setData(cur.geo);
       for (const l of ['sub-fill', 'sub-border', 'sub-mark-line']) map.setLayoutProperty(l, 'visibility', cur.source === 'sub' ? 'visible' : 'none');
       map.setLayoutProperty('dim', 'visibility', cur.parent ? 'visible' : 'none');
-      // the deep-dive country's own (coarser) world shape is covered fully: where it sticks out
+      // lakes go on top of land and of states/cantons (whose shapes include their lakes), but
+      // under shapes already clipped to land (Geneva's communes): the coarse world lakes would
+      // otherwise cut across them
+      map.moveLayer('lakes', cur.landOnly ? 'sub-fill' : 'rivers');
+      if (cur.mask) map.getSource('mask').setData(cur.mask);
+      // the deep-dive country's own (coarser) world shape is painted grey: where it sticks out
       // from under the finer state/canton shapes it then looks like the dimmed neighbours
       // instead of leaving slivers in its national colour along the border
-      if (cur.parent) map.setPaintProperty('dim', 'fill-opacity', ['case', ['==', ['get', 'id'], cur.parent], 1, 0.8]);
+      map.setPaintProperty('land', 'fill-color', cur.parent ? ['case', ['==', ['get', 'id'], cur.parent], DIMMED, fillColor] : fillColor);
       relayout();
     },
     /** fit the current deep-dive country on screen: its core (default) or everything (full,
@@ -329,7 +404,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     flyToSet({ full = false } = {}) {
       if (!cur.extent || cur.id === 'world') { map.flyTo({ ...REGION_VIEWS.World, duration: 900 }); return; }
       // exploring: no card at the bottom, so use the whole screen below the top bars
-      const pad = full ? padding() : { top: 130, bottom: 24, left: 16, right: 16 };
+      const pad = padding();
       fitBox(full ? cur.extent : cur.core, pad, cur.maxZoom);
     },
     /** show all markers (explore) or only some ids (quiz feedback); dots: capital dots only */

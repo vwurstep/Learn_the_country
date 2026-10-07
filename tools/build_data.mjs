@@ -25,6 +25,11 @@
  *       longitude is scaled by cos(mean latitude) of that polygon.
  *   - Flags:
  *       flag-icons npm package (MIT) https://github.com/lipis/flag-icons, flags/4x3/ set.
+ *   - Population (pop in countries.json, people):
+ *       World Bank indicator SP.POP.TOTL (CC BY 4.0), the most recent non-empty value per
+ *       country/territory. The entries it lacks (small territories, Taiwan, Vatican City, Western
+ *       Sahara) are filled from Wikidata's "population" (P1082, CC0): the item with that ISO 3166-1
+ *       alpha-2 code (P297), the statement with the latest "point in time".
  *
  * Only data/, flags/ and the cache directory are written. No build step or deps are needed:
  * runs on Node >= 18 (uses global fetch) plus the system `tar` binary.
@@ -48,7 +53,10 @@ const SRC = {
   places: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places_simple.geojson',
   shapes: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson',
   flags: `https://registry.npmjs.org/flag-icons/-/flag-icons-${FLAG_ICONS_VERSION}.tgz`,
+  population: 'https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?mrnev=1&format=json&per_page=20000',
+  sparql: 'https://query.wikidata.org/sparql',
 };
+const USER_AGENT = 'LearnTheCountry-build/1.0 (https://github.com/vwurstep/Learn_the_country; philippe.vonwurstemberger@gmail.com) node';
 
 // ---------------------------------------------------------------------------
 // Curation tables
@@ -162,11 +170,11 @@ const SHAPE_OVERRIDES = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-async function download(url, file) {
+async function download(url, file, init) {
   const dest = path.join(CACHE, file);
   if (fs.existsSync(dest) && fs.statSync(dest).size > 0) return dest;
-  console.log(`downloading ${url}`);
-  const res = await fetch(url);
+  console.log(`downloading ${url.length > 160 ? url.slice(0, 160) + '…' : url}`);
+  const res = await fetch(url, init);
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
   fs.writeFileSync(dest, Buffer.from(await res.arrayBuffer()));
   return dest;
@@ -303,6 +311,65 @@ function buildCountries(mledoze, places) {
 }
 
 // ---------------------------------------------------------------------------
+// 1b. population
+// ---------------------------------------------------------------------------
+
+// Sets c.pop on every entry. The World Bank comes first (its 2-letter codes are ISO 3166-1
+// alpha-2 plus XK for Kosovo; iso3ById guards against a code meaning something else than our
+// entry); whatever it lacks is looked up on Wikidata.
+async function addPopulations(countries, worldBankFile, iso3ById) {
+  const [meta, rows] = readJson(worldBankFile);
+  if (!Array.isArray(rows) || meta.pages !== 1) throw new Error('World Bank: unexpected response');
+  const wb = new Map(); // id -> {pop, year, iso3}
+  for (const r of rows) {
+    if (r.value == null) continue;
+    const id = r.country.id.toLowerCase();
+    if (wb.has(id)) throw new Error(`World Bank: several values for ${id}`);
+    wb.set(id, { pop: r.value, year: +r.date, iso3: r.countryiso3code });
+  }
+  const years = {};
+  const gaps = [];
+  for (const c of countries) {
+    const w = wb.get(c.id);
+    if (!w) { gaps.push(c); continue; }
+    const iso3 = c.id === 'xk' ? 'XKX' : iso3ById.get(c.id);
+    if (w.iso3 !== iso3) throw new Error(`World Bank ${c.id} is ${w.iso3}, expected ${iso3}`);
+    c.pop = w.pop;
+    years[w.year] = (years[w.year] ?? 0) + 1;
+  }
+
+  // Wikidata: the "population" (P1082) statements of the item with this ISO 3166-1 alpha-2 code
+  // (P297). The statement with the latest "point in time" (P585) wins, preferred rank breaks ties,
+  // deprecated statements are ignored.
+  const query = `SELECT ?iso ?item ?pop ?date ?rank WHERE {
+    VALUES ?iso { ${gaps.map((c) => `"${c.id.toUpperCase()}"`).join(' ')} }
+    ?item wdt:P297 ?iso .
+    ?item p:P1082 ?st . ?st ps:P1082 ?pop . ?st wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?st pq:P585 ?date }
+  }`;
+  const wdFile = await download(`${SRC.sparql}?format=json&query=${encodeURIComponent(query)}`, 'wikidata-population.json',
+    { headers: { 'User-Agent': USER_AGENT, Accept: 'application/sparql-results+json' } });
+  const best = new Map(); // iso -> {item, pop, date, preferred}
+  for (const b of readJson(wdFile).results.bindings) {
+    const iso = b.iso.value;
+    const cand = { item: b.item.value.split('/').pop(), pop: +b.pop.value, date: b.date?.value.slice(0, 10) ?? '', preferred: b.rank.value.endsWith('PreferredRank') };
+    const cur = best.get(iso);
+    if (cur && cur.item !== cand.item) throw new Error(`Wikidata: ${iso} is both ${cur.item} and ${cand.item}`);
+    if (!cur || cand.date > cur.date || (cand.date === cur.date && cand.preferred && !cur.preferred)) best.set(iso, cand);
+  }
+  const wdYears = [];
+  for (const c of gaps) {
+    const w = best.get(c.id.toUpperCase());
+    if (!w) throw new Error(`no population for ${c.id} (${c.name}); if the World Bank coverage changed, delete ${wdFile} and rerun`);
+    c.pop = w.pop;
+    wdYears.push(`${c.id} ${w.date.slice(0, 4) || '?'}`);
+  }
+  for (const c of countries) if (!Number.isInteger(c.pop) || c.pop <= 0) throw new Error(`bad population for ${c.id}: ${c.pop}`);
+  console.log(`population: ${countries.length - gaps.length} from the World Bank (${Object.entries(years).map(([y, n]) => `${n} × ${y}`).join(', ')}), ${gaps.length} from Wikidata (${wdYears.join(', ')})`);
+}
+
+// ---------------------------------------------------------------------------
 // 2. world.geojson
 // ---------------------------------------------------------------------------
 
@@ -373,15 +440,17 @@ async function main() {
   fs.mkdirSync(CACHE, { recursive: true });
   fs.mkdirSync(DATA_DIR, { recursive: true });
 
-  const [countriesFile, placesFile, shapesFile, flagsTgz] = await Promise.all([
+  const [countriesFile, placesFile, shapesFile, flagsTgz, populationFile] = await Promise.all([
     download(SRC.countries, 'mledoze-countries.json'),
     download(SRC.places, 'ne_10m_populated_places_simple.geojson'),
     download(SRC.shapes, 'ne_50m_admin_0_countries.geojson'),
     download(SRC.flags, `flag-icons-${FLAG_ICONS_VERSION}.tgz`),
+    download(SRC.population, 'worldbank-population.json'),
   ]);
 
   const mledoze = readJson(countriesFile);
   const countries = buildCountries(mledoze, readJson(placesFile));
+  await addPopulations(countries, populationFile, new Map(mledoze.map((c) => [c.cca2.toLowerCase(), c.cca3])));
 
   const { fc, noPolygon, extra } = buildWorld(readJson(shapesFile), countries);
   const worldPath = path.join(DATA_DIR, 'world.geojson');

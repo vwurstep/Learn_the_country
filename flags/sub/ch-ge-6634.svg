@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="720"
+   height="820"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="CHE Pregny-Chambésy COA.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview14"
+     showgrid="false"
+     inkscape:zoom="0.63086429"
+     inkscape:cx="393.68415"
+     inkscape:cy="448.03999"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g861" />
+  <g
+     style="opacity:1;stroke-width:1.09777081"
+     inkscape:label="Fond écu"
+     id="layer1"
+     transform="matrix(0.97963987,0,0,0.84705225,-762.00778,17.244678)" />
+  <g
+     id="g861"
+     transform="translate(-1433.0836,-160.65928)">
+    <path
+       id="path840"
+       style="fill:#fcdb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.13332999"
+       d="m 2142.8498,169.18525 v 404.87784 c 0,0 -24.8476,322.19896 -351.2095,400.88145 h 1.4474 C 1466.6483,896.26221 1441.8029,574.06309 1441.8029,574.06309 V 169.18525 h 701.0469"
+       inkscape:connector-curvature="0" />
+    <path
+       id="path842"
+       style="fill:#0093dd;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:5.1329999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 2144.4599,170.16279 c 0,0 -53.727,2.18932 -75.2831,31.14496 -21.4351,28.91822 -34.2871,77.91768 -72.9661,111.29098 -38.7171,33.41234 -73.0905,28.95563 -100.9889,60.13799 -27.9431,31.14495 -29.666,60.44703 -102.715,125.00108 -73.0474,-64.55405 -75.0873,-93.85613 -102.9857,-125.00108 -27.9431,-31.18236 -62.3547,-26.72565 -100.9901,-60.13799 -38.7213,-33.3733 -51.6123,-82.37276 -73.0849,-111.29098 -21.4793,-28.95564 -75.2058,-31.14496 -75.2058,-31.14496 h 704.2196 m -83.4578,623.14298 c -17.2041,-70.88614 -105.8056,-101.80663 -126.4207,-124.2675 -20.6151,-22.46411 -36.6407,-81.56925 -60.6667,-105.18821 -24.0177,-23.65637 -68.6936,-45.46499 -81.2369,-65.55111 -12.6181,20.08612 -57.0948,41.89474 -81.159,65.55111 -24.0226,23.61896 -40.0516,82.7241 -60.6633,105.18821 -20.5736,22.46087 -106.1246,54.83873 -123.2868,125.68748 0,0 75.8676,132.60644 262.6807,179.11598 183.4408,-37.90158 270.7527,-180.53596 270.7527,-180.53596"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     id="g10"
+     style="stroke:#000000"
+     transform="translate(0.0971,-0.57074)">
+    <path
+       d="m 715,372.23 c 0.095,67.605 -15.822,135.21 -45.263,196.28 a 454.7,454.7 0 0 1 -126.27,158.02 c -53.406,42.408 -116.83,72.75 -183.56,88.326 -66.672,-15.506 -130.02,-45.743 -183.38,-88.07 A 453.33,453.33 0 0 1 50.297,568.966 C 20.84,507.905 4.992,440.166 4.992,372.486 V 4.996 l 709.97,0.069 c 0,0 -0.184,245.06 0.025,367.16 z"
+       id="path8"
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+  </g>
+</svg>

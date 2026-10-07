@@ -1,11 +1,19 @@
 /* Data access: loads the country list, shapes and summaries. No DOM or map code here.
    Learning progress lives in store.js. Schema of data/countries.json:
    {id: 'fr', name, capital, lat, lon (of the capital), fx, fy (flag spot, mid-country), continent,
-   sovereign}. data/colors.json: {id: {c: national colour hex, alt?, why}}. data/info.json: {id: {about, dates: [[year, event]], known: [..]}} (loaded lazily). */
+   sovereign, pop (population)}. data/colors.json: {id: {c: national colour hex, alt?, why}}. data/info.json: {id: {about, dates: [[year, event]], known: [..]}} (loaded lazily). */
 
 export const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
 
 export const flagUrl = (id) => `flags/${id}.svg`;
+
+/** "68.2 million", "1.41 billion", "523,000", "800"; sig = significant digits */
+export function formatPop(n, sig = 3) {
+  const r = (x) => parseFloat(x.toPrecision(sig));
+  if (n >= 1e9) return `${r(n / 1e9)} billion`;
+  if (n >= 1e6) return `${r(n / 1e6)} million`;
+  return Math.round(r(n)).toLocaleString('en-US');
+}
 /** flag image of a country or a subdivision (those carry their own path, svg or png, or null
     when the place has no official flag, e.g. Chinese and South African provinces) */
 export const flagOf = (c) => (c.flag === undefined ? flagUrl(c.id) : c.flag);

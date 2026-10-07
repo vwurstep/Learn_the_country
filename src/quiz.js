@@ -20,6 +20,9 @@ export const MODES = {
   'shape-flag':     { label: 'Map → flag',        ask: 'map',     answer: 'flag',    type: 'choice' },
   'shape-name':     { label: 'Map → country',     ask: 'map',     answer: 'name',    type: 'recall' },
   'shape-capital':  { label: 'Map → capital',     ask: 'map',     answer: 'capital', type: 'recall' },
+  // population (only where items have `pop`): not part of the see → find grid
+  'pop-compare':    { label: 'Which is bigger?',  ask: 'pop',     answer: 'compare', type: 'compare' },
+  'pop-guess':      { label: 'Guess the population', ask: 'pop',  answer: 'estimate', type: 'estimate' },
 };
 
 /** The mode for a (shown, asked-for) pair, e.g. modeFor('flag', 'capital') = 'flag-capital'. */
@@ -80,6 +83,23 @@ export function requeue(deck, item, rng = Math.random, gap = MIN_GAP) {
 export function makeQuestion(item, byId, all, rng = Math.random, nOptions = 4) {
   const target = byId.get(item.id);
   const { ask, answer, type } = MODES[item.mode];
-  const options = type === 'choice' ? shuffle([target, ...distractors(target, all, nOptions - 1, rng)], rng) : [];
+  const options = type === 'choice' ? shuffle([target, ...distractors(target, all, nOptions - 1, rng)], rng)
+    : type === 'compare' ? shuffle([target, opponent(target, all, rng)], rng) : [];
   return { mode: item.mode, target, ask, answer, type, options };
 }
+
+// ---- population ---------------------------------------------------------------------------
+/** A country to compare with: populations a bit apart (factor 1.15–6) so it's neither a coin
+    toss nor obvious; anything else if there is no such one. */
+export function opponent(target, all, rng = Math.random) {
+  const others = all.filter((c) => c.id !== target.id && c.pop);
+  const d = (c) => Math.abs(Math.log10(c.pop / target.pop));
+  const fair = others.filter((c) => d(c) >= 0.06 && d(c) <= 0.78);
+  const from = fair.length ? fair : others;
+  return from[Math.floor(rng() * from.length)];
+}
+
+/** How far a guess is off: the factor between guess and truth (1 = exact, 2 = half or double). */
+export const offBy = (guess, truth) => Math.max(guess / truth, truth / guess);
+/** A guess counts as right within ±50% (factor 1.5). */
+export const GUESS_OK = 1.5;
