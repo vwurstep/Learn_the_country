@@ -489,8 +489,7 @@ function wire() {
   // "Rivers & lakes" (experimental): map toggle and quiz filters
   $('#btn-water').onclick = async () => {
     const to = scope === 'water' ? 'world' : 'water';
-    await setScope(to);
-    world.flyToRegion(to === 'water' ? settings.regions : []);
+    await setScope(to);  // the view stays where it is
     applyFlags();
   };
   $('#water-kinds').onclick = (e) => {

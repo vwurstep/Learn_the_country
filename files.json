@@ -480,7 +480,7 @@
 "./lib/maplibre-gl.css": "7e27dfc94a21",
 "./lib/maplibre-gl.js": "74bdab1483c1",
 "./manifest.webmanifest": "6be6f6319385",
-"./src/app.js": "47f195f2db24",
+"./src/app.js": "9c5619556413",
 "./src/data.js": "c048ccd464a9",
 "./src/map.js": "5ada53811ff5",
 "./src/quiz.js": "f7911893de08",
@@ -489,5 +489,5 @@
 "./src/sync-github.js": "3136f9e140b4",
 "./src/water.js": "b46a3d56097c"
 },
-"version": "2026-10-07.124030"
+"version": "2026-10-07.125948"
 }
