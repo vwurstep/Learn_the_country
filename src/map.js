@@ -3,7 +3,8 @@
    from data.js but nothing about panels or quiz rules. */
 import { flagOf } from './data.js';
 
-const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff', RIVER = '#5b9ccc';
+const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
+const WATER = '#2f78c4', NEUTRAL_LAND = '#ece7dc';  // "Rivers & lakes" mode
 const DIMMED = '#e4e7eb';  // about what the dim layer makes of a country's colour
 // fallback land colours (by hash of the id) for shapes without a national colour
 const LAND = ['#e8dcb5', '#d5e3b5', '#f0c9a8', '#cfd9c0', '#e9d1d9', '#d8cfe8'];
@@ -41,10 +42,12 @@ function angularDistance([lon1, lat1], [lon2, lat2]) {
 /** Box to zoom to for a country: its biggest part plus the parts near it (Corsica, Java…),
     leaving out far-away territories (French Guiana for France, Alaska/Hawaii for the USA). */
 function bboxOf(geom) {
-  const polys = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;
-  const parts = polys.map((p) => {
+  // parts: outer rings of polygons, or the lines of a river
+  const t = geom.type, c = geom.coordinates;
+  const rings = t === 'Polygon' ? [c[0]] : t === 'MultiPolygon' ? c.map((p) => p[0]) : t === 'LineString' ? [c] : c;
+  const parts = rings.map((ring) => {
     let x0 = 180, x1 = -180, y0 = 90, y1 = -90;
-    for (const [x, y] of p[0]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    for (const [x, y] of ring) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     return { b: [x0, y0, x1, y1], cx, cy, area: (x1 - x0) * (y1 - y0) * Math.cos(toRad(cy)) };
   });
@@ -146,7 +149,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         world: { type: 'geojson', data: world, promoteId: 'id' },
         borders: { type: 'geojson', data: borderLines(world) },
         sub: { type: 'geojson', data: empty, promoteId: 'id' },  // states/cantons of a deep dive
-        water: { type: 'geojson', data: empty },  // lakes + major rivers, loaded after start
+        water: { type: 'geojson', data: empty, promoteId: 'id' },  // lakes + rivers (app sets it)
         mask: { type: 'geojson', data: empty },   // deep dive: everything outside the country
       },
       layers: [
@@ -157,12 +160,22 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         { id: 'border', type: 'line', source: 'borders', paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 4, 1.2, 8, 2] } },
         { id: 'sub-fill', type: 'fill', source: 'sub', layout: { visibility: 'none' }, paint: { 'fill-color': fillColor } },
         { id: 'sub-border', type: 'line', source: 'sub', layout: { visibility: 'none' }, paint: { 'line-color': BORDER, 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 8, 1.5] } },
-        // water on top of the land: each feature has k (lake/river) and z (zoom from which it shows)
+        // lakes on top of the land (not rivers: Phil found them distracting while learning
+        // countries); each feature has k (lake/river) and z (zoom from which it shows)
         { id: 'lakes', type: 'fill', source: 'water', filter: ['all', ['==', ['get', 'k'], 'lake'], ['>=', ['zoom'], ['get', 'z']]],
           paint: { 'fill-color': OCEAN } },
-        { id: 'rivers', type: 'line', source: 'water', filter: ['all', ['==', ['get', 'k'], 'river'], ['>=', ['zoom'], ['get', 'z']]],
-          layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: { 'line-color': RIVER, 'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.7, 5, 1.5, 7, 2.2, 10, 3.2] } },
+        // "Rivers & lakes" mode (experimental): the learnable ones (with an id), strong blue
+        { id: 'w-lakes', type: 'fill', source: 'water', layout: { visibility: 'none' },
+          filter: ['all', ['==', ['get', 'k'], 'lake'], ['has', 'id']],  // + zoom rule, see setWaterByZoom
+          paint: { 'fill-color': ['match', markState, 'sel', MARK.sel, 'right', MARK.right, 'wrong', MARK.wrong, 'target', MARK.target, WATER] } },
+        { id: 'w-rivers', type: 'line', source: 'water', layout: { visibility: 'none', 'line-cap': 'round', 'line-join': 'round' },
+          filter: ['all', ['==', ['get', 'k'], 'river'], ['has', 'id']],
+          paint: {
+            'line-color': ['match', markState, 'sel', MARK.sel, 'right', MARK.right, 'wrong', MARK.wrong, 'target', MARK.target, WATER],
+            // zoom must be the top-level input; marked rivers are drawn about twice as thick
+            'line-width': ['interpolate', ['linear'], ['zoom'],
+              1, ['match', markState, '', 1, 2.5], 4, ['match', markState, '', 1.8, 4], 7, ['match', markState, '', 3, 6], 10, ['match', markState, '', 4, 8]],
+          } },
         // deep dive: every other country fades to grey, water and borders included
         { id: 'dim', type: 'fill', source: 'mask', layout: { visibility: 'none' }, paint: { 'fill-color': '#e9ecf0', 'fill-opacity': 0.8 } },
         // bold outline for selected / quiz-marked places (their fill alone can blend in with a
@@ -172,8 +185,6 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       ],
     },
   });
-  map.once('load', () => fetch('data/water.geojson').then((r) => (r.ok ? r.json() : null))
-    .then((w) => w && map.getSource('water').setData(w)).catch(() => {}));
   map.touchZoomRotate.disableRotation();
   map.keyboard.disableRotation();
   el.style.background = SPACE;
@@ -203,13 +214,13 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         f.textContent = c.local;
       }
       const cap = document.createElement('div');
-      cap.className = c.capital ? 'cap' : 'cap nameonly';
+      cap.className = (c.capital ? 'cap' : 'cap nameonly') + (opts.markerClass ? ' ' + opts.markerClass : '');
       cap.innerHTML = '<i class="dot"></i><span class="lbl"></span>';
       cap.querySelector('.lbl').textContent = c.capital || c.name;
       for (const node of [f, cap].filter(Boolean)) node.addEventListener('click', (e) => { e.stopPropagation(); onClick?.(c.id, true); });
       markers.set(c.id, { item: c, flag: f && mk(f, [c.fx ?? c.lon, c.fy ?? c.lat]), cap: mk(cap, [c.lon, c.lat]) });
     }
-    const bboxes = new Map(geo.features.map((f) => [f.properties.id, bboxOf(f.geometry)]));
+    const bboxes = new Map(geo.features.filter((f) => f.properties.id).map((f) => [f.properties.id, bboxOf(f.geometry)]));
     const all = [...bboxes.values()];
     const extent = all.length ? [Math.min(...all.map((b) => b[0])), Math.min(...all.map((b) => b[1])),
       Math.max(...all.map((b) => b[2])), Math.max(...all.map((b) => b[3]))] : null;
@@ -221,7 +232,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   });
   cur = sets.get('world');
 
-  let showAll = false, only = null, selected = null, dotsOnly = false;
+  let showAll = false, only = null, selected = null, dotsOnly = false, waterByZoom = false;
 
   // Greedy declutter: big places first; a flag or a name is only shown where it has room.
   // Capital dots give way to flags when zoomed out; they reappear as the map is zoomed in.
@@ -233,6 +244,8 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     el.style.setProperty('--flag-w', fw + 'px');
     const center = map.getCenter().toArray();
     const globe = map.getProjection()?.type === 'globe';
+    const W = el.clientWidth, H = el.clientHeight;
+    const onScreen = (p) => p.x > -60 && p.x < W + 60 && p.y > -60 && p.y < H + 60;  // others: no marker
     const taken = [];
     const free = (b) => !taken.some((t) => b[0] < t[2] && b[2] > t[0] && b[1] < t[3] && b[3] > t[1]);
     const { markers, order } = cur;
@@ -244,7 +257,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       if (seen.has(c.id)) continue;
       seen.add(c.id);
       const m = markers.get(c.id);
-      const want = showAll || (only && only.has(c.id));
+      const want = (showAll && !(waterByZoom && cur.water && c.z > Math.max(3, z + 1))) || (only && only.has(c.id));
       const force = !showAll || c.id === selected;  // quiz feedback / selection: always show
       if (dotsOnly || !m.flag) {  // self-test (capital positions only), or nothing to pin mid-place
         setOn(m.flag, false);
@@ -259,7 +272,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
         const ar = img.naturalWidth ? img.naturalHeight / img.naturalWidth : 0.75;
         const w = name ? c.local.length * 14 + 12 : fw, h = name ? 22 : Math.round(fw * ar);  // name pin: 13px text
         const box = [p.x - w / 2 - 1, p.y - h / 2 - 1, p.x + w / 2 + 1, p.y + h / 2 + 1];
-        const show = force || free(box);
+        const show = onScreen(p) && (force || free(box));
         if (show) taken.push(box);
         setOn(m.flag, show);
       } else setOn(m.flag, false);
@@ -270,14 +283,16 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     for (const [c, m, force] of shown) {
       if (!c.capital) {  // no capital: the name under the flag, when there's room (never in the self-test)
         const p = map.project([c.lon, c.lat]), lw = c.name.length * 6.4 + 8;
+        if (!onScreen(p) || (globe && angularDistance(center, [c.lon, c.lat]) > 75)) { setOn(m.cap, false); continue; }
         const label = [p.x - lw / 2, p.y + 9, p.x + lw / 2, p.y + 23];
         const on = !dotsOnly && (force || free(label));
         if (on) taken.push(label);
         setOn(m.cap, on);
         continue;
       }
-      const capOk = !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
+      let capOk = !(globe && angularDistance(center, [c.lon, c.lat]) > 75);
       const p = capOk && map.project([c.lon, c.lat]);
+      if (p && !onScreen(p)) capOk = false;
       const dot = p && [p.x - 5, p.y - 5, p.x + 5, p.y + 5];
       const showDot = capOk && (force || dotsOnly || free(dot));
       setOn(m.cap, showDot);
@@ -304,8 +319,10 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   // A tap hits a place if its shape is under the finger; tiny ones also count when the tap is
   // within a few px of their shape or of their capital dot.
   function hitTest(point, pad = 0) {
-    const box = [[point.x - pad, point.y - pad], [point.x + pad, point.y + pad]];
-    return [...new Set(map.queryRenderedFeatures(pad ? box : point, { layers: [cur.fill] }).map((f) => f.properties.id))];
+    const box = (r) => [[point.x - r, point.y - r], [point.x + r, point.y + r]];
+    const layers = [].concat(cur.fill);
+    pad = Math.max(pad, cur.hitPad || 0);  // thin rivers: a few px around the finger count
+    return [...new Set(map.queryRenderedFeatures(pad ? box(pad) : point, { layers }).map((f) => f.properties.id).filter(Boolean))];
   }
   function nearestCapital(point, maxPx) {
     let best = null, bd = maxPx;
@@ -377,6 +394,23 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       s.core = [Math.min(...core.map((b) => b[0])), Math.min(...core.map((b) => b[1])),
         Math.max(...core.map((b) => b[2])), Math.max(...core.map((b) => b[3]))];
     },
+    /** "Rivers & lakes" (experimental): water = data/water.geojson (features with an id are
+        learnable), items from data/water.json. Also feeds the plain lakes layer. */
+    /** map tab: major waters when zoomed out, more as you zoom in (z ≤ max(3, zoom + 1));
+        quiz: all learnable ones, so the asked-for river is always drawn */
+    setWaterByZoom(on) {
+      waterByZoom = on;
+      const zoomRule = on ? [['any', ['<=', ['get', 'z'], 3], ['>=', ['+', ['zoom'], 1], ['get', 'z']]]] : [];
+      map.setFilter('w-lakes', ['all', ['==', ['get', 'k'], 'lake'], ['has', 'id'], ...zoomRule]);
+      map.setFilter('w-rivers', ['all', ['==', ['get', 'k'], 'river'], ['has', 'id'], ...zoomRule]);
+      relayout();
+    },
+    setWater(geo) { const go = () => map.getSource('water').setData(geo); map.isStyleLoaded() ? go() : map.once('load', go); },
+    addWaterSet(items, geo) {
+      if (sets.has('water')) return;
+      makeSet('water', items, geo, { source: 'water', fill: ['w-lakes', 'w-rivers'], water: true, hitPad: 8,
+        labelZoom: 0, maxZoom: 9, ctxZoom: 8, minCtx: [6, 4], flagScale: 1, markerClass: 'waterlbl' });
+    },
     /** Switch between the world ('world') and a deep dive (a country id added before). */
     useSet(id) {
       const next = sets.get(id) || sets.get('world');
@@ -387,16 +421,18 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       cur = next;
       if (cur.source === 'sub') map.getSource('sub').setData(cur.geo);
       for (const l of ['sub-fill', 'sub-border', 'sub-mark-line']) map.setLayoutProperty(l, 'visibility', cur.source === 'sub' ? 'visible' : 'none');
+      for (const l of ['w-lakes', 'w-rivers']) map.setLayoutProperty(l, 'visibility', cur.water ? 'visible' : 'none');
       map.setLayoutProperty('dim', 'visibility', cur.parent ? 'visible' : 'none');
       // lakes go on top of land and of states/cantons (whose shapes include their lakes), but
       // under shapes already clipped to land (Geneva's communes): the coarse world lakes would
       // otherwise cut across them
-      map.moveLayer('lakes', cur.landOnly ? 'sub-fill' : 'rivers');
+      map.moveLayer('lakes', cur.landOnly ? 'sub-fill' : 'w-lakes');
       if (cur.mask) map.getSource('mask').setData(cur.mask);
       // the deep-dive country's own (coarser) world shape is painted grey: where it sticks out
       // from under the finer state/canton shapes it then looks like the dimmed neighbours
       // instead of leaving slivers in its national colour along the border
-      map.setPaintProperty('land', 'fill-color', cur.parent ? ['case', ['==', ['get', 'id'], cur.parent], DIMMED, fillColor] : fillColor);
+      map.setPaintProperty('land', 'fill-color', cur.water ? NEUTRAL_LAND
+        : cur.parent ? ['case', ['==', ['get', 'id'], cur.parent], DIMMED, fillColor] : fillColor);
       relayout();
     },
     /** fit the current deep-dive country on screen: its core (default) or everything (full,

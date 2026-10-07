@@ -63,16 +63,36 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   (below the tabs or the deep-dive bar, above the open card). `fitBox` fits the box with a 6%
   margin into it, with the zoom from Mercator maths (MapLibre's cameraForBounds threw on
   the globe). Show the card first, then fly (nextQuestion, answer).
-- **Lakes and rivers** (2026-10-07): `data/water.geojson` (1.6 MB, Natural Earth 10m plus the
-  Europe supplements, `tools/build_water.mjs`) has features `{k: lake|river, z, n}`.
-  - The `lakes`/`rivers` layers show a feature from zoom `z` on (giants at 1, Lake Zurich
-    and the Aare at 5, Thun/Zug/Reuss/Limmat at 6). Loaded after start.
-  - Lakes are drawn above the land and above state shapes, but below Geneva's communes,
-    which are clipped to land (`landOnly` in index.json).
-  - The deep-dive `dim` layer is a mask polygon (world minus the set's outline, built with
-    `outlineMask`), drawn above the water, so the neighbours' rivers are dimmed too. The
-    parent's own world shape is painted grey (`DIMMED`), so no slivers show along the
-    finer border.
+- **Lakes** (2026-10-07): `data/water.geojson` comes from Natural Earth 10m plus the Europe
+  supplements (`tools/build_water.mjs`), with features `{k: lake|river, z, n, id?}`.
+  - The country map shows **lakes only** (`lakes` layer, from zoom `z`). Rivers were removed
+    there at Phil's request; they now live in the Rivers & lakes mode.
+  - Lakes are drawn below Geneva's communes, which are clipped to land (`landOnly`).
+  - The deep-dive `dim` layer is a mask polygon (world minus the set's outline, from
+    `outlineMask`). The parent's own world shape is painted grey (`DIMMED`).
+- **"Rivers & lakes" mode — EXPERIMENTAL (2026-10-07), Phil may scrap it.**
+  - What it is:
+    - Wave button on the map tab; "Rivers & lakes" in the Learn list.
+    - Scope `water` works like a deep dive. The land turns neutral, learnable rivers and
+      lakes show in strong blue with italic names, and tapping one shows "River · countries".
+    - On the map tab, the major ones show when zoomed out and more appear as you zoom in
+      (z ≤ max(3, zoom+1)); the quiz shows all of them.
+    - Quiz: map → name and name → map. Filters: continents (region chips), Rivers/Lakes,
+      and how many (Major z≤3: 170, More z≤4: about 675, All z≤5: 1,445).
+  - Data: `tools/build_water_index.mjs` (run after build_water.mjs) merges the pieces of each
+    named river or lake into one feature with an `id` and writes `data/water.json`.
+    Countries come from point-in-polygon on sampled vertices; continents are per point
+    (Russia east of 60°E and Anatolia count as Asia).
+  - **To remove it:**
+    - delete `src/water.js`, `tools/build_water_index.mjs` and `data/water.json`;
+    - in app.js, drop the lines marked `water` / "Rivers & lakes" (import, settings
+      waterKinds/waterLevel, the setScope branch, #btn-water and the filter handlers,
+      learn-list row, showSetup water-options, poolNow, flyToRegion);
+    - in index.html, drop `#btn-water` and `#water-options`;
+    - in map.js, drop the `w-lakes`/`w-rivers` layers, `addWaterSet`, `setWaterByZoom` and
+      `cur.water`;
+    - in style.css, drop the "Rivers & lakes" block;
+    - water.geojson keeps working for the lakes (the `id`s are harmless).
 - **Nested deep dive: Geneva's communes** (Phil's Easter egg for his mum, 2026-10-07): set
   `ch-ge` with `parent: 'ch'` and `parentItem: 'ch-ge'`.
   - The Geneva canton card in the CH deep dive shows "Explore the communes →", and the bar

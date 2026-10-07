@@ -144,7 +144,7 @@ body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
 #scope-bar { display: none; position: fixed; left: 12px; top: calc(var(--safe-top) + 64px); z-index: 4; border-radius: 999px;
   padding: 4px 14px 4px 4px; align-items: center; gap: 8px; font-size: 14px; max-width: calc(100% - 80px); }
 html.deep body.tab-map #scope-bar { display: flex; }
-#scope-bar .back { background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; }
+#scope-bar .back { background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; white-space: nowrap; flex: none; }
 #scope-bar .scope-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.deep #hint { top: calc(var(--safe-top) + 112px); }
 #info .explore { width: 100%; margin-top: 12px; padding: 10px; border-radius: 12px; font-weight: 600;
@@ -198,3 +198,7 @@ html.deep #hint { top: calc(var(--safe-top) + 112px); }
 .est-truth { position: absolute; top: -4px; width: 4px; height: 28px; margin-left: -2px; background: var(--ok); border-radius: 2px; }
 .cap.nameonly .dot { display: none; }
 .cap.nameonly .lbl { left: 0; top: 9px; transform: translateX(-50%); }
+
+/* "Rivers & lakes" mode (experimental) */
+#btn-water[aria-pressed="true"] { color: #fff; background: #2f78c4; }
+.cap.waterlbl .lbl { color: #1d4f86; font-style: italic; }

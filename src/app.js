@@ -2,6 +2,7 @@
 import { loadData, loadInfo, loadSubIndex, loadSub, flagOf, flagUrl, formatPop, CONTINENTS, loadSetting, saveSetting } from './data.js';
 import * as store from './store.js';
 import { createMap } from './map.js';
+import { loadWater, waterSet, waterPool, WATER_LEVELS, WATER_KINDS } from './water.js';  // experimental
 import { MODES, modeFor, pool, makeDeck, makePileDeck, requeue, makeQuestion, offBy, GUESS_OK } from './quiz.js';
 
 const $ = (s) => document.querySelector(s);
@@ -15,6 +16,8 @@ const settings = {
   regions: loadSetting('regions', null) ?? ((r) => (r && r !== 'World' ? [r] : []))(loadSetting('region', 'World')),
   territories: loadSetting('territories', false),
   scope: loadSetting('scope', 'world'),
+  waterKinds: loadSetting('waterKinds', ['river', 'lake']),  // "Rivers & lakes" quiz filters
+  waterLevel: loadSetting('waterLevel', 3),
 };
 const set = (k, v) => { settings[k] = v; saveSetting(k, v); };
 
@@ -40,7 +43,10 @@ const capsOk = () => !cur().noCapital;
 const flagsOk = () => cur().items.filter(hasFlag).length >= cur().items.length / 2;
 
 async function setScope(id) {
-  if (id !== 'world' && !subs[id]) {
+  if (id === 'water' && !subs.water) {  // "Rivers & lakes" (experimental)
+    subs.water = await waterSet(data.byId);
+    world.addWaterSet(subs.water.items, subs.water.geo);
+  } else if (id !== 'world' && !subs[id]) {
     const meta = subIndex.find((m) => m.id === id);
     try {
       const sub = await loadSub(id);
@@ -55,9 +61,10 @@ async function setScope(id) {
   set('scope', id);
   world.useSet(id);
   document.documentElement.classList.toggle('deep', id !== 'world');
+  $('#btn-water').setAttribute('aria-pressed', id === 'water');
   if (id !== 'world') {
-    $('#scope-bar .scope-name').textContent = `${subs[id].name} · ${subs[id].kinds}`;
-    $('#scope-bar .back').textContent = '‹ ' + (subs[id].parent ? subs[subs[id].parent]?.name || 'Back' : 'World');
+    $('#scope-bar .scope-name').textContent = id === 'water' ? subs[id].name : `${subs[id].name} · ${subs[id].kinds}`;
+    $('#scope-bar .back').textContent = '‹ ' + (subs[id].parent ? subs[subs[id].parent]?.name || 'Back' : id === 'water' ? 'Countries' : 'World');
   }
 }
 /** "‹ World" / "‹ Switzerland": one level up */
@@ -81,6 +88,7 @@ function showTab(t) {
   $('#tab-map').setAttribute('aria-selected', t === 'map');
   $('#tab-quiz').setAttribute('aria-selected', t === 'quiz');
   $('#learn').hidden = true;
+  world.setWaterByZoom(t === 'map');
   if (t === 'map') {
     $('#setup').hidden = $('#question').hidden = true;
     world.mark({});
@@ -97,6 +105,7 @@ let infoId = null, exploreId = null;
 function applyFlags() {
   $('#btn-flags').setAttribute('aria-pressed', settings.showFlags);
   $('#hint').hidden = settings.showFlags;
+  $('#hint').textContent = scope === 'water' ? 'Names hidden: tap a river or lake to test yourself' : 'Flags hidden: tap a country to test yourself';
   // flags hidden = self-test: capital positions stay, without flags or names
   world.setMarkers(true, null, { dots: !settings.showFlags });
 }
@@ -118,7 +127,7 @@ async function openInfo(id) {
   pop.hidden = !c.pop;
   pop.textContent = c.pop ? 'Population: ' + formatPop(c.pop) : '';
   card.querySelector('.info-meta').textContent = scope === 'world'
-    ? c.continent + (c.sovereign ? '' : ' · territory') : `${capFirst(cur().kind)} · ${cur().name}`;
+    ? c.continent + (c.sovereign ? '' : ' · territory') : c.desc || `${capFirst(cur().kind)} · ${cur().name}`;
   // countries with subdivision data offer a deep dive
   const dive = subIndex.find((m) => (scope === 'world' ? m.id === id && !m.parent : m.parent === scope && m.parentItem === id));
   exploreId = dive?.id;
@@ -161,20 +170,22 @@ const isPop = (mode = settings.mode) => MODES[mode].ask === 'pop';
 // population questions only where (most) places have a population
 const popOk = () => cur().items.filter((c) => c.pop).length >= cur().items.length / 2;
 const fits = (c) => (!usesFlag() || hasFlag(c)) && (!isPop() || c.pop);
-const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : cur().items).filter(fits);
+const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : scope === 'water' ? waterPool(cur().items, settings) : cur().items).filter(fits);
 const allNow = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items)
   .filter(isPop() ? (c) => c.pop : hasFlag);
 
 // ---- what to learn: one button in the setup, opening a searchable list grouped by continent ----
 const learnIcon = (id) => {
   if (id === 'world') return '<span class="globe">🌍</span>';
+  if (id === 'water') return '<span class="globe">🌊</span>';
   const m = metaOf(id);
   const src = m?.parentItem ? `flags/sub/${m.parentItem}.svg` : flagUrl(id);
   return `<img src="${src}" alt="" onerror="this.onerror=null;this.src=this.src.replace('.svg','.png')">`;
 };
 function renderLearnButton() {
   const m = subIndex.find((x) => x.id === scope);
-  $('#learn-btn').innerHTML = `${learnIcon(scope)}<span>${esc(m ? scopeLabel(m) : 'Countries of the world')}</span><span class="chev">›</span>`;
+  const label = m ? scopeLabel(m) : scope === 'water' ? 'Rivers & lakes' : 'Countries of the world';
+  $('#learn-btn').innerHTML = `${learnIcon(scope)}<span>${esc(label)}</span><span class="chev">›</span>`;
 }
 function showLearn() {
   $('#setup').hidden = true;
@@ -187,6 +198,7 @@ function renderLearnList() {
   const hit = (...texts) => !term || texts.some((t) => t && t.toLowerCase().includes(term));
   const row = (id, title, sub) => `<button class="learn-row" data-scope="${id}" aria-pressed="${id === scope}">${learnIcon(id)}<span><b>${esc(title)}</b><small>${esc(sub)}</small></span></button>`;
   let html = hit('countries of the world', 'world') ? row('world', 'Countries of the world', `${data.countries.filter((c) => c.sovereign).length} countries`) : '';
+  if (hit('rivers', 'lakes', 'water')) html += row('water', 'Rivers & lakes', 'Major rivers and lakes of the world');
   const groups = {};
   for (const m of subIndex.filter((m) => hit(m.name, m.label, m.kinds))) (groups[data.byId.get(m.parent || m.id)?.continent || 'Other'] ||= []).push(m);
   for (const cont of [...CONTINENTS, 'Other']) {
@@ -201,10 +213,17 @@ function showSetup() {
   $('#question').hidden = true;
   $('#learn').hidden = true;
   renderLearnButton();
-  $('#world-options').hidden = scope !== 'world';
+  $('#world-options').hidden = scope !== 'world' && scope !== 'water';
+  $('#territories').parentElement.hidden = scope !== 'world';
+  $('#water-options').hidden = scope !== 'water';
+  if (scope === 'water') {
+    $('#water-kinds').innerHTML = WATER_KINDS.map(([k, l]) => `<button data-wkind="${k}" aria-pressed="${settings.waterKinds.includes(k)}">${l}</button>`).join('');
+    $('#water-level').innerHTML = WATER_LEVELS.map(([z, l]) => `<button data-wlevel="${z}" aria-pressed="${settings.waterLevel === z}">${l}</button>`).join('');
+  }
   // mode = what is shown + what is asked for; no flag questions where places have no flags
   const usesCap = () => { const m = MODES[settings.mode]; return m.ask === 'capital' || m.answer === 'capital'; };
-  if ((!flagsOk() && usesFlag()) || (!popOk() && isPop()) || (!capsOk() && usesCap())) set('mode', capsOk() ? 'name-capital' : 'flag-name');
+  if ((!flagsOk() && usesFlag()) || (!popOk() && isPop()) || (!capsOk() && usesCap()))
+    set('mode', capsOk() ? 'name-capital' : flagsOk() ? 'flag-name' : 'shape-name');
   const { ask, answer } = MODES[settings.mode];
   $('#pop-row').hidden = !popOk();
   $('#popmodes').innerHTML = ['pop-compare', 'pop-guess']
@@ -216,7 +235,7 @@ function showSetup() {
   $('#regions').innerHTML = ['World', ...CONTINENTS]
     .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === 'World' ? !settings.regions.length : settings.regions.includes(r)}">${esc(r)}</button>`).join('');
   $('#territories').checked = settings.territories;
-  const n = poolNow().length, all = scope === 'world' ? pool(data.countries, settings).length : cur().items.length;
+  const n = poolNow().length, all = scope === 'world' ? pool(data.countries, settings).length : scope === 'water' ? n : cur().items.length;
   $('#progress').textContent = n < all ? `${n} of ${all} ${cur().kinds} (the others have no flag)` : `${n} ${cur().kinds}`;
   // the hard pile of this scope (cards of countries, or of this country's subdivisions)
   const cards = Object.entries(store.hardCards()).filter(([k]) => cur().byId.has(store.parseKey(k).id));
@@ -249,8 +268,8 @@ function nextQuestion() {
   world.setMarkers(false);
   showQuestion();  // first, so the camera knows how much of the screen the card covers
   if (q.type === 'map') {
-    if (scope !== 'world') world.flyToSet({ full: true });
-    else world.flyToRegion(session.source === 'pile' ? [q.target.continent] : settings.regions);
+    if (scope !== 'world' && scope !== 'water') world.flyToSet({ full: true });
+    else world.flyToRegion(session.source === 'pile' ? [q.target.continent || q.target.continents?.[0]] : settings.regions);
   }
   if (q.ask === 'map' || q.type === 'estimate') showOnMap(q.target);
 }
@@ -270,7 +289,7 @@ function mapInsets() {
     without a shape) also get their capital dot so they can be found. */
 function showOnMap(c) {
   world.mark({ [c.id]: 'sel' });
-  const small = scope === 'world' ? 1 : cur().smallSize;
+  const small = scope === 'world' ? 1 : scope === 'water' ? 0 : cur().smallSize;
   world.setMarkers(false, c.size < small ? [c.id] : null, { dots: true });
   world.flyToCountry(c, { context: true });
 }
@@ -353,7 +372,7 @@ function showRoundDone() {
 
 const answerHtml = (c) => `<div class="answer">${
   q.ask === 'flag' ? '' : hasFlag(c) ? `<img src="${flagOf(c)}" alt="">` : c.local ? `<span class="q-local">${esc(c.local)}</span>` : ''
-}<div><b>${esc(nameOf(c))}</b>${c.capital ? `<br>Capital: ${esc(capOf(c))}` : ''}</div></div>`;
+}<div><b>${esc(nameOf(c))}</b>${c.capital ? `<br>Capital: ${esc(capOf(c))}` : c.desc ? `<br><span class="muted">${esc(c.desc)}</span>` : ''}</div></div>`;
 
 /** Buttons and result area for the current phase: ask → (revealed, flashcards only) → done. */
 function renderPhase() {
@@ -467,6 +486,21 @@ function wire() {
     applyFlags();
   };
   $('#scope-bar .back').onclick = leaveDeepDive;
+  // "Rivers & lakes" (experimental): map toggle and quiz filters
+  $('#btn-water').onclick = async () => {
+    const to = scope === 'water' ? 'world' : 'water';
+    await setScope(to);
+    world.flyToRegion(to === 'water' ? settings.regions : []);
+    applyFlags();
+  };
+  $('#water-kinds').onclick = (e) => {
+    const k = e.target.closest('button')?.dataset.wkind;
+    if (!k) return;
+    const next = settings.waterKinds.includes(k) ? settings.waterKinds.filter((x) => x !== k) : [...settings.waterKinds, k];
+    set('waterKinds', next.length ? next : [k]);
+    showSetup();
+  };
+  $('#water-level').onclick = (e) => { const z = e.target.closest('button')?.dataset.wlevel; if (z) { set('waterLevel', +z); showSetup(); } };
   $('#popmodes').onclick = (e) => { const b = e.target.closest('button'); if (b) { set('mode', b.dataset.mode); showSetup(); } };
   $('#learn-btn').onclick = showLearn;
   $('#learn .close').onclick = showSetup;
@@ -557,11 +591,12 @@ async function start() {
   });
   worldSet = { id: 'world', name: 'World', kind: 'country', kinds: 'countries', items: data.countries, byId: data.byId };
   subIndex = await loadSubIndex();
+  loadWater().then(([, geo]) => world.setWater(geo));  // the lakes of the country map
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
   world.map.on('load', async () => {
     fitScreen();
-    if (settings.scope !== 'world') { await setScope(settings.scope); world.flyToSet(); }
+    if (settings.scope !== 'world') { await setScope(settings.scope); scope === 'water' ? world.flyToRegion(settings.regions) : world.flyToSet(); }
     showTab('map');
   });
 }

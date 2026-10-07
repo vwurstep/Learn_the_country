@@ -1,6 +1,6 @@
 {
 "files": {
-"./": "fad5d447961b",
+"./": "bf89422d683c",
 "./data/colors.json": "a0c04f09420b",
 "./data/countries.json": "0266756648b1",
 "./data/info.json": "046fd6f1b7fe",
@@ -29,7 +29,8 @@
 "./data/sub/us.json": "fad859ba8c63",
 "./data/sub/za.geojson": "227af1c58c11",
 "./data/sub/za.json": "7a8843f29865",
-"./data/water.geojson": "64f552c741d3",
+"./data/water.geojson": "34b3cf68d4e9",
+"./data/water.json": "de75a74d17f3",
 "./data/world.geojson": "6f334de69bd0",
 "./flags/ad.svg": "8b6d0230c0ca",
 "./flags/ae.svg": "60dd5188209b",
@@ -475,17 +476,18 @@
 "./icons/icon-180.png": "13470abdfd0c",
 "./icons/icon-192.png": "3f5130658d0b",
 "./icons/icon-512.png": "2ee42000aa1d",
-"./index.html": "fad5d447961b",
+"./index.html": "bf89422d683c",
 "./lib/maplibre-gl.css": "7e27dfc94a21",
 "./lib/maplibre-gl.js": "74bdab1483c1",
 "./manifest.webmanifest": "6be6f6319385",
-"./src/app.js": "1bc940bc921c",
+"./src/app.js": "47f195f2db24",
 "./src/data.js": "c048ccd464a9",
-"./src/map.js": "87b3dfda5afc",
+"./src/map.js": "5ada53811ff5",
 "./src/quiz.js": "f7911893de08",
 "./src/store.js": "cef45c02e538",
-"./src/style.css": "0865e8d37458",
-"./src/sync-github.js": "3136f9e140b4"
+"./src/style.css": "09e83e9f170a",
+"./src/sync-github.js": "3136f9e140b4",
+"./src/water.js": "b46a3d56097c"
 },
-"version": "2026-10-07.121304"
+"version": "2026-10-07.124030"
 }
