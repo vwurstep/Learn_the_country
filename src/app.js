@@ -16,6 +16,10 @@ const settings = {
   regions: loadSetting('regions', null) ?? ((r) => (r && r !== 'World' ? [r] : []))(loadSetting('region', 'World')),
   territories: loadSetting('territories', false),
   scope: loadSetting('scope', 'world'),
+  // hand-picked selections, per scope: picks[scope] = [ids] (absent = regions / all);
+  // pickSel[scope] = id of the saved selection that is active (store.selections)
+  picks: loadSetting('picks', {}),
+  pickSel: loadSetting('pickSel', {}),
   waterKinds: loadSetting('waterKinds', ['river', 'lake']),  // "Rivers & lakes" quiz filters
   waterLevel: loadSetting('waterLevel', 3),
 };
@@ -87,7 +91,7 @@ function showTab(t) {
   document.body.className = 'tab-' + t;
   $('#tab-map').setAttribute('aria-selected', t === 'map');
   $('#tab-quiz').setAttribute('aria-selected', t === 'quiz');
-  $('#learn').hidden = true;
+  $('#learn').hidden = $('#pick').hidden = true;
   world.setWaterByZoom(t === 'map');
   if (t === 'map') {
     $('#setup').hidden = $('#question').hidden = true;
@@ -170,7 +174,17 @@ const isPop = (mode = settings.mode) => MODES[mode].ask === 'pop';
 // population questions only where (most) places have a population
 const popOk = () => cur().items.filter((c) => c.pop).length >= cur().items.length / 2;
 const fits = (c) => (!usesFlag() || hasFlag(c)) && (!isPop() || c.pop);
-const poolNow = () => (scope === 'world' ? pool(data.countries, settings) : scope === 'water' ? waterPool(cur().items, settings) : cur().items).filter(fits);
+// the places the regions / "all" give, before any hand-picking
+const basePool = () => (scope === 'world' ? pool(data.countries, settings) : scope === 'water' ? waterPool(cur().items, settings) : cur().items);
+const picksNow = () => (scope !== 'water' && settings.picks[scope]?.length ? settings.picks[scope] : null);
+const poolNow = () => {
+  const p = picksNow();
+  return (p ? p.map((id) => cur().byId.get(id)).filter(Boolean) : basePool()).filter(fits);
+};
+function setPicks(ids, selId = null) {
+  set('picks', { ...settings.picks, [scope]: ids || undefined });
+  set('pickSel', { ...settings.pickSel, [scope]: (ids && selId) || undefined });
+}
 const allNow = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items)
   .filter(isPop() ? (c) => c.pop : hasFlag);
 
@@ -209,11 +223,51 @@ function renderLearnList() {
   $('#learn-list').innerHTML = html || '<p class="muted">Nothing found.</p>';
 }
 
+// ---- hand-picked selection: a checklist of the scope's places, saved selections on top ----------
+let pickDraft = new Set(), pickFrom = null;
+const pickCandidates = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items);
+const pickMatches = (c) => { const t = $('#pick-search').value.trim().toLowerCase(); return !t || nameOf(c).toLowerCase().includes(t); };
+function showPick() {
+  // start from what is selected now: the hand-picked places, or what the regions give
+  pickDraft = new Set(picksNow() || basePool().map((c) => c.id));
+  pickFrom = settings.pickSel[scope] || null;
+  $('#pick-title').textContent = `Choose ${cur().kinds}`;
+  $('#pick-search').value = '';
+  $('#setup').hidden = true;
+  $('#pick').hidden = false;
+  renderPick();
+}
+function renderPickCount() {
+  $('#pick-count').textContent = `${pickDraft.size} selected`;
+  $('#pick-done').disabled = $('#pick-save').disabled = !pickDraft.size;
+}
+function renderPick() {
+  const saved = store.selections(scope);
+  $('#pick-saved').innerHTML = saved.length ? '<p class="label">Saved selections</p>' + saved.map((x) =>
+    `<div class="saved-row"><button class="load" data-id="${x.id}">★ ${esc(x.name)} <small class="muted">· ${x.ids.length}</small></button>` +
+    `<button class="del" data-id="${x.id}" aria-label="Delete ${esc(x.name)}">×</button></div>`).join('') : '';
+  const row = (c) => `<label class="pick-row"><input type="checkbox" data-id="${c.id}"${pickDraft.has(c.id) ? ' checked' : ''}>${
+    hasFlag(c) ? `<img src="${flagOf(c)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<span>${esc(nameOf(c))}${
+    c.sovereign === false ? ' <small>territory</small>' : ''}</span></label>`;
+  const items = pickCandidates().filter(pickMatches).sort((a, b) => a.name.localeCompare(b.name));
+  let html = '';
+  if (scope === 'world') {  // grouped by continent, each with an all / none toggle
+    for (const g of CONTINENTS) {
+      const inG = items.filter((c) => c.continent === g);
+      if (!inG.length) continue;
+      const on = inG.filter((c) => pickDraft.has(c.id)).length;
+      html += `<p class="label">${esc(g)} <button class="ghost small" data-group="${esc(g)}">${on}/${inG.length} · ${on === inG.length ? 'clear' : 'add all'}</button></p>` + inG.map(row).join('');
+    }
+  } else html = items.map(row).join('');
+  $('#pick-list').innerHTML = html || '<p class="muted">Nothing found.</p>';
+  renderPickCount();
+}
+
 function showSetup() {
+  $('#pick').hidden = true;
   $('#question').hidden = true;
   $('#learn').hidden = true;
   renderLearnButton();
-  $('#world-options').hidden = scope !== 'world' && scope !== 'water';
   $('#territories').parentElement.hidden = scope !== 'world';
   $('#water-options').hidden = scope !== 'water';
   if (scope === 'water') {
@@ -232,11 +286,23 @@ function showSetup() {
     f === off || (f === 'flag' && !flagsOk()) || (f === 'capital' && !capsOk()) ? ' disabled' : ''}>${esc(facetName(f))}</button>`).join('');
   $('#ask').innerHTML = chips('ask', ask, null);
   $('#answer').innerHTML = chips('answer', answer, ask);
-  $('#regions').innerHTML = ['World', ...CONTINENTS]
-    .map((r) => `<button data-region="${esc(r)}" aria-pressed="${r === 'World' ? !settings.regions.length : settings.regions.includes(r)}">${esc(r)}</button>`).join('');
+  // regions (world) or "All" (a deep dive), then saved selections, the hand-picked one, "Choose…"
+  const picks = picksNow(), selId = picks && settings.pickSel[scope];
+  const geo = scope === 'world' || scope === 'water';
+  $('#region-label').innerHTML = geo ? 'Region <span class="hint">· tap several to combine</span>' : 'Which';
+  let rc = (geo ? ['World', ...CONTINENTS] : ['All']).map((r) => `<button data-region="${esc(r)}" aria-pressed="${
+    !picks && (r === 'World' || r === 'All' ? !settings.regions.length || !geo : settings.regions.includes(r))}">${esc(r)}</button>`).join('');
+  if (scope !== 'water') {
+    rc += store.selections(scope).map((x) => `<button class="saved" data-sel="${x.id}" aria-pressed="${x.id === selId}">${esc(x.name)}</button>`).join('');
+    if (picks && !selId) rc += `<button data-custom="1" aria-pressed="true">Custom · ${picks.length}</button>`;
+    rc += `<button class="choose" data-choose="1">✎ Choose ${cur().kinds}…</button>`;
+  }
+  $('#regions').innerHTML = rc;
   $('#territories').checked = settings.territories;
   const n = poolNow().length, all = scope === 'world' ? pool(data.countries, settings).length : scope === 'water' ? n : cur().items.length;
-  $('#progress').textContent = n < all ? `${n} of ${all} ${cur().kinds} (the others have no flag)` : `${n} ${cur().kinds}`;
+  $('#progress').textContent = picks ? `${n} ${cur().kinds}` + (n < picks.length ? ` (${picks.length - n} without a flag left out)` : '')
+    : n < all ? `${n} of ${all} ${cur().kinds} (the others have no flag)` : `${n} ${cur().kinds}`;
+  $('#start').disabled = !n;
   // the hard pile of this scope (cards of countries, or of this country's subdivisions)
   const cards = Object.entries(store.hardCards()).filter(([k]) => cur().byId.has(store.parseKey(k).id));
   const nHard = cards.length, due = cards.filter(([, c]) => c.due <= Date.now()).length;
@@ -268,7 +334,8 @@ function nextQuestion() {
   world.setMarkers(false);
   showQuestion();  // first, so the camera knows how much of the screen the card covers
   if (q.type === 'map') {
-    if (scope !== 'world' && scope !== 'water') world.flyToSet({ full: true });
+    if (session.source === 'pool' && picksNow()) world.flyToIds(picksNow());  // the hand-picked places
+    else if (scope !== 'world' && scope !== 'water') world.flyToSet({ full: true });
     else world.flyToRegion(session.source === 'pile' ? [q.target.continent || q.target.continents?.[0]] : settings.regions);
   }
   if (q.ask === 'map' || q.type === 'estimate') showOnMap(q.target);
@@ -321,7 +388,7 @@ const hint = { recall: '', map: 'Tap it on the map', choice: '' };
 
 function showQuestion() {
   $('#setup').hidden = true;
-  $('#learn').hidden = true;
+  $('#learn').hidden = $('#pick').hidden = true;
   const card = $('#question');
   card.hidden = false;
   card.classList.toggle('map-q', q.type === 'map' || q.ask === 'map' || q.type === 'estimate');
@@ -537,13 +604,67 @@ function wire() {
   };
   // World = everything; continents can be combined (tap again to remove one)
   $('#regions').onclick = (e) => {
-    const r = e.target.closest('button')?.dataset.region;
-    if (!r) return;
-    const cur = settings.regions;
-    const next = r === 'World' ? [] : cur.includes(r) ? cur.filter((x) => x !== r) : CONTINENTS.filter((x) => x === r || cur.includes(x));
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.choose || b.dataset.custom) return showPick();
+    if (b.dataset.sel) {  // a saved selection
+      const sel = store.selections(scope).find((x) => x.id === b.dataset.sel);
+      if (sel) { setPicks(sel.ids.filter((id) => cur().byId.has(id)), sel.id); world.flyToIds(settings.picks[scope]); }
+      return showSetup();
+    }
+    const r = b.dataset.region;
+    const wasPicked = !!picksNow();
+    setPicks(null);
+    if (r === 'All') { world.flyToSet(); return showSetup(); }
+    const cur_ = wasPicked ? [] : settings.regions;  // after a hand-picked one, a continent starts fresh
+    const next = r === 'World' ? [] : cur_.includes(r) ? cur_.filter((x) => x !== r) : CONTINENTS.filter((x) => x === r || cur_.includes(x));
     set('regions', next.length === CONTINENTS.length ? [] : next);
     world.flyToRegion(settings.regions);
     showSetup();
+  };
+  $('#pick .close').onclick = showSetup;
+  $('#pick-search').oninput = renderPick;
+  $('#pick-all').onclick = () => { for (const c of pickCandidates()) if (pickMatches(c)) pickDraft.add(c.id); renderPick(); };
+  $('#pick-none').onclick = () => { for (const c of pickCandidates()) if (pickMatches(c)) pickDraft.delete(c.id); renderPick(); };
+  $('#pick-list').onchange = (e) => {
+    const id = e.target.dataset.id;
+    if (id) { e.target.checked ? pickDraft.add(id) : pickDraft.delete(id); renderPickCount(); }
+  };
+  $('#pick-list').onclick = (e) => {  // continent header: all / none of that continent
+    const g = e.target.closest('button')?.dataset.group;
+    if (!g) return;
+    const inG = pickCandidates().filter((c) => c.continent === g);
+    const allOn = inG.every((c) => pickDraft.has(c.id));
+    for (const c of inG) allOn ? pickDraft.delete(c.id) : pickDraft.add(c.id);
+    renderPick();
+  };
+  $('#pick-saved').onclick = (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const sel = store.selections(scope).find((x) => x.id === b.dataset.id);
+    if (!sel) return;
+    if (b.classList.contains('del')) {
+      if (!confirm(`Delete the selection "${sel.name}"?`)) return;
+      store.deleteSelection(sel.id);
+      if (settings.pickSel[scope] === sel.id) set('pickSel', { ...settings.pickSel, [scope]: undefined });  // keep its places, as "Custom"
+    } else { pickDraft = new Set(sel.ids.filter((id) => cur().byId.has(id))); pickFrom = sel.id; }
+    renderPick();
+  };
+  $('#pick-done').onclick = () => {
+    const ids = [...pickDraft];
+    const same = pickFrom && JSON.stringify([...ids].sort()) === JSON.stringify([...(store.selections(scope).find((x) => x.id === pickFrom)?.ids || [])].sort());
+    setPicks(ids, same ? pickFrom : null);
+    showSetup();
+    world.flyToIds(ids);
+  };
+  $('#pick-save').onclick = () => {
+    const name = prompt(`Name for this selection of ${pickDraft.size} ${cur().kinds}:`)?.trim();
+    if (!name) return;
+    const ids = [...pickDraft];
+    const id = store.saveSelection(scope, name, ids);
+    setPicks(ids, id);
+    showSetup();
+    world.flyToIds(ids);
   };
   $('#territories').onchange = (e) => { set('territories', e.target.checked); showSetup(); };
   $('#reset').onclick = () => { if (confirm('Forget all answer statistics? (The hard pile stays.)')) { store.resetStats(); showSetup(); } };

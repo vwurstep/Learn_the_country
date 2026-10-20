@@ -111,6 +111,19 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
     - `pop-guess`: a log slider from 100 to 3 bn with −/+ (±5%) and ticks 1k…1B; right
       within ±50% (`GUESS_OK`).
   - Only shown where items have `pop`.
+- **Hand-picked selections** (2026-10-20):
+  - The Region row (or "Which" in deep dives) has "✎ Choose countries…", which opens
+    `#pick`: a checklist starting from the current selection, grouped by continent for the
+    world, with search, All/None and "Save as…".
+  - The active pick is per scope: `settings.picks[scope]` holds the ids, and
+    `settings.pickSel[scope]` the saved selection it came from.
+  - Saved selections live in the store (`doc.sels`, synced and merged like the hard pile)
+    and show as ★ chips.
+  - They're deleted with × in the picker; the places stay active as "Custom · N".
+  - Tapping a continent or All clears the pick. Map questions zoom to the picked places
+    (`flyToIds`).
+  - Not for Rivers & lakes.
+- The hard pile row sits at the bottom of the setup card; Phil uses it rarely.
 - **Learn picker:** a single button in the setup ("🇨🇭 Swiss cantons ›") opens `#learn`, a
   searchable list (World first, then deep dives grouped by the parent's continent, with
   counts). Phil plans about 11 deep dives, not 100.

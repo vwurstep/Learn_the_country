@@ -5,7 +5,8 @@
      { v: 1,
        stats:   { [countryId]: {right, wrong, last} },              // all answers, for weighting
        hard:    { [cardKey]: {box, due, added, updated} },           // the hard pile (Leitner boxes)
-       removed: { [cardKey]: removedAt } }                            // tombstones so removals sync
+       sels:    { [selId]: {scope, name, ids, updated} },          // saved selections ("Africa minus …")
+       removed: { [cardKey or selId]: removedAt } }                   // tombstones so removals sync
    cardKey = `${mode}:${countryId}`, e.g. "flag-name:fr".
 
    Sync is pluggable: a backend is {id, label, pull(): Promise<doc|null>, push(doc): Promise}
@@ -17,7 +18,7 @@ const BACKEND_KEY = 'ltc.sync';
 export const BOX_DAYS = [0, 1, 3, 7, 21];
 const DAY = 864e5;
 
-const empty = () => ({ v: 1, stats: {}, hard: {}, removed: {} });
+const empty = () => ({ v: 1, stats: {}, hard: {}, sels: {}, removed: {} });
 let doc = load();
 const listeners = new Set();
 
@@ -77,6 +78,23 @@ export function record(mode, id, correct) {
   save();
 }
 
+// ---- saved selections (a named subset of a scope's items, e.g. "Balkans") ------------------
+export function selections(scope) {
+  return Object.entries(doc.sels).filter(([, s]) => s.scope === scope)
+    .map(([id, s]) => ({ id, ...s })).sort((a, b) => a.name.localeCompare(b.name));
+}
+export function saveSelection(scope, name, ids) {
+  const id = 'sel-' + Date.now().toString(36);
+  doc.sels[id] = { scope, name, ids: [...ids], updated: Date.now() };
+  save();
+  return id;
+}
+export function deleteSelection(id) {
+  delete doc.sels[id];
+  doc.removed[id] = Date.now();
+  save();
+}
+
 // ---- merge + sync --------------------------------------------------------------------------
 /** Merge another copy into ours: per entry, the most recently changed one wins. */
 export function merge(a, b) {
@@ -91,6 +109,11 @@ export function merge(a, b) {
     const x = a.hard?.[k], y = b.hard?.[k];
     const c = !x ? y : !y ? x : (y.updated > x.updated ? y : x);
     if (!(out.removed[k] >= c.updated)) out.hard[k] = c;
+  }
+  for (const k of new Set([...Object.keys(a.sels || {}), ...Object.keys(b.sels || {})])) {
+    const x = a.sels?.[k], y = b.sels?.[k];
+    const c = !x ? y : !y ? x : (y.updated > x.updated ? y : x);
+    if (!(out.removed[k] >= c.updated)) out.sels[k] = c;
   }
   return out;
 }

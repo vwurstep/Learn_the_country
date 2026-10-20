@@ -202,3 +202,25 @@ html.deep #hint { top: calc(var(--safe-top) + 112px); }
 /* "Rivers & lakes" mode (experimental) */
 #btn-water[aria-pressed="true"] { color: #fff; background: #2f78c4; }
 .cap.waterlbl .lbl { color: #1d4f86; font-style: italic; }
+
+/* setup: hard pile at the bottom; selections */
+.pile-row.bottom { margin: 14px 0 0; }
+.chips button.choose { background: none; color: var(--accent); border: 1px dashed rgba(47, 111, 214, 0.5); }
+.chips button.saved::before { content: "★ "; color: #f2a541; }
+#pick { max-height: calc(100% - var(--safe-top) - var(--safe-bottom) - 80px); display: flex; flex-direction: column; }
+#pick[hidden] { display: none !important; }
+#pick-search { width: 100%; font: inherit; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.15); background: #fff; margin: 6px 0 2px; }
+#pick-list { overflow-y: auto; flex: 1; min-height: 120px; margin-top: 4px; }
+#pick-list .label { display: flex; justify-content: space-between; align-items: center; }
+#pick-list .label button { text-transform: none; letter-spacing: 0; }
+.pick-row { display: flex; align-items: center; gap: 10px; padding: 6px 4px; border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+.pick-row input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+.pick-row img { width: 28px; height: 21px; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); flex: none; }
+.pick-row .ph { width: 28px; flex: none; }
+.pick-row small { color: var(--muted); }
+#pick-saved .saved-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; margin-top: 4px;
+  background: rgba(242, 165, 65, 0.12); border-radius: 10px; }
+#pick-saved .saved-row button.load { flex: 1; text-align: left; font-weight: 600; }
+#pick-saved .saved-row button.del { color: var(--bad); font-size: 20px; padding: 0 6px; }
+.pick-actions { margin-top: 8px; }
+#pick-done:disabled { opacity: 0.4; }

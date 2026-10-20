@@ -63,10 +63,6 @@
   <!-- quiz tab: setup -->
   <section id="setup" class="card glass only-quiz" hidden>
     <h2>Quiz</h2>
-    <div class="row tight pile-row">
-      <span id="pile-info" class="muted"></span>
-      <button id="start-pile" class="primary">Practise</button>
-    </div>
     <p class="label">Learn</p>
     <button id="learn-btn" class="learn-btn"></button>
     <!-- question type: what you see → what you find -->
@@ -81,7 +77,7 @@
       <div id="popmodes" class="chips"></div>
     </div>
     <div id="world-options">
-      <p class="label">Region <span class="hint">· tap several to combine</span></p>
+      <p class="label" id="region-label">Region <span class="hint">· tap several to combine</span></p>
       <div id="regions" class="chips"></div>
       <label class="check"><input type="checkbox" id="territories"> Include territories (Greenland, Hong Kong, …)</label>
     </div>
@@ -95,6 +91,27 @@
     <div class="row">
       <button id="reset" class="ghost">Reset statistics</button>
       <button id="start" class="primary">Start</button>
+    </div>
+    <div class="row tight pile-row bottom">
+      <span id="pile-info" class="muted"></span>
+      <button id="start-pile" class="primary">Practise</button>
+    </div>
+  </section>
+
+  <!-- quiz tab: pick the places of a selection by hand; save it under a name -->
+  <section id="pick" class="card glass only-quiz" hidden>
+    <button class="close" aria-label="Close">×</button>
+    <h2 id="pick-title">Choose</h2>
+    <div id="pick-saved"></div>
+    <input id="pick-search" type="search" placeholder="Search…" autocomplete="off">
+    <div class="row tight">
+      <span id="pick-count" class="muted"></span>
+      <span><button id="pick-all" class="ghost small">All</button> · <button id="pick-none" class="ghost small">None</button></span>
+    </div>
+    <div id="pick-list"></div>
+    <div class="row pick-actions">
+      <button id="pick-save" class="ghost">Save as…</button>
+      <button id="pick-done" class="primary">Use selection</button>
     </div>
   </section>
 

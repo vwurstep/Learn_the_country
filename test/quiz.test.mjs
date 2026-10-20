@@ -120,4 +120,13 @@ assert.equal(M.hard['a:fr'].box, 3);
 assert.ok(!M.hard['b:de']);
 assert.ok(merge(B, { hard: { 'b:de': { box: 0, updated: 8 } } }).hard['b:de'], 're-added after removal survives');
 
+// saved selections merge like the hard pile: newest wins, deletions win over older copies
+{
+  const a = { sels: { 's1': { scope: 'world', name: 'A', ids: ['fr'], updated: 5 }, 's2': { scope: 'ch', name: 'B', ids: [], updated: 5 } } };
+  const b = { sels: { 's1': { scope: 'world', name: 'A2', ids: ['fr', 'de'], updated: 9 } }, removed: { 's2': 7 } };
+  const m = merge(a, b);
+  assert.equal(m.sels.s1.name, 'A2');
+  assert.ok(!m.sels.s2);
+}
+
 console.log('quiz tests passed:', countries.length, 'countries');

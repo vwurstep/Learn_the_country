@@ -477,6 +477,18 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       }
       fitBox(b, padding(), maxZoom);
     },
+    /** fit a hand-picked selection: the union of its places (the world view if they span more
+        than half the globe) */
+    flyToIds(ids) {
+      const bs = ids.map((id) => cur.bboxes.get(id) || (() => {
+        const c = cur.markers.get(id)?.item;
+        return c && [c.lon, c.lat, c.lon, c.lat];  // no shape (tiny places): the capital
+      })()).filter(Boolean);
+      if (!bs.length) return;
+      const box = [Math.min(...bs.map((b) => b[0])), Math.min(...bs.map((b) => b[1])), Math.max(...bs.map((b) => b[2])), Math.max(...bs.map((b) => b[3]))];
+      if (box[2] - box[0] > 180) { map.flyTo({ ...REGION_VIEWS.World, duration: 900 }); return; }
+      fitBox(box, padding(), cur.maxZoom);
+    },
     /** regions: a continent name or a list of them ([] or 'World' = whole world) */
     flyToRegion(regions) {
       const list = (Array.isArray(regions) ? regions : [regions]).filter((r) => REGION_VIEWS[r] && r !== 'World');
