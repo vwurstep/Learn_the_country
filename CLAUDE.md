@@ -125,9 +125,11 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   - **List | Map** switch in the picker (`settings.pickMode`, remembered). In map mode the
     card shrinks to a bar, the map shows only the shapes (no flags or capitals, Phil's
     wish), and a tap adds or removes a place.
-  - Picked places get blue diagonal stripes plus a blue outline: `world-pick-*` and
-    `sub-pick-*` layers, feature-state `pick`, the pattern image `stripes` drawn on a canvas
-    (`styleimagemissing`), and `world.setPicked(ids)`.
+  - Picked places get a thin translucent black cross-hatching plus a dark outline
+    (2026-10-20, Phil's choice over blue stripes). Implemented with `world-pick-*` and
+    `sub-pick-*` layers, feature-state `pick`, and `world.setPicked(ids)`.
+  - The pattern images `hatch-1/2/3` (finer when zoomed out, step on zoom 3 and 6) are
+    drawn on a canvas in `styleimagemissing`.
   - Not for Rivers & lakes.
 - The hard pile row sits at the bottom of the setup card; Phil uses it rarely.
 - **Learn picker:** a single button in the setup ("🇨🇭 Swiss cantons ›") opens `#learn`, a
@@ -165,14 +167,14 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Startup:** everything awaited (data, sub index) comes before `createMap`, and the
   start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
   an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
-- **iOS bottom gap** with the translucent status bar: `fitScreen()` in app.js, the same
-  fix as in the SA app. The map extends by `--app-extra` = screen.height − innerHeight
-  (standalone, portrait, ≤150 px). It is re-measured on resize, on load and when the app
-  returns to the foreground; iOS sometimes reports late. It never shrinks within a session and
-  only calls map.resize() on a real change. **Don't** listen to visualViewport resize and don't
-  extend html/body: on 2026-10-05 that froze the map (map.resize() cancels gestures) and made
-  the layout flip-flop (the reported height reacts to our own change). Phil confirmed it mostly works. If the gap comes back,
-  the settings card shows the measured values (tiny grey line).
+- **iOS bottom gap:** in the home-screen app (standalone, portrait) the map's height is
+  `screen.height` (`--map-h`, `fitScreen` in app.js), whatever iOS reports as the window
+  height.
+  - History: measuring `screen.height − innerHeight` first worked, then broke twice. On
+    2026-10-05 a visualViewport listener froze the map; on 2026-10-20 the gap came back
+    because iOS changes innerHeight later without an event.
+  - `mapInsets()` measures the card against the map's height, not innerHeight.
+  - Never listen to visualViewport resize; `map.resize()` cancels gestures.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.

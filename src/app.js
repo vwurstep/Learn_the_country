@@ -361,7 +361,7 @@ function nextQuestion() {
 /** Free screen area for the map camera: below the tabs (and the deep-dive bar on the map tab),
     above whichever card is open at the bottom. */
 function mapInsets() {
-  const h = innerHeight;
+  const h = $('#map').clientHeight;  // can reach below the window (fitScreen)
   let top = $('#top').getBoundingClientRect().bottom;
   const bar = $('#scope-bar');
   if (getComputedStyle(bar).display !== 'none') top = bar.getBoundingClientRect().bottom;
@@ -757,26 +757,18 @@ async function start() {
 // bar but doesn't make it taller, leaving an empty strip at the bottom. Measure the gap and let
 // the map extend into it (same fix as in the LP_South_Africa app). Only when the quirk is present.
 function fitScreen() {
-  const probe = document.createElement('div');
-  probe.style.cssText = 'position:fixed;top:0;height:0;padding-top:env(safe-area-inset-top);visibility:hidden';
-  document.body.appendChild(probe);
-  const safeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0;
-  probe.remove();
+  // Home-screen app: the map is as tall as the physical screen (screen.height), whatever iOS
+  // reports as the window height. Measuring the gap (screen.height - innerHeight) failed when
+  // iOS changed the window height later without telling the page (gap back on 2026-10-20).
+  // Only touch the map when the value really changes: map.resize() cancels a running pinch/drag.
   const portrait = innerHeight > innerWidth;
-  // In the home-screen app the map reaches down to the physical bottom of the screen.
-  const measured = navigator.standalone && portrait ? Math.max(0, Math.min(150, screen.height - innerHeight)) : 0;
-  // Never shrink within the same screen setup: our own change can make iOS report a taller
-  // window, and reacting to that made the layout flip back and forth (2026-10-05). Only touch
-  // the map when the value really changes: map.resize() cancels a running pinch/drag.
-  const key = `${screen.width}x${screen.height}:${portrait}`;
-  const extra = key === fit.key ? Math.max(fit.extra, measured) : measured;
-  screenInfo = `screen ${screen.height}, window ${innerHeight}, top inset ${safeTop}, standalone ${!!navigator.standalone}, extra ${extra}`;
-  if (key === fit.key && extra === fit.extra) return;
-  fit = { key, extra };
-  document.documentElement.style.setProperty('--app-extra', `${extra}px`);
+  const h = navigator.standalone && portrait ? Math.max(screen.height, innerHeight) : 0;
+  if (h === fitH) return;
+  fitH = h;
+  document.documentElement.style.setProperty('--map-h', h ? `${h}px` : '100%');
   world?.map.resize();
 }
-let fit = { key: '', extra: -1 }, screenInfo = '';
+let fitH = -1;
 addEventListener('resize', fitScreen);
 addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
 // iOS can change the window size when the app comes back from the background without a

@@ -6,17 +6,22 @@ import { flagOf } from './data.js';
 const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
 const WATER = '#2f78c4', NEUTRAL_LAND = '#ece7dc';  // "Rivers & lakes" mode
 const DIMMED = '#e4e7eb';
-const PICK = '#2f6fd6';  // hand-picked places (stripes + outline)
+const PICK = '#1b2430';  // hand-picked places: outline + cross-hatching in translucent black
+// cross-hatch tiles by zoom (css px): finer when zoomed out, so the lines never look heavy
+const HATCH = { 'hatch-1': [5, 0.6], 'hatch-2': [7, 0.8], 'hatch-3': [9, 1] };
 
-/** Diagonal blue stripes on transparent, for the fill-pattern of hand-picked places. */
-function stripes() {
-  const r = Math.min(3, Math.max(1, Math.round(window.devicePixelRatio || 2))), n = 12 * r;
+/** A seamless tile of thin diagonal lines in both directions (translucent black). */
+function hatch(size, width) {
+  const r = Math.min(3, Math.max(1, Math.round(window.devicePixelRatio || 2))), n = size * r;
   const c = document.createElement('canvas');
   c.width = c.height = n;
   const x = c.getContext('2d');
-  x.strokeStyle = 'rgba(47, 111, 214, 0.75)';
-  x.lineWidth = 3.2 * r;
-  for (const o of [-n, 0, n]) { x.beginPath(); x.moveTo(o, n); x.lineTo(o + n, 0); x.stroke(); }
+  x.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+  x.lineWidth = width * r;
+  for (const o of [-n, 0, n]) {  // offsets by a whole tile keep the lines continuous across tiles
+    x.beginPath(); x.moveTo(o, n); x.lineTo(o + n, 0); x.stroke();
+    x.beginPath(); x.moveTo(o, 0); x.lineTo(o + n, n); x.stroke();
+  }
   return { image: x.getImageData(0, 0, n, n), pixelRatio: r };
 }  // about what the dim layer makes of a country's colour
 // fallback land colours (by hash of the id) for shapes without a national colour
@@ -192,13 +197,15 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
           } },
         // deep dive: every other country fades to grey, water and borders included
         { id: 'dim', type: 'fill', source: 'mask', layout: { visibility: 'none' }, paint: { 'fill-color': '#e9ecf0', 'fill-opacity': 0.8 } },
-        // hand-picking on the map: picked places get blue stripes and a blue outline
+        // hand-picking on the map: picked places get a black cross-hatching and outline
         // (feature-state `pick`); one pair per source
         ...['world', 'sub'].flatMap((src) => [
           { id: `${src}-pick-fill`, type: 'fill', source: src, layout: { visibility: src === 'world' ? 'visible' : 'none' },
-            paint: { 'fill-pattern': 'stripes', 'fill-opacity': ['case', ['boolean', ['feature-state', 'pick'], false], 1, 0] } },
+            paint: { 'fill-pattern': ['step', ['zoom'], 'hatch-1', 3, 'hatch-2', 6, 'hatch-3'],
+              'fill-opacity': ['case', ['boolean', ['feature-state', 'pick'], false], 1, 0] } },
           { id: `${src}-pick-line`, type: 'line', source: src, layout: { visibility: src === 'world' ? 'visible' : 'none' },
-            paint: { 'line-color': PICK, 'line-width': 2, 'line-opacity': ['case', ['boolean', ['feature-state', 'pick'], false], 1, 0] } },
+            paint: { 'line-color': PICK, 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.8, 4, 1.4, 8, 2],
+              'line-opacity': ['case', ['boolean', ['feature-state', 'pick'], false], 0.9, 0] } },
         ]),
         // bold outline for selected / quiz-marked places (their fill alone can blend in with a
         // similar colour)
@@ -208,7 +215,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     },
   });
   map.on('styleimagemissing', (e) => {
-    if (e.id === 'stripes' && !map.hasImage('stripes')) { const st = stripes(); map.addImage('stripes', st.image, { pixelRatio: st.pixelRatio }); }
+    if (HATCH[e.id] && !map.hasImage(e.id)) { const h = hatch(...HATCH[e.id]); map.addImage(e.id, h.image, { pixelRatio: h.pixelRatio }); }
   });
   map.touchZoomRotate.disableRotation();
   map.keyboard.disableRotation();
