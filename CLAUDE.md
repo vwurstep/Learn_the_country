@@ -167,14 +167,17 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Startup:** everything awaited (data, sub index) comes before `createMap`, and the
   start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
   an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
-- **iOS bottom gap:** in the home-screen app (standalone, portrait) the map's height is
-  `screen.height` (`--map-h`, `fitScreen` in app.js), whatever iOS reports as the window
-  height.
-  - History: measuring `screen.height − innerHeight` first worked, then broke twice. On
-    2026-10-05 a visualViewport listener froze the map; on 2026-10-20 the gap came back
-    because iOS changes innerHeight later without an event.
-  - `mapInsets()` measures the card against the map's height, not innerHeight.
-  - Never listen to visualViewport resize; `map.resize()` cancels gestures.
+- **Status bar = "default" (opaque), since 2026-10-20.** For three weeks "black-translucent"
+  was used (the map under the clock). In that mode iOS lays home-screen apps out one
+  status-bar height too short, leaving a dark strip at the bottom (59 pt on Phil's iPhone).
+  - Every JS workaround failed sooner or later: measuring the gap, a visualViewport
+    listener that froze the map, sizing the map to screen.height.
+  - With an opaque status bar there is no gap and no hack (`#map { inset: 0 }`). The 2048
+    app uses the same setting.
+  - iOS reads the setting only when the app is added to the home screen, so Phil has to
+    re-add it. **Back up / Restore** in the quiz setup copies the store as a code
+    (`LTC1:` + base64 JSON), and restoring merges it.
+  - Don't go back to black-translucent.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.

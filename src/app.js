@@ -361,7 +361,7 @@ function nextQuestion() {
 /** Free screen area for the map camera: below the tabs (and the deep-dive bar on the map tab),
     above whichever card is open at the bottom. */
 function mapInsets() {
-  const h = $('#map').clientHeight;  // can reach below the window (fitScreen)
+  const h = $('#map').clientHeight;
   let top = $('#top').getBoundingClientRect().bottom;
   const bar = $('#scope-bar');
   if (getComputedStyle(bar).display !== 'none') top = bar.getBoundingClientRect().bottom;
@@ -699,6 +699,23 @@ function wire() {
   $('#territories').onchange = (e) => { set('territories', e.target.checked); showSetup(); };
   $('#reset').onclick = () => { if (confirm('Forget all answer statistics? (The hard pile stays.)')) { store.resetStats(); showSetup(); } };
   $('#start').onclick = () => startQuiz('pool');
+  // progress backup: a text code (stats, hard pile, saved selections) to copy and paste back,
+  // e.g. before re-adding the app to the home screen. Restoring merges, nothing is lost.
+  $('#backup').onclick = async () => {
+    const code = 'LTC1:' + btoa(unescape(encodeURIComponent(JSON.stringify(store.exportData()))));
+    try { await navigator.clipboard.writeText(code); alert('Backup copied. Paste it somewhere safe (e.g. a note), then use Restore to bring it back.'); }
+    catch { prompt('Copy this backup code:', code); }
+  };
+  $('#restore').onclick = () => {
+    const code = prompt('Paste a backup code:')?.trim();
+    if (!code) return;
+    try {
+      if (!code.startsWith('LTC1:')) throw new Error();
+      store.importData(JSON.parse(decodeURIComponent(escape(atob(code.slice(5))))));
+      alert('Progress restored.');
+      showSetup();
+    } catch { alert('That is not a valid backup code.'); }
+  };
   $('#start-pile').onclick = () => startQuiz('pile');
   $('#q-back').onclick = () => { q = null; world.mark({}); world.setMarkers(false); showSetup(); };
   $('#q-options').onclick = (e) => {
@@ -746,39 +763,12 @@ async function start() {
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
   const ready = async () => {
-    fitScreen();
     if (settings.scope !== 'world') { await setScope(settings.scope); scope === 'water' ? world.flyToRegion(settings.regions) : world.flyToSet(); }
     showTab('map');
   };
   world.map.loaded() ? ready() : world.map.once('load', ready);
 }
 
-// iOS home-screen app with a translucent status bar: iOS moves the window up under the status
-// bar but doesn't make it taller, leaving an empty strip at the bottom. Measure the gap and let
-// the map extend into it (same fix as in the LP_South_Africa app). Only when the quirk is present.
-function fitScreen() {
-  // Home-screen app: the map is as tall as the physical screen (screen.height), whatever iOS
-  // reports as the window height. Measuring the gap (screen.height - innerHeight) failed when
-  // iOS changed the window height later without telling the page (gap back on 2026-10-20).
-  // Only touch the map when the value really changes: map.resize() cancels a running pinch/drag.
-  const portrait = innerHeight > innerWidth;
-  const h = navigator.standalone && portrait ? Math.max(screen.height, innerHeight) : 0;
-  if (h === fitH) return;
-  fitH = h;
-  document.documentElement.style.setProperty('--map-h', h ? `${h}px` : '100%');
-  world?.map.resize();
-}
-let fitH = -1;
-addEventListener('resize', fitScreen);
-addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
-// iOS can change the window size when the app comes back from the background without a
-// resize event: measure again then
-const refit = () => { fitScreen(); setTimeout(fitScreen, 300); setTimeout(fitScreen, 1000); };
-document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && refit());
-addEventListener('pageshow', refit);
-fitScreen();
-setTimeout(fitScreen, 500);
-setTimeout(fitScreen, 2000);
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 start();

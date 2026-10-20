@@ -1,6 +1,6 @@
 {
 "files": {
-"./": "ac5b41ee5253",
+"./": "60c355a642a7",
 "./data/colors.json": "a0c04f09420b",
 "./data/countries.json": "0266756648b1",
 "./data/info.json": "046fd6f1b7fe",
@@ -476,18 +476,18 @@
 "./icons/icon-180.png": "13470abdfd0c",
 "./icons/icon-192.png": "3f5130658d0b",
 "./icons/icon-512.png": "2ee42000aa1d",
-"./index.html": "ac5b41ee5253",
+"./index.html": "60c355a642a7",
 "./lib/maplibre-gl.css": "7e27dfc94a21",
 "./lib/maplibre-gl.js": "74bdab1483c1",
-"./manifest.webmanifest": "6be6f6319385",
-"./src/app.js": "dc4919633ef7",
+"./manifest.webmanifest": "b341372da602",
+"./src/app.js": "e5fb3b887464",
 "./src/data.js": "c048ccd464a9",
 "./src/map.js": "1cf67bf13627",
 "./src/quiz.js": "f7911893de08",
 "./src/store.js": "e57a083651de",
-"./src/style.css": "05d14d10b34d",
+"./src/style.css": "74dd783fe24b",
 "./src/sync-github.js": "3136f9e140b4",
 "./src/water.js": "b46a3d56097c"
 },
-"version": "2026-10-20.111034"
+"version": "2026-10-20.112155"
 }
