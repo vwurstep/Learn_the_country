@@ -131,7 +131,8 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   - The pattern images `hatch-1/2/3` (finer when zoomed out, step on zoom 3 and 6) are
     drawn on a canvas in `styleimagemissing`.
   - Not for Rivers & lakes.
-- The hard pile row sits at the bottom of the setup card; Phil uses it rarely.
+- Bottom of the setup card: the hard pile row (Phil uses it rarely), then "Progress: Back up ·
+  Restore" (Phil wants to keep these).
 - **Learn picker:** a single button in the setup ("🇨🇭 Swiss cantons ›") opens `#learn`, a
   searchable list (World first, then deep dives grouped by the parent's continent, with
   counts). Phil plans about 11 deep dives, not 100.
