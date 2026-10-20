@@ -5,7 +5,20 @@ import { flagOf } from './data.js';
 
 const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
 const WATER = '#2f78c4', NEUTRAL_LAND = '#ece7dc';  // "Rivers & lakes" mode
-const DIMMED = '#e4e7eb';  // about what the dim layer makes of a country's colour
+const DIMMED = '#e4e7eb';
+const PICK = '#2f6fd6';  // hand-picked places (stripes + outline)
+
+/** Diagonal blue stripes on transparent, for the fill-pattern of hand-picked places. */
+function stripes() {
+  const r = Math.min(3, Math.max(1, Math.round(window.devicePixelRatio || 2))), n = 12 * r;
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const x = c.getContext('2d');
+  x.strokeStyle = 'rgba(47, 111, 214, 0.75)';
+  x.lineWidth = 3.2 * r;
+  for (const o of [-n, 0, n]) { x.beginPath(); x.moveTo(o, n); x.lineTo(o + n, 0); x.stroke(); }
+  return { image: x.getImageData(0, 0, n, n), pixelRatio: r };
+}  // about what the dim layer makes of a country's colour
 // fallback land colours (by hash of the id) for shapes without a national colour
 const LAND = ['#e8dcb5', '#d5e3b5', '#f0c9a8', '#cfd9c0', '#e9d1d9', '#d8cfe8'];
 const MARK = { sel: '#f2a541', right: '#4caf6a', wrong: '#e0574f', target: '#4caf6a' };
@@ -179,12 +192,23 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
           } },
         // deep dive: every other country fades to grey, water and borders included
         { id: 'dim', type: 'fill', source: 'mask', layout: { visibility: 'none' }, paint: { 'fill-color': '#e9ecf0', 'fill-opacity': 0.8 } },
+        // hand-picking on the map: picked places get blue stripes and a blue outline
+        // (feature-state `pick`); one pair per source
+        ...['world', 'sub'].flatMap((src) => [
+          { id: `${src}-pick-fill`, type: 'fill', source: src, layout: { visibility: src === 'world' ? 'visible' : 'none' },
+            paint: { 'fill-pattern': 'stripes', 'fill-opacity': ['case', ['boolean', ['feature-state', 'pick'], false], 1, 0] } },
+          { id: `${src}-pick-line`, type: 'line', source: src, layout: { visibility: src === 'world' ? 'visible' : 'none' },
+            paint: { 'line-color': PICK, 'line-width': 2, 'line-opacity': ['case', ['boolean', ['feature-state', 'pick'], false], 1, 0] } },
+        ]),
         // bold outline for selected / quiz-marked places (their fill alone can blend in with a
         // similar colour)
         { id: 'mark-line', type: 'line', source: 'world', paint: markLine },
         { id: 'sub-mark-line', type: 'line', source: 'sub', layout: { visibility: 'none' }, paint: markLine },
       ],
     },
+  });
+  map.on('styleimagemissing', (e) => {
+    if (e.id === 'stripes' && !map.hasImage('stripes')) { const st = stripes(); map.addImage('stripes', st.image, { pixelRatio: st.pixelRatio }); }
   });
   map.touchZoomRotate.disableRotation();
   map.keyboard.disableRotation();
@@ -347,6 +371,15 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     map.setFeatureState({ source: cur.source, id }, { mark });
   };
   const clearMarks = () => { for (const x of marked) setMark(x, null); marked = []; };
+  // hand-picked places (feature-state `pick`): only the changes are written
+  let picked = new Set();
+  function setPicked(ids) {
+    const next = new Set(ids || []);
+    const put = (id, on) => { if (cur.bboxes.has(id)) map.setFeatureState({ source: cur.source, id }, { pick: on }); };
+    for (const id of picked) if (!next.has(id)) put(id, false);
+    for (const id of next) if (!picked.has(id)) put(id, true);
+    picked = next;
+  }
 
   // Fit a box [x0, y0, x1, y1] on screen, centred in the padded (free) area. MapLibre's
   // fitBounds drifts on the globe away from the equator (South Africa ended up near the top).
@@ -419,9 +452,10 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       clearMarks();
       selected = null;
       for (const m of cur.markers.values()) { setOn(m.flag, false); setOn(m.cap, false); }
+      setPicked(null);  // (still on the old set's source)
       cur = next;
       if (cur.source === 'sub') map.getSource('sub').setData(cur.geo);
-      for (const l of ['sub-fill', 'sub-border', 'sub-mark-line']) map.setLayoutProperty(l, 'visibility', cur.source === 'sub' ? 'visible' : 'none');
+      for (const l of ['sub-fill', 'sub-border', 'sub-mark-line', 'sub-pick-fill', 'sub-pick-line']) map.setLayoutProperty(l, 'visibility', cur.source === 'sub' ? 'visible' : 'none');
       for (const l of ['w-lakes', 'w-rivers']) map.setLayoutProperty(l, 'visibility', cur.water ? 'visible' : 'none');
       map.setLayoutProperty('dim', 'visibility', cur.parent ? 'visible' : 'none');
       // lakes go on top of land and of states/cantons (whose shapes include their lakes), but
@@ -444,6 +478,8 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       const pad = padding();
       fitBox(full ? cur.extent : cur.core, pad, cur.maxZoom);
     },
+    /** stripe these places (hand-picking on the map); null clears */
+    setPicked,
     /** show all markers (explore) or only some ids (quiz feedback); dots: capital dots only */
     setMarkers(all, onlyIds = null, { dots = false } = {}) { showAll = all; only = onlyIds ? new Set(onlyIds) : null; dotsOnly = dots; relayout(); },
     select(id) {

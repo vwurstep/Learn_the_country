@@ -122,6 +122,12 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   - They're deleted with × in the picker; the places stay active as "Custom · N".
   - Tapping a continent or All clears the pick. Map questions zoom to the picked places
     (`flyToIds`).
+  - **List | Map** switch in the picker (`settings.pickMode`, remembered). In map mode the
+    card shrinks to a bar, the map shows only the shapes (no flags or capitals, Phil's
+    wish), and a tap adds or removes a place.
+  - Picked places get blue diagonal stripes plus a blue outline: `world-pick-*` and
+    `sub-pick-*` layers, feature-state `pick`, the pattern image `stripes` drawn on a canvas
+    (`styleimagemissing`), and `world.setPicked(ids)`.
   - Not for Rivers & lakes.
 - The hard pile row sits at the bottom of the setup card; Phil uses it rarely.
 - **Learn picker:** a single button in the setup ("🇨🇭 Swiss cantons ›") opens `#learn`, a
@@ -156,6 +162,9 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   worker via `postMessage` (`offline-status` / `download`, reply on a MessageChannel) and
   shows "✓ Everything is on this phone". Tested with Chrome offline (Playwright
   `channel: 'chrome'`; WebKit in Playwright has no service workers).
+- **Startup:** everything awaited (data, sub index) comes before `createMap`, and the
+  start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
+  an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
 - **iOS bottom gap** with the translucent status bar: `fitScreen()` in app.js, the same
   fix as in the SA app. The map extends by `--app-extra` = screen.height − innerHeight
   (standalone, portrait, ≤150 px). It is re-measured on resize, on load and when the app

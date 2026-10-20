@@ -224,3 +224,12 @@ html.deep #hint { top: calc(var(--safe-top) + 112px); }
 #pick-saved .saved-row button.del { color: var(--bad); font-size: 20px; padding: 0 6px; }
 .pick-actions { margin-top: 8px; }
 #pick-done:disabled { opacity: 0.4; }
+
+/* picker: list or map */
+.seg { display: inline-flex; align-self: flex-start; padding: 3px; border-radius: 999px; background: rgba(0, 0, 0, 0.06); margin: 2px 0 6px; }
+.seg button { padding: 5px 16px; border-radius: 999px; font-weight: 600; color: var(--muted); font-size: 14px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+#pick-maphint { display: none; margin: 0 0 4px; }
+#pick.mapmode #pick-maphint { display: block; }
+#pick.mapmode #pick-saved, #pick.mapmode #pick-search, #pick.mapmode #pick-list { display: none; }
+#pick.mapmode { max-height: none; }

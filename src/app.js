@@ -20,6 +20,7 @@ const settings = {
   // pickSel[scope] = id of the saved selection that is active (store.selections)
   picks: loadSetting('picks', {}),
   pickSel: loadSetting('pickSel', {}),
+  pickMode: loadSetting('pickMode', 'list'),  // the picker: tick boxes in a list, or tap the map
   waterKinds: loadSetting('waterKinds', ['river', 'lake']),  // "Rivers & lakes" quiz filters
   waterLevel: loadSetting('waterLevel', 3),
 };
@@ -91,6 +92,7 @@ function showTab(t) {
   document.body.className = 'tab-' + t;
   $('#tab-map').setAttribute('aria-selected', t === 'map');
   $('#tab-quiz').setAttribute('aria-selected', t === 'quiz');
+  if (!$('#pick').hidden) leavePick();
   $('#learn').hidden = $('#pick').hidden = true;
   world.setWaterByZoom(t === 'map');
   if (t === 'map') {
@@ -227,6 +229,18 @@ function renderLearnList() {
 let pickDraft = new Set(), pickFrom = null;
 const pickCandidates = () => (scope === 'world' ? data.countries.filter((c) => settings.territories || c.sovereign) : cur().items);
 const pickMatches = (c) => { const t = $('#pick-search').value.trim().toLowerCase(); return !t || nameOf(c).toLowerCase().includes(t); };
+const pickMap = () => !$('#pick').hidden && settings.pickMode === 'map';
+function applyPickMode() {
+  const map = settings.pickMode === 'map';
+  $('#pick').classList.toggle('mapmode', map);
+  for (const b of $('#pick-mode').querySelectorAll('button')) b.setAttribute('aria-pressed', b.dataset.pm === settings.pickMode);
+  $('#pick-maphint').textContent = `Tap ${cur().kinds} on the map to add or remove them.`;
+  // map: just the shapes, picked ones striped (no flags or capitals)
+  world.setMarkers(false);
+  world.setPicked(map ? pickDraft : null);
+  if (map) pickDraft.size ? world.flyToIds([...pickDraft]) : scope === 'world' ? world.flyToRegion(settings.regions) : world.flyToSet();
+}
+function leavePick() { world.setPicked(null); }
 function showPick() {
   // start from what is selected now: the hand-picked places, or what the regions give
   pickDraft = new Set(picksNow() || basePool().map((c) => c.id));
@@ -236,9 +250,11 @@ function showPick() {
   $('#setup').hidden = true;
   $('#pick').hidden = false;
   renderPick();
+  applyPickMode();
 }
 function renderPickCount() {
   $('#pick-count').textContent = `${pickDraft.size} selected`;
+  if (pickMap()) world.setPicked(pickDraft);
   $('#pick-done').disabled = $('#pick-save').disabled = !pickDraft.size;
 }
 function renderPick() {
@@ -264,6 +280,7 @@ function renderPick() {
 }
 
 function showSetup() {
+  if (!$('#pick').hidden) leavePick();
   $('#pick').hidden = true;
   $('#question').hidden = true;
   $('#learn').hidden = true;
@@ -388,6 +405,7 @@ const hint = { recall: '', map: 'Tap it on the map', choice: '' };
 
 function showQuestion() {
   $('#setup').hidden = true;
+  if (!$('#pick').hidden) leavePick();
   $('#learn').hidden = $('#pick').hidden = true;
   const card = $('#question');
   card.hidden = false;
@@ -526,6 +544,11 @@ function answer(correct, chosenId, skipped = false, guess = null) {
 // ---- events -------------------------------------------------------------------------------
 function onMapClick(id, viaMarker, point) {
   if (tab === 'map') { id ? openInfo(id) : closeInfo(); return; }
+  if (pickMap()) {  // hand-picking on the map: a tap adds or removes the place
+    if (!id || !pickCandidates().some((c) => c.id === id)) return;
+    pickDraft.has(id) ? pickDraft.delete(id) : pickDraft.add(id);
+    return renderPick();
+  }
   if (!q || phase !== 'ask' || q.type !== 'map') return;
   if (!id) return;  // tap on the ocean: ignore
   const t = q.target.id;
@@ -623,6 +646,13 @@ function wire() {
     showSetup();
   };
   $('#pick .close').onclick = showSetup;
+  $('#pick-mode').onclick = (e) => {
+    const m = e.target.closest('button')?.dataset.pm;
+    if (!m || m === settings.pickMode) return;
+    set('pickMode', m);
+    applyPickMode();
+    if (m === 'list') renderPick();
+  };
   $('#pick-search').oninput = renderPick;
   $('#pick-all').onclick = () => { for (const c of pickCandidates()) if (pickMatches(c)) pickDraft.add(c.id); renderPick(); };
   $('#pick-none').onclick = () => { for (const c of pickCandidates()) if (pickMatches(c)) pickDraft.delete(c.id); renderPick(); };
@@ -705,20 +735,22 @@ function wire() {
 }
 
 async function start() {
-  data = await loadData();
+  // everything that is awaited comes before the map exists: a 'load' event that fires while
+  // we wait would otherwise be missed, leaving the map without flags until a tab switch
+  [data, subIndex] = await Promise.all([loadData(), loadSubIndex()]);
+  worldSet = { id: 'world', name: 'World', kind: 'country', kinds: 'countries', items: data.countries, byId: data.byId };
   world = createMap($('#map'), {
     countries: data.countries, world: data.world, colors: data.colors, projection: settings.projection, onClick: onMapClick, insets: mapInsets,
   });
-  worldSet = { id: 'world', name: 'World', kind: 'country', kinds: 'countries', items: data.countries, byId: data.byId };
-  subIndex = await loadSubIndex();
   loadWater().then(([, geo]) => world.setWater(geo));  // the lakes of the country map
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
-  world.map.on('load', async () => {
+  const ready = async () => {
     fitScreen();
     if (settings.scope !== 'world') { await setScope(settings.scope); scope === 'water' ? world.flyToRegion(settings.regions) : world.flyToSet(); }
     showTab('map');
-  });
+  };
+  world.map.loaded() ? ready() : world.map.once('load', ready);
 }
 
 // iOS home-screen app with a translucent status bar: iOS moves the window up under the status
