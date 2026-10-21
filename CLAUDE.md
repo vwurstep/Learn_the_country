@@ -179,6 +179,10 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
     re-add it. **Back up / Restore** in the quiz setup copies the store as a code
     (`LTC1:` + base64 JSON), and restoring merges it.
   - Don't go back to black-translucent.
+  - The opaque band takes the page background colour. Since 2026-10-21 that background is
+    the sea (#a9cbe0) so the band blends into the map (Phil found the navy band a strip).
+    `band()` in app.js switches html/body and the theme-color to the dark space colour
+    below zoom 2.4 (the globe with space at the top). The manifest colours are the sea too.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.

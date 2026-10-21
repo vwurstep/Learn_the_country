@@ -14,7 +14,18 @@ ROOT = Path(__file__).resolve().parent.parent
 INCLUDE = ["index.html", "manifest.webmanifest", "src/*.js", "src/*.css", "lib/*", "icons/*.png",
            "data/*.json", "data/*.geojson", "data/sub/*", "flags/*.svg", "flags/sub/*"]
 
+SF_DATALESS = 0x40000000  # macOS: file offloaded to iCloud ("Optimise Mac Storage")
+try:
+    previous = json.loads((ROOT / "files.json").read_text())["files"]
+except Exception:
+    previous = {}
+
 def digest(p):
+    # An offloaded file can't have changed since it was last written, so its hash from the
+    # previous release is still right; reading it would wait for an iCloud download.
+    key = "./" + p.relative_to(ROOT).as_posix()
+    if getattr(p.stat(), "st_flags", 0) & SF_DATALESS and key in previous:
+        return previous[key]
     return hashlib.sha1(p.read_bytes()).hexdigest()[:12]
 
 files = {}

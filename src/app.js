@@ -762,7 +762,19 @@ async function start() {
   loadWater().then(([, geo]) => world.setWater(geo));  // the lakes of the country map
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
+  // iOS status bar band = page background: the sea, or the dark space colour while the
+  // zoomed-out globe leaves space visible at the top of the screen
+  let bandColor = '';
+  const band = () => {
+    const c = world.map.getZoom() < 2.4 ? '#0e1726' : '#a9cbe0';
+    if (c === bandColor) return;
+    bandColor = c;
+    document.documentElement.style.background = document.body.style.background = c;
+    document.querySelector('meta[name="theme-color"]').content = c;
+  };
+  world.map.on('moveend', band);
   const ready = async () => {
+    band();
     if (settings.scope !== 'world') { await setScope(settings.scope); scope === 'water' ? world.flyToRegion(settings.regions) : world.flyToSet(); }
     showTab('map');
   };

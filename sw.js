@@ -2,7 +2,7 @@
    it works offline. files.json (written by tools/release.py) lists every file with a content
    hash; on an update only files whose hash changed are downloaded, the rest is copied from the
    previous cache. CACHE is stamped by tools/release.py; old caches are deleted on activate. */
-var CACHE = 'ltc-2026-10-20.124406';
+var CACHE = 'ltc-2026-10-21.075452';
 
 function manifest() {
   return fetch('./files.json', { cache: 'no-store' }).then(function (r) {
