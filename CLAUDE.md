@@ -161,7 +161,9 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   with a content hash per file. `tools/release.py` writes files.json.
   - **An update downloads only files whose hash changed** and copies the rest from the
     previous cache (tested: one changed flag means one download).
-  - Always run release.py before pushing, or phones won't get the new files. The settings card (Quiz → Sync & offline…) asks the
+  - Always run release.py before pushing, or phones won't get the new files.
+  - iCloud may offload files of this folder ("dataless"); release.py then reuses their
+    previous hash instead of reading them, which would block on a download. The settings card (Quiz → Sync & offline…) asks the
   worker via `postMessage` (`offline-status` / `download`, reply on a MessageChannel) and
   shows "✓ Everything is on this phone". Tested with Chrome offline (Playwright
   `channel: 'chrome'`; WebKit in Playwright has no service workers).
