@@ -547,5 +547,15 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       map.flyTo({ center, zoom, duration: 900 });
     },
     setProjection(type) { map.setProjection({ type }); relayout(); },
+    /** Is the top edge of the screen off the globe (space)? Five points along the top edge are
+        cast at the planet; space wins when most of them miss. The iOS status-bar band (page
+        background) follows this. The flat map never shows space: MapLibre keeps the world
+        covering the viewport, and the globe draws its pole caps, so no latitude check. */
+    topIsSpace() {
+      const t = map.transform;
+      let off = 0;
+      for (let i = 1; i <= 5; i++) if (!t.isPointOnMapSurface(new maplibregl.Point(t.width * i / 6, 1))) off++;
+      return off >= 3;
+    },
   };
 }

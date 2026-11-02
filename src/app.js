@@ -557,6 +557,8 @@ function onMapClick(id, viaMarker, point) {
   answer(hit, hit ? t : id);
 }
 
+let band = () => {};  // recolours the status-bar band (set up in main, used by the globe toggle)
+
 function wire() {
   $('#tab-map').onclick = () => showTab('map');
   $('#tab-quiz').onclick = () => showTab('quiz');
@@ -568,6 +570,7 @@ function wire() {
   $('#btn-globe').onclick = () => {
     set('projection', settings.projection === 'globe' ? 'mercator' : 'globe');
     world.setProjection(settings.projection);
+    band();
   };
   $('#info .close').onclick = closeInfo;
   $('#info .explore').onclick = async () => {
@@ -762,17 +765,21 @@ async function start() {
   loadWater().then(([, geo]) => world.setWater(geo));  // the lakes of the country map
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
-  // iOS status bar band = page background: the sea, or the dark space colour while the
-  // zoomed-out globe leaves space visible at the top of the screen
+  // iOS status bar band = page background. The bar is opaque, so the page colour should match
+  // what the map draws right under it: the sea, or the dark space colour when the top edge of
+  // the screen is off the globe. Measured from the camera (map.topIsSpace), not guessed from the
+  // zoom: on a phone the zoomed-out globe is much wider than the screen, so at zoom 2 the top
+  // edge is usually still ocean (2026-11-02: a dark band over a map of Africa).
   let bandColor = '';
-  const band = () => {
-    const c = world.map.getZoom() < 2.4 ? '#0e1726' : '#a9cbe0';
+  band = () => {
+    const c = world.topIsSpace() ? '#0e1726' : '#a9cbe0';
     if (c === bandColor) return;
     bandColor = c;
     document.documentElement.style.background = document.body.style.background = c;
     document.querySelector('meta[name="theme-color"]').content = c;
   };
-  world.map.on('moveend', band);
+  world.map.on('move', band);
+  world.map.on('resize', band);
   const ready = async () => {
     band();
     if (settings.scope !== 'world') { await setScope(settings.scope); scope === 'water' ? world.flyToRegion(settings.regions) : world.flyToSet(); }

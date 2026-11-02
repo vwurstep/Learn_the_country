@@ -183,8 +183,13 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   - Don't go back to black-translucent.
   - The opaque band takes the page background colour. Since 2026-10-21 that background is
     the sea (#a9cbe0) so the band blends into the map (Phil found the navy band a strip).
-    `band()` in app.js switches html/body and the theme-color to the dark space colour
-    below zoom 2.4 (the globe with space at the top). The manifest colours are the sea too.
+    `band()` in app.js switches html/body and the theme-color to the dark space colour when
+    the top edge of the screen is off the globe (`world.topIsSpace()`: five points along the
+    top edge ray-cast with MapLibre's `isPointOnMapSurface`). Until 2026-11-02 it guessed from
+    the zoom (dark below 2.4), which painted the band black over a zoomed-in flat map or a
+    globe wider than the phone. Never guess the band from the zoom again; the flat map never
+    shows space (MapLibre keeps the world covering the viewport). The manifest colours are the
+    sea too.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.
