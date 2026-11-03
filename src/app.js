@@ -725,7 +725,9 @@ function wire() {
     const lvh = probe.offsetHeight; probe.remove();
     const mapR = $('#map').getBoundingClientRect(), bodyR = document.body.getBoundingClientRect();
     const safeTop = parseFloat(getComputedStyle($('#top')).top) - 10;
-    $('#diag').textContent = `Layout: screen ${screen.width}×${screen.height}, window ${innerWidth}×${innerHeight}, `
+    const bar = !navigator.standalone ? 'Safari' : safeTop > 0 ? 'translucent ✓ (the map runs under the clock)'
+      : 'opaque: to get the map under the clock, back up, delete the app, open the site in Safari, reload it twice and add it to the home screen again';
+    $('#diag').textContent = `Status bar: ${bar}. Layout: screen ${screen.width}×${screen.height}, window ${innerWidth}×${innerHeight}, `
       + `visual ${Math.round(visualViewport?.height ?? 0)}, 100lvh ${lvh}, safe top ${Math.round(safeTop)}, `
       + `body ${Math.round(bodyR.top)}…${Math.round(bodyR.bottom)}, map ${Math.round(mapR.top)}…${Math.round(mapR.bottom)}, `
       + `scroll ${Math.round(scrollY)}, standalone ${!!navigator.standalone}, `

@@ -25,6 +25,10 @@ html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: non
   html { height: min(100lvh, calc(100% + env(safe-area-inset-top, 0px))); }
 }
 body { position: relative; }
+/* faint shade under the status bar so the white clock stays readable on the light sea (as in
+   the SA app); only where the page runs under the bar (safe-top > 0, translucent install) */
+body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; z-index: 3; pointer-events: none;
+  height: calc(var(--safe-top) * 1.35); background: linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.12) 70%, rgba(0, 0, 0, 0)); }
 button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
 #map { position: absolute; inset: 0; }
 .glass { background: var(--glass); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);

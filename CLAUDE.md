@@ -170,32 +170,28 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Startup:** everything awaited (data, sub index) comes before `createMap`, and the
   start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
   an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
-- **Status bar: the page colour follows the map (2026-11-03).** Phil wants the map to fill the
-  screen with no band, neither black nor blue.
-  - History. Until 10-20 the bar was "black-translucent" and the map was drawn under the clock,
-    but iOS 26 laid the app out one status-bar height too short (WebKit bug 301108): a black
-    strip at the bottom, and every JS workaround (measuring screen.height − innerHeight, a
-    visualViewport listener, sizing the map to screen.height) broke sooner or later. From
-    10-20 to 11-03 the bar was opaque ("default") and its colour was guessed from the zoom,
-    which painted it black over most views.
-  - Since iOS 26.1 a home-screen app can't draw under the status bar at all: even with
-    "black-translucent" the bar sits above the page and takes the page colour (Apple's reply on
-    WebKit bug 317153; the top safe-area inset is 0). Phil confirmed on 11-03: no strip at the
-    top or bottom, the bar in the page colour. So the band is unavoidable; the best is a band
-    in the map's own colour.
-  - `watchTopColor` in map.js reads the row 1 px below the top edge with `gl.readPixels` inside
-    the 'render' event (throttled to 150 ms, plus once after each moveend) and reports the
-    dominant colour (16-level bins, averaged; transparent = space). `band()` in app.js paints
-    html/body and theme-color with it: sea over the ocean, the national tint over a big
-    country, the dark space colour when the globe's edge is off the top. Not guessed from the
-    zoom (the 10-21 bug: on a phone the zoomed-out globe is wider than the screen).
-  - `topIsSpace()` (five rays along the top edge, `isPointOnMapSurface`) stays as a fallback.
-  - index.html keeps "black-translucent" and style.css the standalone rule
-    `html { height: min(100lvh, calc(100% + env(safe-area-inset-top))) }` (frappe-ui PR 1284)
-    with every panel `position: absolute` in `body { position: relative }`: harmless on
-    26.1+ (inset 0) and the right layout on an iOS that still draws under the bar.
-  - iOS reads the status-bar meta only when the app is added to the home screen; removing the
-    app deletes its localStorage, so Back up / Restore (quiz setup, bottom) first.
+- **Status bar: "black-translucent", the map under the clock (2026-11-03).** Phil wants the map
+  to fill the screen with no band. Phil's iPhone runs **iOS 18.7** (not 26).
+  - iOS reads the status-bar meta only when the app is added to the home screen, and
+    removing the app deletes its localStorage: Back up / Restore (quiz setup, bottom) first.
+    When adding, Safari may still serve the old index.html from its service worker: reload
+    twice before adding. The "Status bar: …" line at the bottom of the quiz setup says which
+    kind the install has (opaque → re-add).
+  - History. Until 10-20 the bar was translucent and iOS laid the app out one status-bar
+    height too short (window 793 on an 852 screen): a strip at the bottom, patched by JS that
+    measured the gap and broke repeatedly. From 10-20 to 11-03 the bar was opaque ("default"),
+    and its colour (the page background) was guessed from the zoom: black over most views.
+    On 11-03 the install was still the opaque one (safe top 0 in the Layout line), which cost
+    a day of wrong theories (iOS 26.1 scrims) before the screenshots showed it.
+  - Now: `html { height: min(100lvh, calc(100% + env(safe-area-inset-top))) }` in standalone
+    mode (style.css) grows the page by exactly the missing height, capped at the whole screen;
+    every panel is `position: absolute` in `body { position: relative }` so it follows the
+    page. `body::before` is a faint dark gradient under the clock (as in the SA app).
+  - `watchTopColor` in map.js reads the row 1 px below the top edge with `gl.readPixels`
+    inside 'render' (throttled 150 ms, plus once per moveend) and reports the dominant colour;
+    `band()` in app.js paints html/body and theme-color with it. It matters only for an
+    opaque install (and Safari's bar), where the bar takes the page colour. `topIsSpace()`
+    (five rays, `isPointOnMapSurface`) is the fallback. Never guess the band from the zoom.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.
