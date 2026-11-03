@@ -725,13 +725,14 @@ function wire() {
     const lvh = probe.offsetHeight; probe.remove();
     const mapR = $('#map').getBoundingClientRect(), bodyR = document.body.getBoundingClientRect();
     const safeTop = parseFloat(getComputedStyle($('#top')).top) - 10;
-    const bar = !navigator.standalone ? 'Safari' : safeTop > 0 ? 'translucent ✓ (the map runs under the clock)'
-      : 'opaque: to get the map under the clock, back up, delete the app, open the site in Safari, reload it twice and add it to the home screen again';
+    // (no iOS version: Safari freezes the one in the user agent, Phil's 26.6.2 said "18_7")
+    const bar = !navigator.standalone ? 'Safari' : safeTop > 0 ? `the page runs under the clock ✓ (safe top ${Math.round(safeTop)})`
+      : 'the page starts below the clock (safe top 0). To get the map under the clock: back up, delete the app, open the site in Safari, reload it twice, add it to the home screen again';
     $('#diag').textContent = `Status bar: ${bar}. Layout: screen ${screen.width}×${screen.height}, window ${innerWidth}×${innerHeight}, `
       + `visual ${Math.round(visualViewport?.height ?? 0)}, 100lvh ${lvh}, safe top ${Math.round(safeTop)}, `
       + `body ${Math.round(bodyR.top)}…${Math.round(bodyR.bottom)}, map ${Math.round(mapR.top)}…${Math.round(mapR.bottom)}, `
       + `scroll ${Math.round(scrollY)}, standalone ${!!navigator.standalone}, `
-      + `${matchMedia('(display-mode: standalone)').matches ? 'media standalone' : 'media browser'}, ${navigator.userAgent.match(/OS (\d+_\d+)/)?.[1]?.replace('_', '.') ?? '?'}`;
+      + `${matchMedia('(display-mode: standalone)').matches ? 'media standalone' : 'media browser'}`;
   };
   diag();
   addEventListener('resize', diag);

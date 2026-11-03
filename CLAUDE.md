@@ -171,7 +171,8 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
   an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
 - **Status bar: "black-translucent", the map under the clock (2026-11-03).** Phil wants the map
-  to fill the screen with no band. Phil's iPhone runs **iOS 18.7** (not 26).
+  to fill the screen with no band. Phil's iPhone 15 runs **iOS 26.6.2** (the user agent says 18_7: Safari freezes it, never
+  read the iOS version from it).
   - iOS reads the status-bar meta only when the app is added to the home screen, and
     removing the app deletes its localStorage: Back up / Restore (quiz setup, bottom) first.
     When adding, Safari may still serve the old index.html from its service worker: reload
