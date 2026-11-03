@@ -184,6 +184,9 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
     and its colour (the page background) was guessed from the zoom: black over most views.
     On 11-03 the install was still the opaque one (safe top 0 in the Layout line), which cost
     a day of wrong theories (iOS 26.1 scrims) before the screenshots showed it.
+  - Confirmed on 11-03 after a clean re-add (Safari reloaded twice first): "the page runs under
+    the clock ✓ (safe top 59)", window 393×852 = the whole screen, no strip anywhere. On iOS
+    26.6.2 the short-viewport bug is gone (window = screen), so the CSS below is a safety net.
   - Now: `html { height: min(100lvh, calc(100% + env(safe-area-inset-top))) }` in standalone
     mode (style.css) grows the page by exactly the missing height, capped at the whole screen;
     every panel is `position: absolute` in `body { position: relative }` so it follows the
