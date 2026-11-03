@@ -765,14 +765,18 @@ async function start() {
   loadWater().then(([, geo]) => world.setWater(geo));  // the lakes of the country map
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
-  // iOS status bar band = page background. The bar is opaque, so the page colour should match
-  // what the map draws right under it: the sea, or the dark space colour when the top edge of
-  // the screen is off the globe. Measured from the camera (map.topIsSpace), not guessed from the
-  // zoom: on a phone the zoomed-out globe is much wider than the screen, so at zoom 2 the top
-  // edge is usually still ocean (2026-11-02: a dark band over a map of Africa).
+  // iOS status bar band. With the translucent status bar (index.html) the map is drawn under
+  // the clock and there is no band; the page background stays the sea. An app added to the
+  // home screen before 2026-11-03 still has the opaque bar, which takes the page colour: then
+  // the page follows what the map draws right under the bar, the sea or the dark space colour
+  // when the top edge of the screen is off the globe. Measured from the camera (map.topIsSpace),
+  // not guessed from the zoom: on a phone the zoomed-out globe is much wider than the screen,
+  // so at zoom 2 the top edge is usually still ocean (2026-11-02: a dark band over Africa).
+  // Opaque bar = no top safe-area inset (#top sits at safe-top + 10px).
   let bandColor = '';
   band = () => {
-    const c = world.topIsSpace() ? '#0e1726' : '#a9cbe0';
+    const opaqueBar = parseFloat(getComputedStyle($('#top')).top) - 10 < 1;
+    const c = opaqueBar && world.topIsSpace() ? '#0e1726' : '#a9cbe0';
     if (c === bandColor) return;
     bandColor = c;
     document.documentElement.style.background = document.body.style.background = c;

@@ -7,9 +7,11 @@
   <meta name="theme-color" content="#a9cbe0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <!-- "default" (an opaque status bar band), not "black-translucent": in translucent mode iOS lays
-       home-screen apps out one status-bar height too short, leaving a strip at the bottom -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <!-- translucent: the map fills the whole screen, under the clock. iOS 26 then lays the
+       home-screen app out one status-bar height too short (WebKit bug 301108); style.css grows
+       the page by env(safe-area-inset-top) to compensate. iOS reads this only when the app is
+       added to the home screen. -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Countries">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-180.png">

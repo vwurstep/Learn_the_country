@@ -11,33 +11,43 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-/* the background also colours the iOS status bar band: the sea (app.js switches it to the dark
-   space colour while the zoomed-out globe shows space at the top) */
+/* The page is exactly the screen. Everything is positioned absolutely inside body (not fixed),
+   so the panels follow the page, not the viewport iOS reports.
+   Home-screen app with a translucent status bar on iOS 26: the viewport is one status-bar height
+   too short (WebKit bug 301108) and would leave a dark strip at the bottom. The page grows by
+   env(safe-area-inset-top), which is exactly that height, capped at the large viewport (100lvh,
+   the whole screen) so a correct iOS doesn't get a scrollable page. No JS, no measuring.
+   The background is the sea, so a strip, should one ever remain, blends in; with an opaque status
+   bar (older install) app.js colours the bar via the page background and theme-color. */
 html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: #a9cbe0; color: var(--ink);
   font: 16px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+@media (display-mode: standalone) {
+  html { height: min(100lvh, calc(100% + env(safe-area-inset-top, 0px))); }
+}
+body { position: relative; }
 button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
-#map { position: fixed; inset: 0; }
+#map { position: absolute; inset: 0; }
 .glass { background: var(--glass); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18); }
 [hidden] { display: none !important; }
 body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
 
 /* ---- top tabs ---- */
-#top { position: fixed; top: calc(var(--safe-top) + 10px); left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 20; }
+#top { position: absolute; top: calc(var(--safe-top) + 10px); left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 20; }
 .tabs { pointer-events: auto; display: flex; padding: 4px; border-radius: 999px; }
 .tabs button { padding: 7px 22px; border-radius: 999px; font-weight: 600; color: var(--muted); }
 .tabs button[aria-selected="true"] { background: var(--ink); color: #fff; }
 
-#side { position: fixed; right: 12px; top: calc(var(--safe-top) + 64px); display: flex; flex-direction: column; gap: 10px; z-index: 4; }
+#side { position: absolute; right: 12px; top: calc(var(--safe-top) + 64px); display: flex; flex-direction: column; gap: 10px; z-index: 4; }
 .round { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; }
 #btn-flags[aria-pressed="false"] { color: var(--muted); }
 #btn-flags[aria-pressed="false"] svg { opacity: 0.45; }
 #btn-flags[aria-pressed="true"] { color: var(--accent); }
-#hint { position: fixed; left: 50%; transform: translateX(-50%); top: calc(var(--safe-top) + 64px); padding: 6px 14px; border-radius: 999px;
+#hint { position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--safe-top) + 64px); padding: 6px 14px; border-radius: 999px;
   font-size: 13px; color: var(--muted); z-index: 3; white-space: nowrap; }
 
 /* ---- cards ---- */
-.card { background: var(--card) !important; position: fixed; left: 10px; right: 10px; bottom: calc(var(--safe-bottom) + 10px); max-width: 520px; margin: 0 auto;
+.card { background: var(--card) !important; position: absolute; left: 10px; right: 10px; bottom: calc(var(--safe-bottom) + 10px); max-width: 520px; margin: 0 auto;
   border-radius: var(--radius); padding: 14px 16px; z-index: 6; max-height: 72vh; overflow-y: auto;
   max-height: min(72vh, calc(100% - var(--safe-top) - var(--safe-bottom) - 80px)); }
 .card h2 { margin: 0 0 6px; font-size: 20px; }
@@ -141,7 +151,7 @@ body.tab-map .only-quiz, body.tab-quiz .only-map { display: none !important; }
 .label .hint { text-transform: none; letter-spacing: 0; font-weight: 400; }
 
 /* deep dive (states / cantons) */
-#scope-bar { display: none; position: fixed; left: 12px; top: calc(var(--safe-top) + 64px); z-index: 4; border-radius: 999px;
+#scope-bar { display: none; position: absolute; left: 12px; top: calc(var(--safe-top) + 64px); z-index: 4; border-radius: 999px;
   padding: 4px 14px 4px 4px; align-items: center; gap: 8px; font-size: 14px; max-width: calc(100% - 80px); }
 html.deep body.tab-map #scope-bar { display: flex; }
 #scope-bar .back { background: var(--ink); color: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 600; white-space: nowrap; flex: none; }

@@ -170,26 +170,28 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Startup:** everything awaited (data, sub index) comes before `createMap`, and the
   start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
   an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
-- **Status bar = "default" (opaque), since 2026-10-20.** For three weeks "black-translucent"
-  was used (the map under the clock). In that mode iOS lays home-screen apps out one
-  status-bar height too short, leaving a dark strip at the bottom (59 pt on Phil's iPhone).
-  - Every JS workaround failed sooner or later: measuring the gap, a visualViewport
-    listener that froze the map, sizing the map to screen.height.
-  - With an opaque status bar there is no gap and no hack (`#map { inset: 0 }`). The 2048
-    app uses the same setting.
-  - iOS reads the setting only when the app is added to the home screen, so Phil has to
-    re-add it. **Back up / Restore** in the quiz setup copies the store as a code
-    (`LTC1:` + base64 JSON), and restoring merges it.
-  - Don't go back to black-translucent.
-  - The opaque band takes the page background colour. Since 2026-10-21 that background is
-    the sea (#a9cbe0) so the band blends into the map (Phil found the navy band a strip).
-    `band()` in app.js switches html/body and the theme-color to the dark space colour when
-    the top edge of the screen is off the globe (`world.topIsSpace()`: five points along the
-    top edge ray-cast with MapLibre's `isPointOnMapSurface`). Until 2026-11-02 it guessed from
-    the zoom (dark below 2.4), which painted the band black over a zoomed-in flat map or a
-    globe wider than the phone. Never guess the band from the zoom again; the flat map never
-    shows space (MapLibre keeps the world covering the viewport). The manifest colours are the
-    sea too.
+- **Status bar = "black-translucent" again, since 2026-11-03: the map fills the whole screen.**
+  Phil wants no band at all, neither black nor blue.
+  - iOS 26 lays a home-screen app with a translucent bar out one status-bar height too short
+    (WebKit bug 301108), which left a black strip at the bottom (59 pt on Phil's iPhone). From
+    2026-10-01 to 10-20 JS workarounds measured the gap (screen.height − innerHeight, a
+    visualViewport listener, sizing the map to screen.height) and each broke sooner or later.
+    From 10-20 to 11-03 the bar was opaque ("default"); its colour came from the page
+    background and was guessed from the zoom, which painted it black over most views.
+  - Now CSS only (style.css): in `(display-mode: standalone)` the html height is
+    `min(100lvh, calc(100% + env(safe-area-inset-top)))`. The top inset is exactly the missing
+    height; 100lvh (the whole screen) caps it on an iOS without the bug. Every panel is
+    `position: absolute` inside `body { position: relative }`, not fixed, so it follows the
+    page and the cards sit at the real bottom. Same fix as frappe-ui PR 1284.
+  - iOS 26.1+ draws a dark gradient over the status bar area of translucent apps (can't be
+    turned off from the page), so the clock stays readable over the map.
+  - iOS reads the setting only when the app is added to the home screen: Phil must Back up
+    (quiz setup, bottom), delete the app, re-add it and Restore. Removing the app deletes its
+    localStorage.
+  - `band()` in app.js is kept for an old opaque install (top inset 0): there the page
+    background and theme-color follow what the map draws under the bar, measured with
+    `world.topIsSpace()` (five rays along the top edge, `isPointOnMapSurface`), never guessed
+    from the zoom. With the translucent bar the background stays the sea.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.
