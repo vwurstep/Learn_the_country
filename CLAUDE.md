@@ -176,8 +176,9 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
   - iOS reads the status-bar meta only when the app is added to the home screen, and
     removing the app deletes its localStorage: Back up / Restore (quiz setup, bottom) first.
     When adding, Safari may still serve the old index.html from its service worker: reload
-    twice before adding. The "Status bar: …" line at the bottom of the quiz setup says which
-    kind the install has (opaque → re-add).
+    twice before adding. To check which kind an install has, measure `env(safe-area-inset-top)` in
+    the app (0 = opaque, 59 = translucent); a temporary "Layout:" line in the quiz setup did
+    that on 11-03 and was removed afterwards (see git history).
   - History. Until 10-20 the bar was translucent and iOS laid the app out one status-bar
     height too short (window 793 on an 852 screen): a strip at the bottom, patched by JS that
     measured the gap and broke repeatedly. From 10-20 to 11-03 the bar was opaque ("default"),

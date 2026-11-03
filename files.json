@@ -1,6 +1,6 @@
 {
 "files": {
-"./": "82fc584ee33b",
+"./": "e689c4ce8ede",
 "./data/colors.json": "a0c04f09420b",
 "./data/countries.json": "0266756648b1",
 "./data/info.json": "046fd6f1b7fe",
@@ -476,11 +476,11 @@
 "./icons/icon-180.png": "13470abdfd0c",
 "./icons/icon-192.png": "3f5130658d0b",
 "./icons/icon-512.png": "2ee42000aa1d",
-"./index.html": "82fc584ee33b",
+"./index.html": "e689c4ce8ede",
 "./lib/maplibre-gl.css": "7e27dfc94a21",
 "./lib/maplibre-gl.js": "74bdab1483c1",
 "./manifest.webmanifest": "90b051897149",
-"./src/app.js": "37f4261d773a",
+"./src/app.js": "1d94d6072e0c",
 "./src/data.js": "c048ccd464a9",
 "./src/map.js": "a2282fbbcac9",
 "./src/quiz.js": "f7911893de08",
@@ -489,5 +489,5 @@
 "./src/sync-github.js": "3136f9e140b4",
 "./src/water.js": "b46a3d56097c"
 },
-"version": "2026-11-03.150328"
+"version": "2026-11-03.154624"
 }
