@@ -716,6 +716,24 @@ function wire() {
       showSetup();
     } catch { alert('That is not a valid backup code.'); }
   };
+  // layout diagnostics at the bottom of the setup (iOS status-bar / bottom-strip work, 2026-11-03):
+  // the numbers that decide where iOS puts the page on the screen
+  const diag = () => {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;visibility:hidden;height:100lvh;width:0';
+    document.body.appendChild(probe);
+    const lvh = probe.offsetHeight; probe.remove();
+    const mapR = $('#map').getBoundingClientRect(), bodyR = document.body.getBoundingClientRect();
+    const safeTop = parseFloat(getComputedStyle($('#top')).top) - 10;
+    $('#diag').textContent = `Layout: screen ${screen.width}×${screen.height}, window ${innerWidth}×${innerHeight}, `
+      + `visual ${Math.round(visualViewport?.height ?? 0)}, 100lvh ${lvh}, safe top ${Math.round(safeTop)}, `
+      + `body ${Math.round(bodyR.top)}…${Math.round(bodyR.bottom)}, map ${Math.round(mapR.top)}…${Math.round(mapR.bottom)}, `
+      + `scroll ${Math.round(scrollY)}, standalone ${!!navigator.standalone}, `
+      + `${matchMedia('(display-mode: standalone)').matches ? 'media standalone' : 'media browser'}, ${navigator.userAgent.match(/OS (\d+_\d+)/)?.[1]?.replace('_', '.') ?? '?'}`;
+  };
+  diag();
+  addEventListener('resize', diag);
+  $('#tab-quiz')?.addEventListener('click', () => setTimeout(diag, 300));
   $('#start-pile').onclick = () => startQuiz('pile');
   $('#q-back').onclick = () => { q = null; world.mark({}); world.setMarkers(false); showSetup(); };
   $('#q-options').onclick = (e) => {
