@@ -170,28 +170,32 @@ on his phone (iPhone), installed from GitHub Pages like `../Phils_2048` and
 - **Startup:** everything awaited (data, sub index) comes before `createMap`, and the
   start-up code runs on `map.loaded() ? ready() : once('load')`. A 'load' that fired during
   an await was missed (2026-10-20 bug), leaving the map without flags until a tab switch.
-- **Status bar = "black-translucent" again, since 2026-11-03: the map fills the whole screen.**
-  Phil wants no band at all, neither black nor blue.
-  - iOS 26 lays a home-screen app with a translucent bar out one status-bar height too short
-    (WebKit bug 301108), which left a black strip at the bottom (59 pt on Phil's iPhone). From
-    2026-10-01 to 10-20 JS workarounds measured the gap (screen.height − innerHeight, a
-    visualViewport listener, sizing the map to screen.height) and each broke sooner or later.
-    From 10-20 to 11-03 the bar was opaque ("default"); its colour came from the page
-    background and was guessed from the zoom, which painted it black over most views.
-  - Now CSS only (style.css): in `(display-mode: standalone)` the html height is
-    `min(100lvh, calc(100% + env(safe-area-inset-top)))`. The top inset is exactly the missing
-    height; 100lvh (the whole screen) caps it on an iOS without the bug. Every panel is
-    `position: absolute` inside `body { position: relative }`, not fixed, so it follows the
-    page and the cards sit at the real bottom. Same fix as frappe-ui PR 1284.
-  - iOS 26.1+ draws a dark gradient over the status bar area of translucent apps (can't be
-    turned off from the page), so the clock stays readable over the map.
-  - iOS reads the setting only when the app is added to the home screen: Phil must Back up
-    (quiz setup, bottom), delete the app, re-add it and Restore. Removing the app deletes its
-    localStorage.
-  - `band()` in app.js is kept for an old opaque install (top inset 0): there the page
-    background and theme-color follow what the map draws under the bar, measured with
-    `world.topIsSpace()` (five rays along the top edge, `isPointOnMapSurface`), never guessed
-    from the zoom. With the translucent bar the background stays the sea.
+- **Status bar: the page colour follows the map (2026-11-03).** Phil wants the map to fill the
+  screen with no band, neither black nor blue.
+  - History. Until 10-20 the bar was "black-translucent" and the map was drawn under the clock,
+    but iOS 26 laid the app out one status-bar height too short (WebKit bug 301108): a black
+    strip at the bottom, and every JS workaround (measuring screen.height − innerHeight, a
+    visualViewport listener, sizing the map to screen.height) broke sooner or later. From
+    10-20 to 11-03 the bar was opaque ("default") and its colour was guessed from the zoom,
+    which painted it black over most views.
+  - Since iOS 26.1 a home-screen app can't draw under the status bar at all: even with
+    "black-translucent" the bar sits above the page and takes the page colour (Apple's reply on
+    WebKit bug 317153; the top safe-area inset is 0). Phil confirmed on 11-03: no strip at the
+    top or bottom, the bar in the page colour. So the band is unavoidable; the best is a band
+    in the map's own colour.
+  - `watchTopColor` in map.js reads the row 1 px below the top edge with `gl.readPixels` inside
+    the 'render' event (throttled to 150 ms, plus once after each moveend) and reports the
+    dominant colour (16-level bins, averaged; transparent = space). `band()` in app.js paints
+    html/body and theme-color with it: sea over the ocean, the national tint over a big
+    country, the dark space colour when the globe's edge is off the top. Not guessed from the
+    zoom (the 10-21 bug: on a phone the zoomed-out globe is wider than the screen).
+  - `topIsSpace()` (five rays along the top edge, `isPointOnMapSurface`) stays as a fallback.
+  - index.html keeps "black-translucent" and style.css the standalone rule
+    `html { height: min(100lvh, calc(100% + env(safe-area-inset-top))) }` (frappe-ui PR 1284)
+    with every panel `position: absolute` in `body { position: relative }`: harmless on
+    26.1+ (inset 0) and the right layout on an iOS that still draws under the bar.
+  - iOS reads the status-bar meta only when the app is added to the home screen; removing the
+    app deletes its localStorage, so Back up / Restore (quiz setup, bottom) first.
 - **Map questions:** a tap counts if it lands on the target, within 10 px of its shape,
   or within 18 px of its capital. That makes microstates without a polygon answerable.
   Taps on the ocean are ignored.

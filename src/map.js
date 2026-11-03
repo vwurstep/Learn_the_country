@@ -4,6 +4,7 @@
 import { flagOf } from './data.js';
 
 const OCEAN = '#a9cbe0', SPACE = '#0e1726', BORDER = '#ffffff';
+const SPACE_RGB = [0x0e, 0x17, 0x26];
 const WATER = '#2f78c4', NEUTRAL_LAND = '#ece7dc';  // "Rivers & lakes" mode
 const DIMMED = '#e4e7eb';
 const PICK = '#1b2430';  // hand-picked places: outline + cross-hatching in translucent black
@@ -139,7 +140,7 @@ function outlineMask(geo) {
   return { type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: [[world, ...outer], ...enclaves.map((r) => [r])] } };
 }
 
-export function createMap(el, { countries, world, colors = {}, projection = 'globe', onClick, insets }) {
+export function createMap(el, { countries, world, colors = {}, projection = 'globe', onClick, insets, onTopColor }) {
   for (const f of world.features) {
     const nat = colors[f.properties.id]?.c;
     f.properties.col = nat ? tint(nat) : LAND[hash(f.properties.id) % LAND.length];
@@ -220,6 +221,7 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
   map.touchZoomRotate.disableRotation();
   map.keyboard.disableRotation();
   el.style.background = SPACE;
+  if (onTopColor) watchTopColor(map, onTopColor);
 
   // ---- sets ------------------------------------------------------------------------------
   // A set is what the map shows markers for and answers taps with: the world's countries, or
@@ -548,9 +550,9 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
     },
     setProjection(type) { map.setProjection({ type }); relayout(); },
     /** Is the top edge of the screen off the globe (space)? Five points along the top edge are
-        cast at the planet; space wins when most of them miss. The iOS status-bar band (page
-        background) follows this. The flat map never shows space: MapLibre keeps the world
-        covering the viewport, and the globe draws its pole caps, so no latitude check. */
+        cast at the planet; space wins when most of them miss. Fallback for topColor when the
+        pixels can't be read. The flat map never shows space: MapLibre keeps the world covering
+        the viewport, and the globe draws its pole caps, so no latitude check. */
     topIsSpace() {
       const t = map.transform;
       let off = 0;
@@ -558,4 +560,46 @@ export function createMap(el, { countries, world, colors = {}, projection = 'glo
       return off >= 3;
     },
   };
+}
+
+/** The colour the map draws along the top edge of the screen, as '#rrggbb', reported to
+    onTopColor whenever it changes. The iOS status bar sits above the page and takes the page
+    colour (iOS 26.1+ no longer draws the page under it), so the page is painted this colour and
+    the bar continues the map: sea over the ocean, the land tint over a big country, the dark
+    space colour when the globe's edge is off the top. The dominant colour of the row 1 px below
+    the top edge (quantised to 16 levels, then averaged), not the mean: a blend of sea and land
+    is a colour the map never shows. Read with gl.readPixels inside the 'render' event, the
+    only time the frame is still in the drawing buffer (preserveDrawingBuffer is off), at most
+    every 150 ms plus once after every movement ends, so the last frame is never missed. */
+function watchTopColor(map, onTopColor) {
+  const canvas = map.getCanvas();
+  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+  if (!gl) return;
+  let last = 0, force = true, prev = '';
+  map.on('render', () => {
+    const now = performance.now();
+    if (!force && now - last < 150) return;
+    last = now; force = false;
+    const w = canvas.width, dpr = Math.max(1, Math.round(window.devicePixelRatio || 1));
+    const y = Math.max(0, canvas.height - 1 - dpr);  // GL rows run bottom-up
+    const px = new Uint8Array(w * 4);
+    try { gl.readPixels(0, y, w, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); } catch { return; }
+    const bins = new Map();
+    for (let i = 0; i < w * 4; i += 4 * dpr) {
+      // transparent = nothing drawn there: space (the element background under the canvas)
+      const [r, g, bl] = px[i + 3] < 128 ? SPACE_RGB : [px[i], px[i + 1], px[i + 2]];
+      const k = (r >> 4) << 8 | (g >> 4) << 4 | (bl >> 4);
+      const b = bins.get(k) || (bins.set(k, { n: 0, r: 0, g: 0, b: 0 }), bins.get(k));
+      b.n++; b.r += r; b.g += g; b.b += bl;
+    }
+    let top = null;
+    for (const b of bins.values()) if (!top || b.n > top.n) top = b;
+    if (!top) return;
+    const hex = '#' + [top.r, top.g, top.b].map((v) => Math.round(v / top.n).toString(16).padStart(2, '0')).join('');
+    if (hex === prev) return;
+    prev = hex;
+    onTopColor(hex);
+  });
+  map.on('moveend', () => { force = true; map.triggerRepaint(); });
+  map.on('resize', () => { force = true; map.triggerRepaint(); });
 }

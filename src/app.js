@@ -557,8 +557,6 @@ function onMapClick(id, viaMarker, point) {
   answer(hit, hit ? t : id);
 }
 
-let band = () => {};  // recolours the status-bar band (set up in main, used by the globe toggle)
-
 function wire() {
   $('#tab-map').onclick = () => showTab('map');
   $('#tab-quiz').onclick = () => showTab('quiz');
@@ -570,7 +568,6 @@ function wire() {
   $('#btn-globe').onclick = () => {
     set('projection', settings.projection === 'globe' ? 'mercator' : 'globe');
     world.setProjection(settings.projection);
-    band();
   };
   $('#info .close').onclick = closeInfo;
   $('#info .explore').onclick = async () => {
@@ -759,33 +756,22 @@ async function start() {
   // we wait would otherwise be missed, leaving the map without flags until a tab switch
   [data, subIndex] = await Promise.all([loadData(), loadSubIndex()]);
   worldSet = { id: 'world', name: 'World', kind: 'country', kinds: 'countries', items: data.countries, byId: data.byId };
+  // iOS status bar = page colour (since iOS 26.1 the bar sits above the page even with the
+  // translucent style; nothing is drawn under it). The page follows the colour the map draws
+  // along the top edge of the screen (watchTopColor in map.js), so the bar continues the map.
+  // theme-color colours Safari's bar the same way.
+  const band = (c) => {
+    document.documentElement.style.background = document.body.style.background = c;
+    document.querySelector('meta[name="theme-color"]').content = c;
+  };
   world = createMap($('#map'), {
     countries: data.countries, world: data.world, colors: data.colors, projection: settings.projection, onClick: onMapClick, insets: mapInsets,
+    onTopColor: band,
   });
   loadWater().then(([, geo]) => world.setWater(geo));  // the lakes of the country map
   window.__app = { data, world, store, setScope };  // for debugging / screenshots
   wire();
-  // iOS status bar band. With the translucent status bar (index.html) the map is drawn under
-  // the clock and there is no band; the page background stays the sea. An app added to the
-  // home screen before 2026-11-03 still has the opaque bar, which takes the page colour: then
-  // the page follows what the map draws right under the bar, the sea or the dark space colour
-  // when the top edge of the screen is off the globe. Measured from the camera (map.topIsSpace),
-  // not guessed from the zoom: on a phone the zoomed-out globe is much wider than the screen,
-  // so at zoom 2 the top edge is usually still ocean (2026-11-02: a dark band over Africa).
-  // Opaque bar = no top safe-area inset (#top sits at safe-top + 10px).
-  let bandColor = '';
-  band = () => {
-    const opaqueBar = parseFloat(getComputedStyle($('#top')).top) - 10 < 1;
-    const c = opaqueBar && world.topIsSpace() ? '#0e1726' : '#a9cbe0';
-    if (c === bandColor) return;
-    bandColor = c;
-    document.documentElement.style.background = document.body.style.background = c;
-    document.querySelector('meta[name="theme-color"]').content = c;
-  };
-  world.map.on('move', band);
-  world.map.on('resize', band);
   const ready = async () => {
-    band();
     if (settings.scope !== 'world') { await setScope(settings.scope); scope === 'water' ? world.flyToRegion(settings.regions) : world.flyToSet(); }
     showTab('map');
   };
